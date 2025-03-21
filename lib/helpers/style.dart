@@ -25,3 +25,9 @@ FontWeight semiBold = FontWeight.w600;
 FontWeight medium = FontWeight.w500;
 FontWeight normal = FontWeight.normal;
 FontWeight light = FontWeight.w300;
+
+BoxShadow defaultShadow = BoxShadow(
+  color: Colors.black.withOpacity(0.1),
+  blurRadius: 20,
+  offset: const Offset(0, 3),
+);
