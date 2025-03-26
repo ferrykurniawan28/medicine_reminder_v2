@@ -1,0 +1,2 @@
+D:/uni/flutter/medicine_reminder/android/app/.cxx/Debug/5x1h2x1w/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/uni/flutter/medicine_reminder/android/app/.cxx/Debug/5x1h2x1w/armeabi-v7a/CMakeFiles/rebuild_cache.dir

@@ -7,16 +7,22 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
+  awesome_dialog: ^3.2.1
   bloc: ^9.0.0
   dio: ^5.8.0+1
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.0
   flutter_carousel_widget: ^3.1.0
   flutter_modular: ^6.3.4
   intl: ^0.20.2
+  meta: ^1.16.0
   percent_indicator: ^4.2.4
+  popup_menu_plus: ^0.0.6
   shared_preferences: ^2.5.2
+  shimmer: ^3.0.0
+  syncfusion_flutter_calendar: ^28.2.12
 
 dev_dependencies:
   flutter_test:

@@ -13,6 +13,15 @@ class AppRoute extends Module {
     r.child('/', child: (_) => const Splash());
     r.child('/boarding', child: (_) => const Onboarding());
     r.child('/home', child: (_) => const MainPage());
+    r.child(
+      '/device/:deviceId',
+      child: (_) => Device(deviceId: int.parse(r.args.params['deviceId']!)),
+    );
+    r.child(
+      '/parental/:groupId',
+      child: (_) =>
+          GroupDetailPage(groupId: int.parse(r.args.params['groupId']!)),
+    );
     r.module('/auth', module: AuthRoutes());
   }
 }
