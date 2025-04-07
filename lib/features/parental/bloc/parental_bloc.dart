@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:medicine_reminder/features/parental/models/models.dart';
+import 'package:medicine_reminder/models/models.dart';
 
 part 'parental_event.dart';
 part 'parental_state.dart';

@@ -21,7 +21,7 @@ class _GroupPageState extends State<GroupDetailPage> {
       builder: (context, state) {
         if (state is ParentalLoaded) {
           Group group = state.parental;
-          List<UserGroup> userGroup = group.users;
+          List<User> userGroup = group.users;
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: defaultAppBar(
@@ -42,7 +42,7 @@ class _GroupPageState extends State<GroupDetailPage> {
                   return ListTile(
                     leading: const Icon(Icons.person),
                     title: Text(userGroup[index].userName),
-                    trailing: userGroup[index].role == UserGroupRole.admin
+                    trailing: userGroup[index].role == UserRole.admin
                         ? const Text('Admin')
                         : const Text('Member'),
                     onTap: () {

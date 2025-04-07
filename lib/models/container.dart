@@ -48,16 +48,6 @@ class ContainerModel extends Equatable {
     );
   }
 
-  // Add this helper function
-  bool listEquals<T>(List<T>? a, List<T>? b) {
-    if (a == null) return b == null;
-    if (b == null || a.length != b.length) return false;
-    for (int i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
-  }
-
   @override
   List<Object?> get props =>
       [id, deviceId, containerId, medicineName, quantity];

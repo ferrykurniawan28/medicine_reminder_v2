@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:medicine_reminder/features/appointment/bloc/appointment_bloc.dart';
-import 'package:medicine_reminder/features/device/bloc/device_bloc.dart';
-import 'package:medicine_reminder/features/parental/bloc/parental_bloc.dart';
+import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/routes/routes.dart';
 
 void main() {
@@ -21,6 +19,7 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => DeviceBloc()),
         BlocProvider(create: (context) => ParentalBloc()),
         BlocProvider(create: (context) => AppointmentBloc()),
+        BlocProvider(create: (context) => ReminderBloc()),
       ],
       child: MaterialApp.router(
         routeInformationParser: Modular.routeInformationParser,

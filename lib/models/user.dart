@@ -1,21 +1,21 @@
 part of 'models.dart';
 
-class UserGroup {
+class User {
   final int userId;
   final String userName;
-  final UserGroupRole role;
+  final UserRole? role;
 
-  UserGroup({
+  User({
     required this.userId,
     required this.userName,
-    required this.role,
+    this.role,
   });
 
-  factory UserGroup.fromJson(Map<String, dynamic> json) {
-    return UserGroup(
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
       userId: json['userId'],
       userName: json['userName'],
-      role: UserGroupRole.values[json['role']],
+      role: UserRole.values[json['role']],
     );
   }
 
@@ -23,24 +23,24 @@ class UserGroup {
     return {
       'userId': userId,
       'userName': userName,
-      'role': role.index,
+      'role': role?.index,
     };
   }
 
-  UserGroup copyWith({
+  User copyWith({
     int? userId,
     String? userName,
-    UserGroupRole? role,
+    UserRole? role,
   }) {
-    return UserGroup(
+    return User(
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
-      role: role ?? this.role,
+      role: role,
     );
   }
 }
 
-enum UserGroupRole {
+enum UserRole {
   admin,
   member,
 }

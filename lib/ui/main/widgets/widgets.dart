@@ -1,11 +1,23 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
-import 'package:medicine_reminder/features/device/models/models.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_modular/flutter_modular.dart' show Modular;
+import 'package:intl/intl.dart';
+import 'package:medicine_reminder/features/features.dart';
+import 'package:medicine_reminder/models/doctor.dart';
+import 'package:medicine_reminder/models/models.dart';
+import 'package:popup_menu_plus/popup_menu_plus.dart';
 
 import '../../../helpers/helpers.dart';
 
 part 'appbar.dart';
 part 'medication.dart';
 part 'card_reminder.dart';
-part 'appointment.dart';
-part 'your_device.dart';
+part 'appointment/appointment.dart';
+part 'appointment/select_date_time.dart';
+part 'appointment/doctor_input_field.dart';
+part 'appointment/add_appointment.dart';
+part 'appointment/edit_appointment.dart';
+part 'device/add_medicine.dart';

@@ -1,12 +1,41 @@
 part of 'widgets.dart';
 
-class CardReminder extends StatelessWidget {
+class CardReminder extends StatefulWidget {
+  final Reminder reminder;
   const CardReminder({
     super.key,
+    required this.reminder,
   });
 
   @override
+  State<CardReminder> createState() => _CardReminderState();
+}
+
+class _CardReminderState extends State<CardReminder> {
+  @override
   Widget build(BuildContext context) {
+    String reminderType;
+    switch (widget.reminder.type) {
+      case ReminderType.onceDaily:
+        reminderType = 'Once Daily';
+        break;
+      case ReminderType.twiceDaily:
+        reminderType = 'Twice Daily';
+        break;
+      case ReminderType.multipleTimesDaily:
+        reminderType = 'Multiple Times Daily';
+        break;
+      case ReminderType.interval:
+        reminderType = 'Interval';
+        break;
+      case ReminderType.specificDays:
+        reminderType = 'Specific Days';
+        break;
+      case ReminderType.cyclic:
+        reminderType = 'Cyclic';
+        break;
+    }
+
     return Container(
       // height: 100,
       width: double.infinity,
@@ -37,15 +66,15 @@ class CardReminder extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Paracetamol',
+                  widget.reminder.medicineName,
                   style: subtitleTextStyle,
                 ),
                 Text(
-                  '1 Tablet before meal',
+                  'Dosage: ${widget.reminder.dosage}',
                   style: captionTextStyle,
                 ),
                 Text(
-                  'Left: 2',
+                  'Left: ${widget.reminder.medicineLeft}',
                   style: bodyTextStyle,
                 )
               ],
@@ -70,24 +99,22 @@ class CardReminder extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      RichText(
-                        text: TextSpan(
-                          text: '10:00',
-                          style: subtitleTextStyle.copyWith(
-                            color: Colors.black,
+                      Text(
+                        DateFormat.jm().format(
+                          DateTime(
+                            0,
+                            0,
+                            0,
+                            widget.reminder.times[0].hour,
+                            widget.reminder.times[0].minute,
                           ),
-                          children: [
-                            TextSpan(
-                              text: ' AM',
-                              style: subtitleTextStyle.copyWith(
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                        ),
+                        style: subtitleTextStyle.copyWith(
+                          color: Colors.black,
                         ),
                       ),
                       Text(
-                        'Mon, Tue, Wed, Thu, Fri, asjdfkaj',
+                        reminderType,
                         style: captionTextStyle.copyWith(
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -100,11 +127,19 @@ class CardReminder extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 2, // 20% of the Row
+            flex: 2,
             child: Switch(
-              value: true,
+              value: widget.reminder.isActive,
               onChanged: (bool value) {
-                // Handle on/off toggle
+                setState(() {
+                  widget.reminder.isActive = value;
+                });
+                context.read<ReminderBloc>().add(
+                      UpdateReminderStatus(
+                        widget.reminder.id!,
+                        value,
+                      ),
+                    );
               },
             ),
           ),

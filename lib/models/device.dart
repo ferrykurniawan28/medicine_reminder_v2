@@ -91,21 +91,19 @@ class DeviceModel extends Equatable {
       [id, uuid, currentState, temperature, humidity, containers];
 }
 
-List<DeviceModel> dummyDevice = [
-  DeviceModel(
-    id: 1,
-    uuid: '123e4567-e89b-12d3-a456-426614174000',
-    currentState: 1,
-    temperature: 25,
-    humidity: 60,
-    containers: List.generate(
-        5,
-        (index) => ContainerModel(
-              id: index,
-              deviceId: 1,
-              containerId: index + 1,
-              medicineName: null,
-              quantity: null,
-            )),
-  )
-];
+DeviceModel dummyDevice = DeviceModel(
+  id: 1,
+  uuid: '123e4567-e89b-12d3-a456-426614174000',
+  currentState: 1,
+  temperature: 25,
+  humidity: 60,
+  containers: List.generate(
+      5,
+      (index) => ContainerModel(
+            id: index,
+            deviceId: 1,
+            containerId: index + 1,
+            medicineName: null,
+            quantity: null,
+          )),
+);

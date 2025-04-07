@@ -10,18 +10,7 @@ sealed class DeviceState extends Equatable {
 
 final class DeviceInitial extends DeviceState {}
 
-final class DeviceListLoading extends DeviceState {}
-
 final class DeviceLoading extends DeviceState {}
-
-final class DevicesLoaded extends DeviceState {
-  final List<DeviceModel> devices;
-
-  const DevicesLoaded(this.devices);
-
-  @override
-  List<Object> get props => [devices];
-}
 
 final class DeviceLoaded extends DeviceState {
   final DeviceModel device;

@@ -1,8 +1,7 @@
 part of '../main.dart';
 
 class Device extends StatefulWidget {
-  final int deviceId;
-  const Device({super.key, required this.deviceId});
+  const Device({super.key});
 
   @override
   State<Device> createState() => _DeviceState();
@@ -12,23 +11,19 @@ class _DeviceState extends State<Device> {
   @override
   void initState() {
     super.initState();
-    context.read<DeviceBloc>().add(DeviceFetch(widget.deviceId));
+    if (context.read<DeviceBloc>().device == null) {
+      context.read<DeviceBloc>().add(DeviceFetch(1));
+    } else {
+      context.read<DeviceBloc>().add(DeviceRefresh());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: defaultAppBar('Device',
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              Modular.to.pop();
-              context.read<DeviceBloc>().add(const DevicesFetch(1));
-            },
-          ),
-          actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.settings))
-          ]),
+      appBar: defaultAppBar('Device', actions: [
+        IconButton(onPressed: () {}, icon: const Icon(Icons.settings))
+      ]),
       backgroundColor: Colors.white,
       body: RefreshIndicator(
         onRefresh: () async {
@@ -86,7 +81,7 @@ class _DeviceState extends State<Device> {
                       style: captionTextStyle,
                     ),
                     onTap: () {
-                      // poopUpMenuContainer(context, container, key);
+                      poopUpMenuContainer(context, container, key);
                     },
                   );
                 },
@@ -95,7 +90,7 @@ class _DeviceState extends State<Device> {
               return ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: 5, // Placeholder shimmer items
+                itemCount: 5,
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Shimmer.fromColors(
@@ -128,8 +123,16 @@ class _DeviceState extends State<Device> {
                   );
                 },
               );
+            } else if (state is DeviceError) {
+              return Center(
+                child: Text(
+                  state.message,
+                  style: bodyTextStyle,
+                ),
+              );
+            } else {
+              return const Text('No data available');
             }
-            return const SizedBox();
           }),
         ]),
       ),

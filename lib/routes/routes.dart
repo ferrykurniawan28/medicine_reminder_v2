@@ -15,7 +15,7 @@ class AppRoute extends Module {
     r.child('/home', child: (_) => const MainPage());
     r.child(
       '/device/:deviceId',
-      child: (_) => Device(deviceId: int.parse(r.args.params['deviceId']!)),
+      child: (_) => const Device(),
     );
     r.child(
       '/parental/:groupId',

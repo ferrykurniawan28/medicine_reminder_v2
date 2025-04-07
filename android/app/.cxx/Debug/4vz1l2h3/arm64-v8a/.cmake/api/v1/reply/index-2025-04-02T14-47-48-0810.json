@@ -8,10 +8,10 @@
 		},
 		"paths" : 
 		{
-			"cmake" : "C:/Users/safer/AppData/Local/Android/Sdk/cmake/3.22.1/bin/cmake.exe",
-			"cpack" : "C:/Users/safer/AppData/Local/Android/Sdk/cmake/3.22.1/bin/cpack.exe",
-			"ctest" : "C:/Users/safer/AppData/Local/Android/Sdk/cmake/3.22.1/bin/ctest.exe",
-			"root" : "C:/Users/safer/AppData/Local/Android/Sdk/cmake/3.22.1/share/cmake-3.22"
+			"cmake" : "D:/Android/Sdk/cmake/3.22.1/bin/cmake.exe",
+			"cpack" : "D:/Android/Sdk/cmake/3.22.1/bin/cpack.exe",
+			"ctest" : "D:/Android/Sdk/cmake/3.22.1/bin/ctest.exe",
+			"root" : "D:/Android/Sdk/cmake/3.22.1/share/cmake-3.22"
 		},
 		"version" : 
 		{
@@ -26,7 +26,7 @@
 	"objects" : 
 	[
 		{
-			"jsonFile" : "codemodel-v2-8802042263dd15ec8862.json",
+			"jsonFile" : "codemodel-v2-9853b2ba36a69e351634.json",
 			"kind" : "codemodel",
 			"version" : 
 			{
@@ -35,7 +35,7 @@
 			}
 		},
 		{
-			"jsonFile" : "cache-v2-f0b0a17836e77f3fb226.json",
+			"jsonFile" : "cache-v2-e00755ecd8e41b81102f.json",
 			"kind" : "cache",
 			"version" : 
 			{
@@ -44,7 +44,7 @@
 			}
 		},
 		{
-			"jsonFile" : "cmakeFiles-v1-fbcbc3cc0ceea2b383cf.json",
+			"jsonFile" : "cmakeFiles-v1-68cf9f6aa2bf4ce6a56c.json",
 			"kind" : "cmakeFiles",
 			"version" : 
 			{
@@ -59,7 +59,7 @@
 		{
 			"cache-v2" : 
 			{
-				"jsonFile" : "cache-v2-f0b0a17836e77f3fb226.json",
+				"jsonFile" : "cache-v2-e00755ecd8e41b81102f.json",
 				"kind" : "cache",
 				"version" : 
 				{
@@ -69,7 +69,7 @@
 			},
 			"cmakeFiles-v1" : 
 			{
-				"jsonFile" : "cmakeFiles-v1-fbcbc3cc0ceea2b383cf.json",
+				"jsonFile" : "cmakeFiles-v1-68cf9f6aa2bf4ce6a56c.json",
 				"kind" : "cmakeFiles",
 				"version" : 
 				{
@@ -79,7 +79,7 @@
 			},
 			"codemodel-v2" : 
 			{
-				"jsonFile" : "codemodel-v2-8802042263dd15ec8862.json",
+				"jsonFile" : "codemodel-v2-9853b2ba36a69e351634.json",
 				"kind" : "codemodel",
 				"version" : 
 				{

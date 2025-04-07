@@ -13,7 +13,7 @@ class _MainPageState extends State<MainPage> {
     const Home(),
     const Appointment(),
     const ListGroup(),
-    const ListDevice(),
+    const Device(),
   ];
   @override
   Widget build(BuildContext context) {
