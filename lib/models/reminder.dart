@@ -6,7 +6,7 @@ class Reminder {
   final int? userId;
   final int? containerId;
   final String medicineName;
-  final int dosage;
+  final List<int> dosage;
   final int? medicineLeft;
   bool isActive;
   bool isAlert;
@@ -48,7 +48,7 @@ class Reminder {
       userId: json['userId'] as int?,
       containerId: json['containerId'] as int?,
       medicineName: json['medicineName'] as String,
-      dosage: json['dosage'] as int? ?? 0,
+      dosage: (json['dosage'] as List<dynamic>).map((e) => e as int).toList(),
       medicineLeft: json['medicineLeft'] as int?,
       isActive: json['isActive'] as bool,
       isAlert: json['isAlert'] as bool? ?? false,
@@ -97,7 +97,7 @@ class Reminder {
     int? userId,
     int? containerId,
     String? medicineName,
-    int? dosage,
+    List<int>? dosage,
     int? medicineLeft,
     bool? isActive,
     bool? isAlert,
@@ -130,7 +130,7 @@ class Reminder {
       userId: deleteUserId ? null : userId ?? this.userId,
       containerId: deleteContainerId ? null : containerId ?? this.containerId,
       medicineName: medicineName ?? this.medicineName,
-      dosage: deleteDosage ? 0 : (dosage ?? this.dosage),
+      dosage: deleteDosage ? [] : dosage ?? this.dosage,
       medicineLeft:
           deleteMedicineLeft ? null : medicineLeft ?? this.medicineLeft,
       isActive: isActive ?? this.isActive,
@@ -220,7 +220,7 @@ List<Reminder> dummyReminders = [
     userId: 1,
     containerId: 1,
     medicineName: 'Paracetamol',
-    dosage: 1,
+    dosage: [1],
     medicineLeft: 10,
     isActive: true,
     note: 'Take medication',
@@ -238,7 +238,7 @@ List<Reminder> dummyReminders = [
     userId: 1,
     containerId: 1,
     medicineName: 'Ibuprofen',
-    dosage: 2,
+    dosage: [2],
     medicineLeft: 5,
     isActive: false,
     note: 'Check blood pressure',

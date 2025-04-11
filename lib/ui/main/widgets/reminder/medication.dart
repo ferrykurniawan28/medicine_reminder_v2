@@ -24,10 +24,7 @@ class AddReminderContent extends StatefulWidget {
 class _AddReminderContentState extends State<AddReminderContent> {
   final List<Widget> _pages = [];
   int? containerIndex;
-  int dose = 1;
-  TimeOfDay selectedTime = const TimeOfDay(hour: 08, minute: 00);
-  ReminderType? reminderType;
-  bool isCriticalAlertEnabled = false;
+  int? optionIndex;
 
   @override
   void initState() {
@@ -134,70 +131,28 @@ class _AddReminderContentState extends State<AddReminderContent> {
         CupertinoListTile(
           title: const Text('Once Daily'),
           onTap: () {
-            reminderType = ReminderType.onceDaily;
-            _pushPage(OnceDailyPage(
+            _pushPage(OnceTwiceDailyPage(
               container: container,
-              initialTime: selectedTime,
-              dose: dose,
-              isCriticalAlertEnabled: isCriticalAlertEnabled,
-              onTimeChanged: (time) => setState(() => selectedTime = time),
-              onCriticalAlertChanged: (value) =>
-                  setState(() => isCriticalAlertEnabled = value),
-              onDoseChanged: (value) => setState(() => dose = value),
-              onSave: () {
-                final newReminder = Reminder(
-                  containerId: container.containerId,
-                  times: [selectedTime],
-                  type: reminderType!,
-                  dosage: dose,
-                  medicineName: container.medicineName!,
-                  medicineLeft: container.quantity,
-                  isAlert: isCriticalAlertEnabled,
-                );
-                context.read<ReminderBloc>().add(AddReminder(
-                      newReminder,
-                    ));
-                Modular.to.pop();
-              },
+              isOnce: true,
             ));
           },
         ),
         CupertinoListTile(
           title: const Text('Twice Daily'),
           onTap: () {
-            reminderType = ReminderType.twiceDaily;
-            // _pushPage(_buildOnceDailyPage(container)); // reuse for now
+            _pushPage(OnceTwiceDailyPage(
+              container: container,
+              isOnce: false,
+            ));
           },
         ),
         CupertinoListTile(
           title: const Text('More options...'),
-          onTap: () => _pushPage(_buildMoreOptionsPage()),
+          onTap: () => _pushPage(MoreOptionsPage(
+            container: container,
+          )),
         ),
       ],
-    );
-  }
-
-  Widget _buildMoreOptionsPage() {
-    return CupertinoListSection.insetGrouped(
-      header: const Text('More Options'),
-      children: [
-        _moreOptionTile(
-            ReminderType.multipleTimesDaily, 'Multiple times daily'),
-        _moreOptionTile(ReminderType.intervalhours, 'Interval hours'),
-        _moreOptionTile(ReminderType.intervaldays, 'Interval days'),
-        _moreOptionTile(ReminderType.specificDays, 'Specific days'),
-      ],
-    );
-  }
-
-  Widget _moreOptionTile(ReminderType type, String label) {
-    return CupertinoListTile(
-      title: Text(label),
-      onTap: () {
-        // reminderType = type;
-        // _pushPage(_buildOnceDailyPage(
-        //     context.read<DeviceBloc>().device!.containers[containerIndex!]));
-      },
     );
   }
 

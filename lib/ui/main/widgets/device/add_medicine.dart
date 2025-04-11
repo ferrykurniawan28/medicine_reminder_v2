@@ -22,6 +22,15 @@ class _MedicineFormState extends State<_MedicineForm> {
   final formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    medicineNameController.text = widget.container.medicineName ?? '';
+    dosageController.text = (widget.container.quantity != null)
+        ? widget.container.quantity.toString()
+        : '';
+    super.initState();
+  }
+
+  @override
   void dispose() {
     medicineNameController.dispose();
     dosageController.dispose();
@@ -104,25 +113,6 @@ class _MedicineFormState extends State<_MedicineForm> {
   }
 }
 
-void selectDialog(BuildContext ctx, ContainerModel container) {
-  AwesomeDialog(
-    context: ctx,
-    dialogType: DialogType.noHeader,
-    animType: AnimType.scale,
-    title: 'Container ${container.id! + 1}',
-    desc: 'What would you like to do?',
-    btnCancelText: 'Reset',
-    btnOkText: 'Refill',
-    btnCancelOnPress: () {
-      resetDialog(ctx, container);
-    },
-    btnOkOnPress: () {
-      // Handle update action
-      print('Update action selected');
-    },
-  ).show();
-}
-
 void resetDialog(BuildContext ctx, ContainerModel container) {
   AwesomeDialog(
     context: ctx,
@@ -140,23 +130,6 @@ void resetDialog(BuildContext ctx, ContainerModel container) {
   ).show();
 }
 
-void refillDialog(BuildContext ctx, ContainerModel container) {
-  AwesomeDialog(
-    context: ctx,
-    dialogType: DialogType.info,
-    animType: AnimType.scale,
-    title: 'Refill Container',
-    desc: 'How many items would you like to refill?',
-    btnCancelText: 'Cancel',
-    btnOkText: 'Refill',
-    btnCancelOnPress: () {},
-    btnOkOnPress: () {
-      // Handle refill action
-      // print('Refill action selected');
-    },
-  ).show();
-}
-
 void poopUpMenuContainer(
     BuildContext ctx, ContainerModel container, GlobalKey key) {
   final RenderBox? renderBox =
@@ -164,13 +137,13 @@ void poopUpMenuContainer(
   if (renderBox == null) return; // Prevent crashes
 
   final Offset offset = renderBox.localToGlobal(Offset.zero);
-  final double popupHeight = 0; // Estimated popup height (adjust as needed)
+  const double popupHeight = 0;
 
   PopupMenu menu = PopupMenu(
     context: ctx,
     config: const MenuConfig(
-      backgroundColor: Colors.green,
-      lineColor: Colors.greenAccent,
+      backgroundColor: Colors.blue,
+      // lineColor: Colors.greenAccent,
       highlightColor: Colors.lightGreenAccent,
     ),
     items: [
@@ -179,21 +152,15 @@ void poopUpMenuContainer(
         image: const Icon(Icons.refresh),
       ),
       PopUpMenuItem(
-        title: 'Change',
-        image: const Icon(Icons.edit),
-      ),
-      PopUpMenuItem(
-        title: 'Refill',
-        image: const Icon(Icons.add),
+        title: 'Add/Refill',
+        image: const Icon(Icons.add_circle_outline),
       ),
     ],
     onClickMenu: (PopUpMenuItemProvider item) {
       if (item.menuTitle == 'Reset') {
         resetDialog(ctx, container);
-      } else if (item.menuTitle == 'Change') {
+      } else if (item.menuTitle == 'Add/Refill') {
         addMedicine(ctx, container);
-      } else if (item.menuTitle == 'Refill') {
-        refillDialog(ctx, container);
       }
     },
   );

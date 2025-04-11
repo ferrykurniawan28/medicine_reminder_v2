@@ -73,11 +73,14 @@ class _CardReminderState extends State<CardReminder> {
                   style: subtitleTextStyle,
                 ),
                 Text(
-                  'Dosage: ${widget.reminder.dosage}',
-                  style: captionTextStyle,
+                  'Dosage: ${widget.reminder.dosage.join(', ')}',
+                  style: captionTextStyle.copyWith(
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  maxLines: 1,
                 ),
                 Text(
-                  'Left: ${widget.reminder.medicineLeft}',
+                  'Left: ${widget.reminder.medicineLeft ?? 'Empty'}',
                   style: bodyTextStyle,
                 )
               ],
@@ -103,18 +106,22 @@ class _CardReminderState extends State<CardReminder> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        DateFormat.jm().format(
-                          DateTime(
-                            0,
-                            0,
-                            0,
-                            widget.reminder.times[0].hour,
-                            widget.reminder.times[0].minute,
-                          ),
-                        ),
+                        widget.reminder.times
+                            .map((time) => DateFormat.jm().format(
+                                  DateTime(
+                                    0,
+                                    0,
+                                    0,
+                                    time.hour,
+                                    time.minute,
+                                  ),
+                                ))
+                            .join(', '),
                         style: subtitleTextStyle.copyWith(
                           color: Colors.black,
+                          overflow: TextOverflow.ellipsis,
                         ),
+                        maxLines: 1,
                       ),
                       Text(
                         reminderType,
