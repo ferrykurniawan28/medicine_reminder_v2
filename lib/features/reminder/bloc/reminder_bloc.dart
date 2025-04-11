@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/models/models.dart';
 
 part 'reminder_event.dart';
@@ -44,9 +45,14 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
   Future<void> _addReminder(
       AddReminder event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
+    // TODO: Uncomment when reminder repository is available
+    final newReminder = event.reminder.copyWith(
+        // deviceId: context.read<DeviceBloc>().device?.id,
+        // userId: context.read<UserBloc>().user?.id,
+        );
     try {
-      reminders.add(event.reminder);
       // await _reminderRepository.addReminder(event.reminder);
+      reminders.add(newReminder);
       // emit(ReminderAdded(event.reminder));
       emit(ReminderLoaded(reminders));
     } catch (e) {

@@ -3,7 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_modular/flutter_modular.dart' show Modular;
+import 'package:flutter_modular/flutter_modular.dart'
+    show ChildRoute, Modular, ModularRoute, Module, RouterOutlet;
 import 'package:intl/intl.dart';
 import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/models/doctor.dart';
@@ -13,7 +14,8 @@ import 'package:popup_menu_plus/popup_menu_plus.dart';
 import '../../../helpers/helpers.dart';
 
 part 'appbar.dart';
-part 'medication.dart';
+part 'reminder/medication.dart';
+part 'reminder/once_daily_page.dart';
 part 'card_reminder.dart';
 part 'appointment/appointment.dart';
 part 'appointment/select_date_time.dart';

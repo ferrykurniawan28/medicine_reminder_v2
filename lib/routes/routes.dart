@@ -1,4 +1,5 @@
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:medicine_reminder/ui/main/widgets/widgets.dart';
 import 'package:medicine_reminder/ui/ui.dart';
 
 import '../ui/auth/auth.dart';
@@ -6,6 +7,7 @@ import '../ui/main/main.dart';
 import '../ui/onboarding/onboarding.dart';
 
 part 'auth.dart';
+part 'reminder.dart';
 
 class AppRoute extends Module {
   @override
@@ -23,5 +25,6 @@ class AppRoute extends Module {
           GroupDetailPage(groupId: int.parse(r.args.params['groupId']!)),
     );
     r.module('/auth', module: AuthRoutes());
+    r.module('/reminder', module: AddReminderModule());
   }
 }

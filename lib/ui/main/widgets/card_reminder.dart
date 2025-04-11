@@ -25,8 +25,11 @@ class _CardReminderState extends State<CardReminder> {
       case ReminderType.multipleTimesDaily:
         reminderType = 'Multiple Times Daily';
         break;
-      case ReminderType.interval:
-        reminderType = 'Interval';
+      case ReminderType.intervalhours:
+        reminderType = 'Interval Hours';
+        break;
+      case ReminderType.intervaldays:
+        reminderType = 'Interval Days';
         break;
       case ReminderType.specificDays:
         reminderType = 'Specific Days';

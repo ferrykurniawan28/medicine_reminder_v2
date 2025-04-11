@@ -9,10 +9,12 @@ class Reminder {
   final int dosage;
   final int? medicineLeft;
   bool isActive;
+  bool isAlert;
   final String? note;
   final ReminderType type;
   final List<TimeOfDay> times;
   final int? intervalHours;
+  final int? invervalDays;
   final List<Days>? daysofWeek;
   final int? cycleDaysOn;
   final int? cycleDaysOff;
@@ -23,7 +25,8 @@ class Reminder {
     this.deviceId,
     this.userId,
     this.containerId,
-    required this.isActive,
+    this.isActive = true,
+    this.isAlert = false,
     required this.medicineName,
     required this.dosage,
     this.medicineLeft,
@@ -31,6 +34,7 @@ class Reminder {
     required this.type,
     required this.times,
     this.intervalHours,
+    this.invervalDays,
     this.daysofWeek,
     this.cycleDaysOn,
     this.cycleDaysOff,
@@ -47,12 +51,14 @@ class Reminder {
       dosage: json['dosage'] as int? ?? 0,
       medicineLeft: json['medicineLeft'] as int?,
       isActive: json['isActive'] as bool,
+      isAlert: json['isAlert'] as bool? ?? false,
       note: json['note'] as String?,
       type: ReminderType.values[json['type'] as int],
       times: (json['times'] as List<dynamic>?)!
           .map((e) => TimeOfDay.fromDateTime(DateTime.parse(e)))
           .toList(),
       intervalHours: json['intervalHours'] as int?,
+      invervalDays: json['invervalDays'] as int?,
       daysofWeek: (json['daysofWeek'] as List<dynamic>?)
           ?.map((e) => Days.values[e])
           .toList(),
@@ -72,10 +78,12 @@ class Reminder {
       'dosage': dosage,
       'medicineLeft': medicineLeft,
       'isActive': isActive,
+      'isAlert': isAlert,
       'note': note,
       'type': type.index,
       'times': times.map((e) => e.toString()).toList(),
       'intervalHours': intervalHours,
+      'invervalDays': invervalDays,
       'daysofWeek': daysofWeek?.map((e) => e.index).toList(),
       'cycleDaysOn': cycleDaysOn,
       'cycleDaysOff': cycleDaysOff,
@@ -92,10 +100,12 @@ class Reminder {
     int? dosage,
     int? medicineLeft,
     bool? isActive,
+    bool? isAlert,
     String? note,
     ReminderType? type,
     List<TimeOfDay>? times,
     int? intervalHours,
+    int? invervalDays,
     List<Days>? daysofWeek,
     int? cycleDaysOn,
     int? cycleDaysOff,
@@ -104,6 +114,7 @@ class Reminder {
     bool deleteDaysofWeek = false,
     bool deleteTimes = false,
     bool deleteIntervalHours = false,
+    bool deleteInvervalDays = false,
     bool deleteCycleDaysOn = false,
     bool deleteCycleDaysOff = false,
     bool deleteEndDate = false,
@@ -123,11 +134,14 @@ class Reminder {
       medicineLeft:
           deleteMedicineLeft ? null : medicineLeft ?? this.medicineLeft,
       isActive: isActive ?? this.isActive,
+      isAlert: isAlert ?? this.isAlert,
       note: deleteNote ? null : note ?? this.note,
       type: type ?? this.type,
       times: deleteTimes ? [] : times ?? this.times,
       intervalHours:
           deleteIntervalHours ? null : intervalHours ?? this.intervalHours,
+      invervalDays:
+          deleteInvervalDays ? null : invervalDays ?? this.invervalDays,
       daysofWeek: deleteDaysofWeek ? [] : daysofWeek ?? this.daysofWeek,
       cycleDaysOn: deleteCycleDaysOn ? null : cycleDaysOn ?? this.cycleDaysOn,
       cycleDaysOff:
@@ -141,7 +155,8 @@ enum ReminderType {
   onceDaily,
   twiceDaily,
   multipleTimesDaily,
-  interval,
+  intervalhours,
+  intervaldays,
   specificDays,
   cyclic,
 }
@@ -165,8 +180,10 @@ class ReminderTypeHelper {
         return 'Twice Daily';
       case ReminderType.multipleTimesDaily:
         return 'Multiple Times Daily';
-      case ReminderType.interval:
-        return 'Interval';
+      case ReminderType.intervalhours:
+        return 'Interval Hours';
+      case ReminderType.intervaldays:
+        return 'Interval Days';
       case ReminderType.specificDays:
         return 'Specific Days';
       case ReminderType.cyclic:
