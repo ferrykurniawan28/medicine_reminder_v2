@@ -58,13 +58,27 @@ class _ListParentalState extends State<ListParental> {
                 header: const CupertinoTextField(
                   placeholder: 'Search',
                   prefix: Icon(CupertinoIcons.search),
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  cursorRadius: Radius.circular(18),
                 ),
                 children: [
                   for (final parental in state.parentals)
                     CupertinoListTile(
                       title: Text(parental.user.userName),
                       leading: const Icon(CupertinoIcons.person),
-                      onTap: () {},
+                      onTap: () {
+                        print('Parental: ${parental.toJson()}');
+                        Modular.to.pushNamed(
+                          '/home/parental/detail',
+                          arguments: {
+                            'parental': parental,
+                          },
+                        );
+                        // Modular.to
+                        //     .navigate('/home/parental/reminder/', arguments: {
+                        //   'parental': parental,
+                        // });
+                      },
                     ),
                 ],
               );

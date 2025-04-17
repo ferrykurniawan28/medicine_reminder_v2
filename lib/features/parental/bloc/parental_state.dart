@@ -39,3 +39,30 @@ final class ParentalError extends ParentalState {
   @override
   List<Object> get props => [message];
 }
+
+final class ReminderParentalLoaded extends ParentalState {
+  final List<Reminder> reminders;
+
+  const ReminderParentalLoaded(this.reminders);
+
+  @override
+  List<Object> get props => [reminders];
+}
+
+final class AppointmentParentalLoaded extends ParentalState {
+  final List<Appointment> appointments;
+
+  const AppointmentParentalLoaded(this.appointments);
+
+  @override
+  List<Object> get props => [appointments];
+}
+
+final class DeviceParentalLoaded extends ParentalState {
+  final DeviceModel devices;
+
+  const DeviceParentalLoaded(this.devices);
+
+  @override
+  List<Object> get props => [devices];
+}

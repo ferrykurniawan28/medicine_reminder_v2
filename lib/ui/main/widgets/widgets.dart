@@ -9,7 +9,9 @@ import 'package:intl/intl.dart';
 import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/models/doctor.dart';
 import 'package:medicine_reminder/models/models.dart';
+import 'package:medicine_reminder/ui/main/main.dart' show YourDevice;
 import 'package:popup_menu_plus/popup_menu_plus.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../helpers/helpers.dart';
 
@@ -27,3 +29,6 @@ part 'appointment/doctor_input_field.dart';
 part 'appointment/add_appointment.dart';
 part 'appointment/edit_appointment.dart';
 part 'device/add_medicine.dart';
+part 'parental/reminder.dart';
+part 'parental/appointment.dart';
+part 'parental/device.dart';

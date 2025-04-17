@@ -22,7 +22,32 @@ class AppRoute extends Module {
         child: (_) => const ParentalMainPage(),
         children: [
           ChildRoute('/list', child: (_) => const ListParental()),
-          ChildRoute('/detail', child: (_) => const ParentalDetail()),
+          ChildRoute(
+            '/detail',
+            child: (_) => ParentalDetail(
+              parental: r.args.data['parental'],
+            ),
+            children: [
+              ChildRoute(
+                '/reminder',
+                child: (_) => ReminderList(
+                  parental: r.args.data['parental'],
+                ),
+              ),
+              ChildRoute(
+                '/appointment',
+                child: (_) => AppointmentList(
+                  parental: r.args.data['parental'],
+                ),
+              ),
+              ChildRoute(
+                '/device',
+                child: (_) => DeviceParental(
+                  parental: r.args.data['parental'],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       ChildRoute('/device', child: (_) => const Device()),

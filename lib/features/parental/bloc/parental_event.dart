@@ -17,12 +17,12 @@ final class LoadParentals extends ParentalEvent {
 }
 
 final class LoadParental extends ParentalEvent {
-  final int id;
+  final int userId;
 
-  const LoadParental(this.id);
+  const LoadParental(this.userId);
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [userId];
 }
 
 final class AddParental extends ParentalEvent {
@@ -50,4 +50,31 @@ final class DeleteParental extends ParentalEvent {
 
   @override
   List<Object> get props => [id];
+}
+
+final class LoadReminderParental extends ParentalEvent {
+  final int parentalId;
+
+  const LoadReminderParental(this.parentalId);
+
+  @override
+  List<Object> get props => [parentalId];
+}
+
+final class LoadAppointmentParental extends ParentalEvent {
+  final int parentalId;
+
+  const LoadAppointmentParental(this.parentalId);
+
+  @override
+  List<Object> get props => [parentalId];
+}
+
+final class LoadDeviceParental extends ParentalEvent {
+  final int parentalId;
+
+  const LoadDeviceParental(this.parentalId);
+
+  @override
+  List<Object> get props => [parentalId];
 }

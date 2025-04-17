@@ -6,11 +6,19 @@ part 'parental_event.dart';
 part 'parental_state.dart';
 
 class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
-  Parental? _parental;
   List<Parental> _parentals = [];
+  List<Reminder>? _reminders = [];
+  List<Appointment>? _appointments = [];
+  DeviceModel? _deviceModel;
   ParentalBloc() : super(ParentalInitial()) {
     on<LoadParentals>(_onFetchParentals);
     on<LoadParental>(_onFetchParental);
+    // on<AddParental>(_onAddParental);
+    // on<UpdateParental>(_onUpdateParental);
+    // on<DeleteParental>(_onDeleteParental);
+    on<LoadReminderParental>(_onFetchReminderParental);
+    on<LoadAppointmentParental>(_onFetchAppointmentParental);
+    on<LoadDeviceParental>(_onFetchDeviceParental);
   }
 
   Future<void> _onFetchParentals(
@@ -29,9 +37,49 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
       LoadParental event, Emitter<ParentalState> emit) async {
     emit(ParentalLoading());
     try {
-      _parental = dummyParental.firstWhere((element) => element.id == event.id);
+      final parental =
+          _parentals.firstWhere((element) => element.id == event.userId);
+      // _parental = dummyParental.firstWhere((element) => element.id == event.id);
       // final parental = await _parentalRepository.getParental(event.id);
-      emit(ParentalLoaded(_parental!));
+      emit(ParentalLoaded(parental));
+    } catch (e) {
+      emit(ParentalError(e.toString()));
+    }
+  }
+
+  Future<void> _onFetchReminderParental(
+      LoadReminderParental event, Emitter<ParentalState> emit) async {
+    emit(ParentalLoading());
+    try {
+      _reminders = dummyReminders;
+      // final reminders = await _reminderRepository.getReminder(event.parentalId);
+      emit(ReminderParentalLoaded(_reminders!));
+    } catch (e) {
+      emit(ParentalError(e.toString()));
+    }
+  }
+
+  Future<void> _onFetchAppointmentParental(
+      LoadAppointmentParental event, Emitter<ParentalState> emit) async {
+    emit(ParentalLoading());
+    try {
+      _appointments = dummyAppointment;
+      // final appointments =
+      //     await _appointmentRepository.getAppointment(event.parentalId);
+      emit(AppointmentParentalLoaded(_appointments!));
+    } catch (e) {
+      emit(ParentalError(e.toString()));
+    }
+  }
+
+  Future<void> _onFetchDeviceParental(
+      LoadDeviceParental event, Emitter<ParentalState> emit) async {
+    emit(ParentalLoading());
+    try {
+      _deviceModel = dummyDevice;
+      // final deviceModel =
+      //     await _deviceRepository.getDevice(event.parentalId);
+      emit(DeviceParentalLoaded(_deviceModel!));
     } catch (e) {
       emit(ParentalError(e.toString()));
     }

@@ -8,14 +8,14 @@ class ParentalMainPage extends StatefulWidget {
 }
 
 class _ParentalMainPageState extends State<ParentalMainPage> {
-  int _currentIndex = 0;
-  final List<Widget> _pages = [
-    const ListParental(),
-    const ParentalDetail(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    Modular.to.navigate('/home/parental/list');
+  }
 
   @override
   Widget build(BuildContext context) {
-    return _pages[_currentIndex];
+    return const RouterOutlet();
   }
 }

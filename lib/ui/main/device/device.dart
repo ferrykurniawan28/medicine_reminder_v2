@@ -39,7 +39,7 @@ class _DeviceState extends State<Device> {
                 baseColor: Colors.grey[300]!,
                 highlightColor: Colors.grey[100]!,
                 child: Column(
-                  children: List.generate(3, (index) {
+                  children: List.generate(2, (index) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Container(
@@ -81,7 +81,7 @@ class _DeviceState extends State<Device> {
                       style: captionTextStyle,
                     ),
                     onTap: () {
-                      poopUpMenuContainer(context, container, key);
+                      poopUpMenuContainer(context, container, key, 0);
                     },
                   );
                 },

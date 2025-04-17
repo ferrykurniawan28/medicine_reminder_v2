@@ -98,7 +98,8 @@ class _MedicineFormState extends State<_MedicineForm> {
                                 quantity: int.parse(dosageController.text),
                               ),
                             );
-                        Modular.to.pop();
+                        Modular.to.popUntil(
+                            (route) => route.settings.name == '/home/device');
                       }
                     },
                     child: const Text('Add Medicine'),
@@ -130,14 +131,14 @@ void resetDialog(BuildContext ctx, ContainerModel container) {
   ).show();
 }
 
-void poopUpMenuContainer(
-    BuildContext ctx, ContainerModel container, GlobalKey key) {
+void poopUpMenuContainer(BuildContext ctx, ContainerModel container,
+    GlobalKey key, double popupHeight) {
   final RenderBox? renderBox =
       key.currentContext?.findRenderObject() as RenderBox?;
   if (renderBox == null) return; // Prevent crashes
 
   final Offset offset = renderBox.localToGlobal(Offset.zero);
-  const double popupHeight = 0;
+  // const double popupHeight;
 
   PopupMenu menu = PopupMenu(
     context: ctx,
