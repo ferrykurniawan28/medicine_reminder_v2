@@ -62,50 +62,70 @@ class _OnceTwiceDailyPageState extends State<OnceTwiceDailyPage> {
     context.read<ReminderBloc>().add(
           AddReminder(reminder),
         );
-    Navigator.of(context).pop();
+    Modular.to.popUntil(
+      (route) => route.settings.name == '/home',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+      body: CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+          middle: Text(widget.container.medicineName ?? 'Empty'),
+        ),
+        backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          child: Stack(
             children: [
-              Text(widget.container.medicineName!, style: captionTextStyle),
-              Text(
-                'When would you like to be reminded?',
-                style: bodyTextStyle.copyWith(
-                  fontSize: 20,
-                  fontWeight: medium,
+              CupertinoListSection(
+                header: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.container.medicineName!,
+                        style: captionTextStyle),
+                    Text(
+                      'When would you like to be reminded?',
+                      style: bodyTextStyle.copyWith(
+                        fontSize: 20,
+                        fontWeight: medium,
+                      ),
+                    ),
+                  ],
+                ),
+                children: [
+                  _buildReminderSection(
+                    selectedTime,
+                    doseController,
+                    Text(
+                      widget.isOnce ? 'Intake' : 'First Intake',
+                      style: captionTextStyle,
+                    ),
+                  ),
+                  if (!widget.isOnce && secondTime != null)
+                    _buildReminderSection(
+                      secondTime!,
+                      secondDoseController!,
+                      Text(
+                        'Second Intake',
+                        style: captionTextStyle,
+                      ),
+                    ),
+                  _buildCriticalAlertSection(),
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: _buildSaveButton(),
                 ),
               ),
             ],
           ),
         ),
-        _buildReminderSection(
-            selectedTime,
-            doseController,
-            Text(
-              widget.isOnce ? 'Intake' : 'First Intake',
-              style: captionTextStyle,
-            )),
-        if (!widget.isOnce && secondTime != null)
-          _buildReminderSection(
-              secondTime!,
-              secondDoseController!,
-              Text(
-                'Second Intake',
-                style: captionTextStyle,
-              )),
-        _buildCriticalAlertSection(),
-        const Spacer(),
-        _buildSaveButton(),
-        const SizedBox(height: 16),
-      ],
+      ),
     );
   }
 

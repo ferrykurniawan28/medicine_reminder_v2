@@ -13,11 +13,7 @@ class Reminder {
   final String? note;
   final ReminderType type;
   final List<TimeOfDay> times;
-  final int? intervalHours;
-  final int? invervalDays;
   final List<Days>? daysofWeek;
-  final int? cycleDaysOn;
-  final int? cycleDaysOff;
   final DateTime? endDate;
 
   Reminder({
@@ -33,11 +29,7 @@ class Reminder {
     this.note,
     required this.type,
     required this.times,
-    this.intervalHours,
-    this.invervalDays,
     this.daysofWeek,
-    this.cycleDaysOn,
-    this.cycleDaysOff,
     this.endDate,
   });
 
@@ -57,13 +49,9 @@ class Reminder {
       times: (json['times'] as List<dynamic>?)!
           .map((e) => TimeOfDay.fromDateTime(DateTime.parse(e)))
           .toList(),
-      intervalHours: json['intervalHours'] as int?,
-      invervalDays: json['invervalDays'] as int?,
       daysofWeek: (json['daysofWeek'] as List<dynamic>?)
           ?.map((e) => Days.values[e])
           .toList(),
-      cycleDaysOn: json['cycleDaysOn'] as int?,
-      cycleDaysOff: json['cycleDaysOff'] as int?,
       endDate: DateTime.tryParse(json['endDate'] as String),
     );
   }
@@ -82,11 +70,7 @@ class Reminder {
       'note': note,
       'type': type.index,
       'times': times.map((e) => e.toString()).toList(),
-      'intervalHours': intervalHours,
-      'invervalDays': invervalDays,
       'daysofWeek': daysofWeek?.map((e) => e.index).toList(),
-      'cycleDaysOn': cycleDaysOn,
-      'cycleDaysOff': cycleDaysOff,
       'endDate': endDate?.toIso8601String(),
     };
   }
@@ -104,19 +88,11 @@ class Reminder {
     String? note,
     ReminderType? type,
     List<TimeOfDay>? times,
-    int? intervalHours,
-    int? invervalDays,
     List<Days>? daysofWeek,
-    int? cycleDaysOn,
-    int? cycleDaysOff,
     DateTime? endDate,
     bool deleteNote = false,
     bool deleteDaysofWeek = false,
     bool deleteTimes = false,
-    bool deleteIntervalHours = false,
-    bool deleteInvervalDays = false,
-    bool deleteCycleDaysOn = false,
-    bool deleteCycleDaysOff = false,
     bool deleteEndDate = false,
     bool deleteMedicineLeft = false,
     bool deleteDosage = false,
@@ -138,14 +114,7 @@ class Reminder {
       note: deleteNote ? null : note ?? this.note,
       type: type ?? this.type,
       times: deleteTimes ? [] : times ?? this.times,
-      intervalHours:
-          deleteIntervalHours ? null : intervalHours ?? this.intervalHours,
-      invervalDays:
-          deleteInvervalDays ? null : invervalDays ?? this.invervalDays,
       daysofWeek: deleteDaysofWeek ? [] : daysofWeek ?? this.daysofWeek,
-      cycleDaysOn: deleteCycleDaysOn ? null : cycleDaysOn ?? this.cycleDaysOn,
-      cycleDaysOff:
-          deleteCycleDaysOff ? null : cycleDaysOff ?? this.cycleDaysOff,
       endDate: deleteEndDate ? null : endDate ?? this.endDate,
     );
   }
@@ -226,10 +195,7 @@ List<Reminder> dummyReminders = [
     note: 'Take medication',
     type: ReminderType.onceDaily,
     times: [const TimeOfDay(hour: 8, minute: 0)],
-    intervalHours: null,
     daysofWeek: null,
-    cycleDaysOn: null,
-    cycleDaysOff: null,
     endDate: DateTime.now().add(const Duration(days: 30)),
   ),
   Reminder(
@@ -247,10 +213,7 @@ List<Reminder> dummyReminders = [
       TimeOfDay(hour: 9, minute: 0),
       TimeOfDay(hour: 18, minute: 0)
     ],
-    intervalHours: null,
     daysofWeek: null,
-    cycleDaysOn: null,
-    cycleDaysOff: null,
     endDate: DateTime.now().add(const Duration(days: 15)),
   ),
 ];

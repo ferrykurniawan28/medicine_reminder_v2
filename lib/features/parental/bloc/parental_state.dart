@@ -14,7 +14,7 @@ final class ParentalListLoading extends ParentalState {}
 final class ParentalLoading extends ParentalState {}
 
 final class ParentalsLoaded extends ParentalState {
-  final List<Group> parentals;
+  final List<Parental> parentals;
 
   const ParentalsLoaded(this.parentals);
 
@@ -23,7 +23,7 @@ final class ParentalsLoaded extends ParentalState {
 }
 
 final class ParentalLoaded extends ParentalState {
-  final Group parental;
+  final Parental parental;
 
   const ParentalLoaded(this.parental);
 

@@ -9,19 +9,16 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
-  final List<Widget> _pages = [
-    const Home(),
-    const Appointment(),
-    const ListGroup(),
-    const Device(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    Modular.to.navigate('/home/reminder');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
+      body: const RouterOutlet(),
       bottomNavigationBar: SizedBox(
         child: Stack(
           clipBehavior: Clip.none,
@@ -46,6 +43,7 @@ class _MainPageState extends State<MainPage> {
                       setState(() {
                         _selectedIndex = 0;
                       });
+                      Modular.to.navigate('/home/reminder');
                     },
                     icon: Image.asset(
                       _selectedIndex == 0
@@ -62,6 +60,7 @@ class _MainPageState extends State<MainPage> {
                       setState(() {
                         _selectedIndex = 1;
                       });
+                      Modular.to.navigate('/home/appointment');
                     },
                     icon: Image.asset(
                       _selectedIndex == 1
@@ -78,6 +77,7 @@ class _MainPageState extends State<MainPage> {
                       setState(() {
                         _selectedIndex = 2;
                       });
+                      Modular.to.navigate('/home/parental/list');
                     },
                     icon: Image.asset(
                       _selectedIndex == 2
@@ -94,6 +94,7 @@ class _MainPageState extends State<MainPage> {
                       setState(() {
                         _selectedIndex = 3;
                       });
+                      Modular.to.navigate('/home/device');
                     },
                     icon: Image.asset(
                       _selectedIndex == 3

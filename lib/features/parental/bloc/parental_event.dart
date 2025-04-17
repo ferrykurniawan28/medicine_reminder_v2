@@ -26,7 +26,7 @@ final class LoadParental extends ParentalEvent {
 }
 
 final class AddParental extends ParentalEvent {
-  final Group parental;
+  final Parental parental;
 
   const AddParental(this.parental);
 
@@ -35,7 +35,7 @@ final class AddParental extends ParentalEvent {
 }
 
 final class UpdateParental extends ParentalEvent {
-  final Group parental;
+  final Parental parental;
 
   const UpdateParental(this.parental);
 

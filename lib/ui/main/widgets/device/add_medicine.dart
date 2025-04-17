@@ -77,12 +77,12 @@ class _MedicineFormState extends State<_MedicineForm> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: const InputDecoration(
-                      labelText: 'Dosage',
-                      hintText: 'Enter dosage',
+                      labelText: 'Quantity',
+                      hintText: 'Enter quantity',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter dosage';
+                        return 'Please enter quantity';
                       } else if (int.tryParse(value) == null) {}
                       return null;
                     },

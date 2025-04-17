@@ -19,9 +19,8 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: defaultAppBar('Medication', actions: [
         IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () => addReminder(context),
-        ),
+            icon: const Icon(Icons.add),
+            onPressed: () => Modular.to.pushNamed('/reminder')),
       ]),
       backgroundColor: Colors.white,
       body: BlocBuilder<ReminderBloc, ReminderState>(

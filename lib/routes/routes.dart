@@ -14,15 +14,22 @@ class AppRoute extends Module {
   void routes(RouteManager r) {
     r.child('/', child: (_) => const Splash());
     r.child('/boarding', child: (_) => const Onboarding());
-    r.child('/home', child: (_) => const MainPage());
+    r.child('/home', child: (_) => const MainPage(), children: [
+      ChildRoute('/reminder', child: (_) => const Home()),
+      ChildRoute('/appointment', child: (_) => const Appointment()),
+      ChildRoute(
+        '/parental',
+        child: (_) => const ParentalMainPage(),
+        children: [
+          ChildRoute('/list', child: (_) => const ListParental()),
+          ChildRoute('/detail', child: (_) => const ParentalDetail()),
+        ],
+      ),
+      ChildRoute('/device', child: (_) => const Device()),
+    ]);
     r.child(
       '/device/:deviceId',
       child: (_) => const Device(),
-    );
-    r.child(
-      '/parental/:groupId',
-      child: (_) =>
-          GroupDetailPage(groupId: int.parse(r.args.params['groupId']!)),
     );
     r.module('/auth', module: AuthRoutes());
     r.module('/reminder', module: AddReminderModule());

@@ -15,8 +15,11 @@ import '../../../helpers/helpers.dart';
 
 part 'appbar.dart';
 part 'reminder/medication.dart';
+part 'reminder/select_routine.dart';
 part 'reminder/once_twice_daily_page.dart';
 part 'reminder/more_options_page.dart';
+part 'reminder/multiple_times_daily.dart';
+part 'reminder/specific_days.dart';
 part 'card_reminder.dart';
 part 'appointment/appointment.dart';
 part 'appointment/select_date_time.dart';
