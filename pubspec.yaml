@@ -7,15 +7,25 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
+  adoptive_calendar: ^0.2.0
+  awesome_datetime_picker: ^0.1.1
+  awesome_dialog: ^3.2.1
   bloc: ^9.0.0
+  cupertino_calendar_picker: ^2.2.3
   dio: ^5.8.0+1
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.0
+  flutter_carousel_widget: ^3.1.0
   flutter_modular: ^6.3.4
-  intl: ^0.20.2
+  intl: ^0.19.0
+  meta: ^1.16.0
   percent_indicator: ^4.2.4
+  popup_menu_plus: ^0.0.6
   shared_preferences: ^2.5.2
+  shimmer: ^3.0.0
+  wheel_picker: ^0.2.1
 
 dev_dependencies:
   flutter_test:
