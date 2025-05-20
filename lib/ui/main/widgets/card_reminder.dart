@@ -1,7 +1,7 @@
 part of 'widgets.dart';
 
 class CardReminder extends StatefulWidget {
-  final ReminderModel reminder;
+  final Reminder reminder;
   const CardReminder({
     super.key,
     required this.reminder,

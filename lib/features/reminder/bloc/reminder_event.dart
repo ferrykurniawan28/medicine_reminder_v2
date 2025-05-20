@@ -10,7 +10,7 @@ sealed class ReminderEvent extends Equatable {
 final class LoadReminders extends ReminderEvent {}
 
 final class AddReminder extends ReminderEvent {
-  final ReminderModel reminder;
+  final Reminder reminder;
 
   const AddReminder(this.reminder);
 
@@ -19,7 +19,7 @@ final class AddReminder extends ReminderEvent {
 }
 
 final class UpdateReminder extends ReminderEvent {
-  final ReminderModel reminder;
+  final Reminder reminder;
 
   const UpdateReminder(this.reminder);
 
@@ -37,7 +37,7 @@ final class DeleteReminder extends ReminderEvent {
 }
 
 final class UpdateReminderStatus extends ReminderEvent {
-  final ReminderModel reminder;
+  final Reminder reminder;
 
   const UpdateReminderStatus(this.reminder);
 

@@ -6,7 +6,7 @@ class AddReminder {
 
   AddReminder(this.repository);
 
-  Future<void> call(Reminder reminder) async {
-    await repository.addReminder(reminder);
+  Future<Reminder> call(Reminder reminder) async {
+    return await repository.addReminder(reminder);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
+import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 import 'package:medicine_reminder/features/reminder/domain/usecases/get_reminders.dart';
 import 'package:medicine_reminder/features/reminder/domain/usecases/add_reminder.dart'
     as usecase_add;
@@ -8,8 +8,6 @@ import 'package:medicine_reminder/features/reminder/domain/usecases/delete_remin
     as usecase_delete;
 import 'package:medicine_reminder/features/reminder/domain/usecases/update_reminder.dart'
     as usecase_update;
-import 'package:medicine_reminder/features/reminder/data/repositories/reminder_repository_impl.dart'
-    show domainToApp, appToDomain;
 
 part 'reminder_event.dart';
 part 'reminder_state.dart';
@@ -37,13 +35,10 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
       LoadReminders event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
     try {
-      final domainReminders = await getReminders();
-      // id is always int in domain entity now
-      final appReminders = domainReminders.map(domainToApp).toList();
-      print(
-          'Fetched reminders: ${appReminders.map((r) => r.toJson()).toList()}');
-      emit(ReminderLoaded(appReminders));
+      final reminders = await getReminders();
+      emit(ReminderLoaded(reminders));
     } catch (e) {
+      print('Error fetching reminders: $e');
       emit(ReminderError(e.toString()));
     }
   }
@@ -52,8 +47,8 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
       AddReminder event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
     try {
-      final domainReminder = appToDomain(event.reminder);
-      await addReminder.call(domainReminder);
+      final newReminder = await addReminder.call(event.reminder);
+      emit(ReminderAdded(newReminder));
       add(LoadReminders());
     } catch (e) {
       emit(ReminderError(e.toString()));
@@ -72,20 +67,22 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
     }
   }
 
-  // TODO: Refactor update and status logic to use repository/use cases
   Future<void> _updateReminder(
       UpdateReminder event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
-    // TODO: Implement update logic using repository/use case
-    emit(ReminderError('Update not implemented in clean architecture yet.'));
+    try {
+      await updateReminder.call(event.reminder);
+      add(LoadReminders());
+    } catch (e) {
+      emit(ReminderError(e.toString()));
+    }
   }
 
   Future<void> _updateReminderStatus(
       UpdateReminderStatus event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
     try {
-      final domainReminder = appToDomain(event.reminder);
-      await updateReminder.call(domainReminder);
+      await updateReminder.call(event.reminder);
       add(LoadReminders());
     } catch (e) {
       emit(ReminderError(e.toString()));

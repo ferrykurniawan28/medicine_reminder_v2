@@ -12,12 +12,9 @@ final class ReminderInitial extends ReminderState {}
 final class ReminderLoading extends ReminderState {}
 
 final class ReminderLoaded extends ReminderState {
-  final List<ReminderModel> reminders;
+  final List<Reminder> reminders;
 
   const ReminderLoaded(this.reminders);
-
-  List<ReminderModel> get sortedReminders => List.from(reminders)
-    ..sort((a, b) => a.times.first.compareTo(b.times.first));
 
   @override
   List<Object> get props => [reminders];
@@ -33,7 +30,7 @@ final class ReminderError extends ReminderState {
 }
 
 final class ReminderUpdated extends ReminderState {
-  final ReminderModel reminder;
+  final Reminder reminder;
 
   const ReminderUpdated(this.reminder);
 
@@ -51,7 +48,7 @@ final class ReminderDeleted extends ReminderState {
 }
 
 final class ReminderAdded extends ReminderState {
-  final ReminderModel reminder;
+  final Reminder reminder;
 
   const ReminderAdded(this.reminder);
 

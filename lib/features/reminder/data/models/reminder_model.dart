@@ -1,36 +1,22 @@
-import 'package:flutter/material.dart';
+import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
+import 'package:medicine_reminder/features/reminder/domain/entities/time.dart';
 
-class ReminderModel {
-  final int? id;
-  final int? deviceId;
-  final int? userId;
-  final int? containerId;
-  final String medicineName;
-  final List<int> dosage;
-  final int? medicineLeft;
-  bool isActive;
-  bool isAlert;
-  final String? note;
-  final ReminderType type;
-  final List<TimeOfDay> times;
-  final List<Days>? daysofWeek;
-  final DateTime? endDate;
-
+class ReminderModel extends Reminder {
   ReminderModel({
-    this.id,
-    this.deviceId,
-    this.userId,
-    this.containerId,
-    this.isActive = true,
-    this.isAlert = false,
-    required this.medicineName,
-    required this.dosage,
-    this.medicineLeft,
-    this.note,
-    required this.type,
-    required this.times,
-    this.daysofWeek,
-    this.endDate,
+    super.id,
+    super.deviceId,
+    super.userId,
+    super.containerId,
+    required super.medicineName,
+    required super.dosage,
+    super.medicineLeft,
+    super.isActive,
+    super.isAlert,
+    super.note,
+    required super.type,
+    required super.times,
+    super.daysofWeek,
+    super.endDate,
   });
 
   factory ReminderModel.fromJson(Map<String, dynamic> json) {
@@ -40,19 +26,21 @@ class ReminderModel {
       userId: json['userId'] as int?,
       containerId: json['containerId'] as int?,
       medicineName: json['medicineName'] as String,
-      dosage: (json['dosage'] as List<dynamic>).map((e) => e as int).toList(),
+      dosage: (json['dosage'] as List).map((e) => e as int).toList(),
       medicineLeft: json['medicineLeft'] as int?,
       isActive: json['isActive'] as bool,
       isAlert: json['isAlert'] as bool? ?? false,
       note: json['note'] as String?,
       type: ReminderType.values[json['type'] as int],
-      times: (json['times'] as List<dynamic>?)!
-          .map((e) => TimeOfDay.fromDateTime(DateTime.parse(e)))
+      times: (json['times'] as List<dynamic>)
+          .map((e) => Time.fromDateTime(DateTime.parse(e)))
           .toList(),
       daysofWeek: (json['daysofWeek'] as List<dynamic>?)
           ?.map((e) => Days.values[e])
           .toList(),
-      endDate: DateTime.tryParse(json['endDate'] as String),
+      endDate: json['endDate'] != null
+          ? DateTime.tryParse(json['endDate'] as String)
+          : null,
     );
   }
 
@@ -69,76 +57,34 @@ class ReminderModel {
       'isAlert': isAlert,
       'note': note,
       'type': type.index,
-      'times': times.map((e) => e.toString()).toList(),
+      'times': times
+          .map((t) => DateTime(0, 1, 1, t.hour, t.minute).toIso8601String())
+          .toList(),
       'daysofWeek': daysofWeek?.map((e) => e.index).toList(),
       'endDate': endDate?.toIso8601String(),
     };
   }
-
-  ReminderModel copyWith({
-    int? id,
-    int? deviceId,
-    int? userId,
-    int? containerId,
-    String? medicineName,
-    List<int>? dosage,
-    int? medicineLeft,
-    bool? isActive,
-    bool? isAlert,
-    String? note,
-    ReminderType? type,
-    List<TimeOfDay>? times,
-    List<Days>? daysofWeek,
-    DateTime? endDate,
-    bool deleteNote = false,
-    bool deleteDaysofWeek = false,
-    bool deleteTimes = false,
-    bool deleteEndDate = false,
-    bool deleteMedicineLeft = false,
-    bool deleteDosage = false,
-    bool deleteContainerId = false,
-    bool deleteUserId = false,
-    bool deleteDeviceId = false,
-  }) {
-    return ReminderModel(
-      id: id ?? this.id,
-      deviceId: deleteDeviceId ? null : deviceId ?? this.deviceId,
-      userId: deleteUserId ? null : userId ?? this.userId,
-      containerId: deleteContainerId ? null : containerId ?? this.containerId,
-      medicineName: medicineName ?? this.medicineName,
-      dosage: deleteDosage ? [] : dosage ?? this.dosage,
-      medicineLeft:
-          deleteMedicineLeft ? null : medicineLeft ?? this.medicineLeft,
-      isActive: isActive ?? this.isActive,
-      isAlert: isAlert ?? this.isAlert,
-      note: deleteNote ? null : note ?? this.note,
-      type: type ?? this.type,
-      times: deleteTimes ? [] : times ?? this.times,
-      daysofWeek: deleteDaysofWeek ? [] : daysofWeek ?? this.daysofWeek,
-      endDate: deleteEndDate ? null : endDate ?? this.endDate,
-    );
-  }
 }
 
-enum ReminderType {
-  onceDaily,
-  twiceDaily,
-  multipleTimesDaily,
-  intervalhours,
-  intervaldays,
-  specificDays,
-  cyclic,
-}
+// enum ReminderType {
+//   onceDaily,
+//   twiceDaily,
+//   multipleTimesDaily,
+//   intervalhours,
+//   intervaldays,
+//   specificDays,
+//   cyclic,
+// }
 
-enum Days {
-  monday,
-  tuesday,
-  wednesday,
-  thursday,
-  friday,
-  saturday,
-  sunday,
-}
+// enum Days {
+//   monday,
+//   tuesday,
+//   wednesday,
+//   thursday,
+//   friday,
+//   saturday,
+//   sunday,
+// }
 
 class ReminderTypeHelper {
   static String getName(ReminderType type) {
@@ -194,7 +140,12 @@ List<ReminderModel> dummyReminders = [
     isActive: true,
     note: 'Take medication',
     type: ReminderType.onceDaily,
-    times: [const TimeOfDay(hour: 8, minute: 0)],
+    times: const [
+      Time(
+        9,
+        0,
+      ),
+    ],
     daysofWeek: null,
     endDate: DateTime.now().add(const Duration(days: 30)),
   ),
@@ -210,8 +161,14 @@ List<ReminderModel> dummyReminders = [
     note: 'Check blood pressure',
     type: ReminderType.twiceDaily,
     times: const [
-      TimeOfDay(hour: 9, minute: 0),
-      TimeOfDay(hour: 18, minute: 0)
+      Time(
+        8,
+        0,
+      ),
+      Time(
+        18,
+        0,
+      ),
     ],
     daysofWeek: null,
     endDate: DateTime.now().add(const Duration(days: 15)),

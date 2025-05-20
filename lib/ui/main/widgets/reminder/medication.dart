@@ -6,7 +6,14 @@ class AddReminderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final device = context.read<DeviceBloc>().device;
-    if (device == null) return const Center(child: Text('No device found'));
+    if (device == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(
+          child: Text('No device connected'),
+        ),
+      );
+    }
 
     return CupertinoPageScaffold(
       backgroundColor: Colors.white,

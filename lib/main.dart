@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:medicine_reminder/features/features.dart';
+import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource.dart';
 import 'package:medicine_reminder/features/reminder/data/repositories/reminder_repository_impl.dart';
 import 'package:medicine_reminder/features/reminder/domain/usecases/get_reminders.dart';
 import 'package:medicine_reminder/features/reminder/domain/usecases/add_reminder.dart'
@@ -23,6 +24,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Modular.setInitialRoute('/');
+    ReminderLocalDataSource().clearReminders();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => DeviceBloc()),

@@ -41,9 +41,14 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
       return;
     }
 
+    List<Time> times = selectedTimes
+        .map((time) =>
+            Time.fromDateTime(DateTime(0, 0, 0, time.hour, time.minute)))
+        .toList();
+
     ReminderModel newReminder = ReminderModel(
       type: ReminderType.multipleTimesDaily,
-      times: selectedTimes,
+      times: times,
       medicineName: widget.container.medicineName!,
       medicineLeft: widget.container.quantity,
       dosage: dosage,
