@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/models/models.dart';
 
 part 'parental_event.dart';
@@ -7,7 +8,7 @@ part 'parental_state.dart';
 
 class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
   List<Parental> _parentals = [];
-  List<Reminder>? _reminders = [];
+  List<ReminderModel>? _reminders = [];
   List<Appointment>? _appointments = [];
   DeviceModel? _deviceModel;
   ParentalBloc() : super(ParentalInitial()) {

@@ -28,6 +28,10 @@ class _HomeState extends State<Home> {
           if (state is ReminderLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ReminderLoaded) {
+            if (state.reminders.isEmpty) {
+              return const Center(
+                  child: Text('You have no reminders yet, add one!'));
+            }
             return ListView.builder(
               padding: const EdgeInsets.all(8),
               itemCount: state.reminders.length,

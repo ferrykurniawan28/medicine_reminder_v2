@@ -47,6 +47,20 @@ class _MedicineFormState extends State<_MedicineForm> {
         child: SingleChildScrollView(
           child: Container(
             padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
             child: Form(
               key: formKey,
               child: Column(
@@ -98,8 +112,12 @@ class _MedicineFormState extends State<_MedicineForm> {
                                 quantity: int.parse(dosageController.text),
                               ),
                             );
-                        Modular.to.popUntil(
-                            (route) => route.settings.name == '/home/device');
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Medicine added successfully'),
+                          ),
+                        );
                       }
                     },
                     child: const Text('Add Medicine'),

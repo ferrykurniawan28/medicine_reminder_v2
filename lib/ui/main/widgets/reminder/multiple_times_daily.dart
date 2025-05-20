@@ -41,7 +41,7 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
       return;
     }
 
-    Reminder newReminder = Reminder(
+    ReminderModel newReminder = ReminderModel(
       type: ReminderType.multipleTimesDaily,
       times: selectedTimes,
       medicineName: widget.container.medicineName!,

@@ -48,7 +48,7 @@ class _OnceTwiceDailyPageState extends State<OnceTwiceDailyPage> {
       return;
     }
 
-    final reminder = Reminder(
+    final reminder = ReminderModel(
       containerId: widget.container.id,
       times: [selectedTime, if (secondTime != null) secondTime!],
       dosage: [dose, if (secondDose != null) secondDose],

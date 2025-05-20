@@ -9,4 +9,4 @@ part 'user.dart';
 part 'container.dart';
 part 'device.dart';
 part 'appointment.dart';
-part 'reminder.dart';
+// part 'reminder.dart';

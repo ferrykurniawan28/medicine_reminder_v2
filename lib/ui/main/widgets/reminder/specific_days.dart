@@ -25,7 +25,7 @@ class _SpecificDaysState extends State<SpecificDays> {
       return;
     }
 
-    Reminder newReminder = Reminder(
+    ReminderModel newReminder = ReminderModel(
       type: ReminderType.specificDays,
       times: [selectedTime],
       medicineName: widget.container.medicineName!,

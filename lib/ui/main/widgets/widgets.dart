@@ -7,6 +7,7 @@ import 'package:flutter_modular/flutter_modular.dart'
     show ChildRoute, Modular, ModularRoute, Module, RouterOutlet;
 import 'package:intl/intl.dart';
 import 'package:medicine_reminder/features/features.dart';
+import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/models/doctor.dart';
 import 'package:medicine_reminder/models/models.dart';
 import 'package:medicine_reminder/ui/main/main.dart' show YourDevice;

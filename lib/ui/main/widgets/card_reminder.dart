@@ -1,7 +1,7 @@
 part of 'widgets.dart';
 
 class CardReminder extends StatefulWidget {
-  final Reminder reminder;
+  final ReminderModel reminder;
   const CardReminder({
     super.key,
     required this.reminder,
@@ -144,11 +144,9 @@ class _CardReminderState extends State<CardReminder> {
                 setState(() {
                   widget.reminder.isActive = value;
                 });
+                print("reminder id: ${widget.reminder.id}");
                 context.read<ReminderBloc>().add(
-                      UpdateReminderStatus(
-                        widget.reminder.id!,
-                        value,
-                      ),
+                      UpdateReminderStatus(widget.reminder),
                     );
               },
             ),
