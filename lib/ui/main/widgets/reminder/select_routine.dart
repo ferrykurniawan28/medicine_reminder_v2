@@ -8,12 +8,10 @@ class RoutineSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: kPrimaryColor,
       // backgroundColor:
       //     CupertinoColors.systemGroupedBackground.resolveFrom(context),
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Select Routine'),
-      ),
+      navigationBar: defaultCupertinoAppBar('Select Routine'),
       child: SafeArea(
         child: CupertinoListSection.insetGrouped(
           header: Column(

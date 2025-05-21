@@ -16,10 +16,8 @@ class AddReminderScreen extends StatelessWidget {
     }
 
     return CupertinoPageScaffold(
-      backgroundColor: Colors.white,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Add Reminder'),
-      ),
+      backgroundColor: kPrimaryColor,
+      navigationBar: defaultCupertinoAppBar('Add Reminder'),
       child: SafeArea(
         child: CupertinoListSection.insetGrouped(
           header: Text('Containers', style: bodyTextStyle),

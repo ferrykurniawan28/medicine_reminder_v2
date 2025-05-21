@@ -178,9 +178,8 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CupertinoPageScaffold(
-        navigationBar: const CupertinoNavigationBar(
-          middle: Text('Multiple Times Daily'),
-        ),
+        backgroundColor: kPrimaryColor,
+        navigationBar: defaultCupertinoAppBar('Multiple Times Daily'),
         child: SafeArea(
           child: Stack(
             children: [

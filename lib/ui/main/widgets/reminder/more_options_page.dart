@@ -70,10 +70,8 @@ class _MoreOptionsPageState extends State<MoreOptionsPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      backgroundColor: Colors.white,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('More Options'),
-      ),
+      backgroundColor: kPrimaryColor,
+      navigationBar: defaultCupertinoAppBar('More Options'),
       child: SafeArea(
         child: Stack(
           children: [

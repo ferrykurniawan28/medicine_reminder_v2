@@ -1,9 +1,8 @@
 part of 'helpers.dart';
 
-// Primary (Main Color)
-Color primaryColor = const Color(0xFF3B82F6); // Blue - Trust, calmness, health
-Color wellnessColor = const Color(0xFF10B981); // Green - Wellness, healing
-
+const Color kPrimaryColor = Color(0xFF27A8B5);
+const Color kSecondaryColor = Color(0xFF1B93A5);
+const Color kAccentColor = Color(0xFF095A6F);
 // Secondary (Supporting Colors)
 Color lightGrayColor =
     const Color(0xFFF3F4F6); // Light Gray - Backgrounds, soft contrast

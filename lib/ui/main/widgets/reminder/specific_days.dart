@@ -72,12 +72,8 @@ class _SpecificDaysState extends State<SpecificDays> {
       body: Stack(
         children: [
           CupertinoPageScaffold(
-            backgroundColor: Colors.white,
-            navigationBar: const CupertinoNavigationBar(
-              middle: Text(
-                'Specific Days',
-              ),
-            ),
+            backgroundColor: kPrimaryColor,
+            navigationBar: defaultCupertinoAppBar('Specific Days'),
             child: SafeArea(
               child: CupertinoListSection.insetGrouped(
                 header: Column(

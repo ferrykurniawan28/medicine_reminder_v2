@@ -97,10 +97,8 @@ class _OnceTwiceDailyPageState extends State<OnceTwiceDailyPage> {
     return Scaffold(
       backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
       body: CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-          middle: Text(widget.container.medicineName ?? 'Empty'),
-        ),
-        backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+        navigationBar: defaultCupertinoAppBar(widget.container.medicineName!),
+        backgroundColor: kPrimaryColor,
         child: SafeArea(
           child: Stack(
             children: [

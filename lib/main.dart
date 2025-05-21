@@ -11,6 +11,7 @@ import 'package:medicine_reminder/features/reminder/domain/usecases/delete_remin
     as usecases;
 import 'package:medicine_reminder/features/reminder/domain/usecases/update_reminder.dart'
     as usecases;
+import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:medicine_reminder/routes/routes.dart';
 
 void main() async {
@@ -24,7 +25,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Modular.setInitialRoute('/');
-    ReminderLocalDataSource().clearReminders();
+    // ReminderLocalDataSource().clearReminders();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => DeviceBloc()),
@@ -44,8 +45,30 @@ class MainApp extends StatelessWidget {
         routerDelegate: Modular.routerDelegate,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primaryColor: kPrimaryColor,
           fontFamily: 'Montserrat ',
+          appBarTheme: const AppBarTheme(
+            backgroundColor: kPrimaryColor,
+            actionsIconTheme: IconThemeData(color: Colors.white),
+            iconTheme: IconThemeData(color: Colors.white),
+            titleTextStyle: TextStyle(
+                fontFamily: 'Montserrat ',
+                fontSize: 20,
+                fontWeight: FontWeight.bold),
+          ),
+          buttonTheme: const ButtonThemeData(
+            buttonColor: kPrimaryColor,
+            textTheme: ButtonTextTheme.primary,
+          ),
+          toggleButtonsTheme: const ToggleButtonsThemeData(
+            selectedColor: kPrimaryColor,
+            color: Colors.white,
+            fillColor: kPrimaryColor,
+          ),
+          switchTheme: const SwitchThemeData(
+            thumbColor: WidgetStatePropertyAll(Colors.white),
+            // trackColor: WidgetStatePropertyAll(kPrimaryColor),
+          ),
           textTheme: const TextTheme(
             titleLarge: TextStyle(
                 fontFamily: 'Montserrat ',

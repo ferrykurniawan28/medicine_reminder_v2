@@ -72,7 +72,7 @@ class _OnboardingState extends State<Onboarding> {
                       : Icons.arrow_forward_ios_rounded,
                 ),
                 iconSize: 50.0,
-                color: primaryColor,
+                color: kPrimaryColor,
                 style: ButtonStyle(
                   shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
