@@ -1,5 +1,9 @@
 part of 'helpers.dart';
 
+const Color kPrimaryColor = Color(0xFF27A8B5);
+const Color kSecondaryColor = Color(0xFF1B93A5);
+const Color kAccentColor = Color(0xFF095A6F);
+
 TextStyle titleTextStyle = TextStyle(
   fontSize: 24,
   fontWeight: bold,

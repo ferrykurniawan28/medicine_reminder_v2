@@ -80,10 +80,15 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
 
   Future<void> _updateReminderStatus(
       UpdateReminderStatus event, Emitter<ReminderState> emit) async {
-    emit(ReminderLoading());
     try {
       await updateReminder.call(event.reminder);
-      add(LoadReminders());
+      if (state is ReminderLoaded) {
+        final currentReminders = (state as ReminderLoaded).reminders;
+        final updatedReminders = currentReminders
+            .map((r) => r.id == event.reminder.id ? event.reminder : r)
+            .toList();
+        emit(ReminderLoaded(updatedReminders));
+      }
     } catch (e) {
       emit(ReminderError(e.toString()));
     }

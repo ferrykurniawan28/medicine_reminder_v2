@@ -40,29 +40,18 @@ class _CardReminderState extends State<CardReminder> {
     }
 
     return Container(
-      // height: 100,
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(
-        bottom: 10,
-      ),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        // gradient: LinearGradient(
-        //   colors: [
-        //     softBlueColor,
-        //     softBlueColor.lighten(0.1),
-        //   ],
-        // ),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          defaultShadow,
-        ],
+        boxShadow: [defaultShadow],
       ),
       child: Row(
         children: [
           Expanded(
-            flex: 4, // 40% of the Row
+            flex: 4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -87,7 +76,7 @@ class _CardReminderState extends State<CardReminder> {
             ),
           ),
           Expanded(
-            flex: 4, // 40% of the Row
+            flex: 4,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -141,12 +130,10 @@ class _CardReminderState extends State<CardReminder> {
             child: Switch(
               value: widget.reminder.isActive,
               onChanged: (bool value) {
-                setState(() {
-                  widget.reminder.isActive = value;
-                });
-                print("reminder id: ${widget.reminder.id}");
                 context.read<ReminderBloc>().add(
-                      UpdateReminderStatus(widget.reminder),
+                      UpdateReminderStatus(
+                        widget.reminder.copyWith(isActive: value),
+                      ),
                     );
               },
             ),
