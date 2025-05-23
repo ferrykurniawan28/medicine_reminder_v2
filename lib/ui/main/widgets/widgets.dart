@@ -6,10 +6,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart'
     show ChildRoute, Modular, ModularRoute, Module, RouterOutlet;
 import 'package:intl/intl.dart';
+import 'package:medicine_reminder/features/device/data/models/device_model.dart';
+import 'package:medicine_reminder/features/device/domain/entities/container.dart';
 import 'package:medicine_reminder/features/features.dart';
+import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
+import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
+import 'package:medicine_reminder/features/reminder/domain/entities/time.dart';
 import 'package:medicine_reminder/models/doctor.dart';
 import 'package:medicine_reminder/models/models.dart';
 import 'package:medicine_reminder/ui/main/main.dart' show YourDevice;
+import 'package:medicine_reminder/utils/overlay.dart';
 import 'package:popup_menu_plus/popup_menu_plus.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -22,6 +28,7 @@ part 'reminder/once_twice_daily_page.dart';
 part 'reminder/more_options_page.dart';
 part 'reminder/multiple_times_daily.dart';
 part 'reminder/specific_days.dart';
+part 'reminder/reminder_detail.dart';
 part 'card_reminder.dart';
 part 'appointment/appointment.dart';
 part 'appointment/select_date_time.dart';

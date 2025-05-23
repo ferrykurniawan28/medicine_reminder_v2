@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:medicine_reminder/features/features.dart';
+// import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource.dart';
+import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:medicine_reminder/routes/routes.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(ModularApp(module: AppRoute(), child: const MainApp()));
 }
 
@@ -14,20 +17,54 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Modular.setInitialRoute('/');
+    // ReminderLocalDataSource().clearReminders();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => DeviceBloc()),
         BlocProvider(create: (context) => ParentalBloc()),
         BlocProvider(create: (context) => AppointmentBloc()),
-        BlocProvider(create: (context) => ReminderBloc()),
+        BlocProvider(
+          create: (context) => ReminderBloc(),
+        ),
       ],
       child: MaterialApp.router(
         routeInformationParser: Modular.routeInformationParser,
         routerDelegate: Modular.routerDelegate,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primaryColor: kPrimaryColor,
           fontFamily: 'Montserrat ',
+          appBarTheme: const AppBarTheme(
+            backgroundColor: kPrimaryColor,
+            actionsIconTheme: IconThemeData(color: Colors.white),
+            iconTheme: IconThemeData(color: Colors.white),
+            titleTextStyle: TextStyle(
+                fontFamily: 'Montserrat ',
+                fontSize: 20,
+                fontWeight: FontWeight.bold),
+          ),
+          buttonTheme: const ButtonThemeData(
+            buttonColor: kPrimaryColor,
+            textTheme: ButtonTextTheme.primary,
+          ),
+          toggleButtonsTheme: const ToggleButtonsThemeData(
+            selectedColor: kPrimaryColor,
+            color: Colors.white,
+            fillColor: kPrimaryColor,
+          ),
+          switchTheme: const SwitchThemeData(
+            thumbColor: WidgetStatePropertyAll(Colors.white),
+            // trackColor: WidgetStatePropertyAll(kPrimaryColor),
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimaryColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
           textTheme: const TextTheme(
             titleLarge: TextStyle(
                 fontFamily: 'Montserrat ',

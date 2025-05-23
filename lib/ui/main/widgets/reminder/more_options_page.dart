@@ -1,7 +1,7 @@
 part of '../widgets.dart';
 
 class MoreOptionsPage extends StatefulWidget {
-  final ContainerModel container;
+  final DeviceContainer container;
   const MoreOptionsPage({super.key, required this.container});
 
   @override
@@ -70,10 +70,8 @@ class _MoreOptionsPageState extends State<MoreOptionsPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      backgroundColor: Colors.white,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('More Options'),
-      ),
+      backgroundColor: kPrimaryColor,
+      navigationBar: defaultCupertinoAppBar('More Options'),
       child: SafeArea(
         child: Stack(
           children: [

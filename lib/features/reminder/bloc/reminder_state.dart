@@ -16,9 +16,6 @@ final class ReminderLoaded extends ReminderState {
 
   const ReminderLoaded(this.reminders);
 
-  List<Reminder> get sortedReminders => List.from(reminders)
-    ..sort((a, b) => a.times.first.compareTo(b.times.first));
-
   @override
   List<Object> get props => [reminders];
 }

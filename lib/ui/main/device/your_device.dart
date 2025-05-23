@@ -2,7 +2,7 @@
 part of '../main.dart';
 
 class YourDevice extends StatelessWidget {
-  final DeviceModel device;
+  final Device device;
   const YourDevice({
     super.key,
     required this.device,
@@ -30,12 +30,12 @@ class YourDevice extends StatelessWidget {
             // floatingIndicator: true,
             slideIndicator: CircularSlideIndicator(
                 slideIndicatorOptions: const SlideIndicatorOptions(
-              currentIndicatorColor: Colors.blue,
+              currentIndicatorColor: kPrimaryColor,
               indicatorBackgroundColor: Colors.grey,
               indicatorRadius: 4,
               haloPadding: EdgeInsets.symmetric(horizontal: 5),
             )),
-            indicatorMargin: 2.5,
+            indicatorMargin: 1,
             scrollDirection: Axis.horizontal,
           ),
           itemBuilder: (BuildContext context, int index, int realIndex) {

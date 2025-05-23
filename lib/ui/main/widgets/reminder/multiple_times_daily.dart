@@ -41,9 +41,14 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
       return;
     }
 
-    Reminder newReminder = Reminder(
+    List<Time> times = selectedTimes
+        .map((time) =>
+            Time.fromDateTime(DateTime(0, 0, 0, time.hour, time.minute)))
+        .toList();
+
+    ReminderModel newReminder = ReminderModel(
       type: ReminderType.multipleTimesDaily,
-      times: selectedTimes,
+      times: times,
       medicineName: widget.container.medicineName!,
       medicineLeft: widget.container.quantity,
       dosage: dosage,
@@ -173,9 +178,8 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CupertinoPageScaffold(
-        navigationBar: const CupertinoNavigationBar(
-          middle: Text('Multiple Times Daily'),
-        ),
+        backgroundColor: kPrimaryColor,
+        navigationBar: defaultCupertinoAppBar('Multiple Times Daily'),
         child: SafeArea(
           child: Stack(
             children: [

@@ -41,7 +41,7 @@ final class ParentalError extends ParentalState {
 }
 
 final class ReminderParentalLoaded extends ParentalState {
-  final List<Reminder> reminders;
+  final List<ReminderModel> reminders;
 
   const ReminderParentalLoaded(this.reminders);
 
@@ -59,7 +59,7 @@ final class AppointmentParentalLoaded extends ParentalState {
 }
 
 final class DeviceParentalLoaded extends ParentalState {
-  final DeviceModel devices;
+  final Device devices;
 
   const DeviceParentalLoaded(this.devices);
 

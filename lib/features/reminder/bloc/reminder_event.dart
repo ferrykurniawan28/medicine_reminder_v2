@@ -37,11 +37,10 @@ final class DeleteReminder extends ReminderEvent {
 }
 
 final class UpdateReminderStatus extends ReminderEvent {
-  final int reminderId;
-  final bool isActive;
+  final Reminder reminder;
 
-  const UpdateReminderStatus(this.reminderId, this.isActive);
+  const UpdateReminderStatus(this.reminder);
 
   @override
-  List<Object> get props => [reminderId, isActive];
+  List<Object> get props => [reminder];
 }

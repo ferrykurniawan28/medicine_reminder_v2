@@ -50,7 +50,7 @@ class _MainPageState extends State<MainPage> {
                           ? 'assets/icons/home-selected.png'
                           : 'assets/icons/home.png',
                       width: 24,
-                      color: _selectedIndex == 0 ? darkGrayColor : Colors.black,
+                      color: _selectedIndex == 0 ? kPrimaryColor : Colors.black,
                     ),
                     label: 'Home',
                     isSelected: _selectedIndex == 0,
@@ -67,7 +67,7 @@ class _MainPageState extends State<MainPage> {
                           ? 'assets/icons/calendar-selected.png'
                           : 'assets/icons/calendar.png',
                       width: 24,
-                      color: _selectedIndex == 1 ? darkGrayColor : Colors.black,
+                      color: _selectedIndex == 1 ? kPrimaryColor : Colors.black,
                     ),
                     label: 'Appointment',
                     isSelected: _selectedIndex == 1,
@@ -84,7 +84,7 @@ class _MainPageState extends State<MainPage> {
                           ? 'assets/icons/family-selected.png'
                           : 'assets/icons/family.png',
                       width: 24,
-                      color: _selectedIndex == 2 ? darkGrayColor : Colors.black,
+                      color: _selectedIndex == 2 ? kPrimaryColor : Colors.black,
                     ),
                     label: 'Parental',
                     isSelected: _selectedIndex == 2,
@@ -101,7 +101,7 @@ class _MainPageState extends State<MainPage> {
                           ? 'assets/icons/pill-dosage-selected.png'
                           : 'assets/icons/pill-dosage.png',
                       width: 24,
-                      color: _selectedIndex == 3 ? darkGrayColor : Colors.black,
+                      color: _selectedIndex == 3 ? kPrimaryColor : Colors.black,
                       height: 24,
                       // fit: BoxFit.fill,
                     ),
@@ -186,7 +186,7 @@ class _CustomIconButtonState extends State<CustomIconButton> {
             Text(
               widget.label,
               style: TextStyle(
-                color: widget.isSelected ? darkGrayColor : Colors.black,
+                color: widget.isSelected ? kPrimaryColor : Colors.black,
                 fontWeight:
                     widget.isSelected ? FontWeight.bold : FontWeight.normal,
               ),

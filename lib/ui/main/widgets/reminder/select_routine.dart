@@ -1,19 +1,17 @@
 part of '../widgets.dart';
 
 class RoutineSelectionScreen extends StatelessWidget {
-  final ContainerModel container;
+  final DeviceContainer container;
 
   const RoutineSelectionScreen({super.key, required this.container});
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: kPrimaryColor,
       // backgroundColor:
       //     CupertinoColors.systemGroupedBackground.resolveFrom(context),
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Select Routine'),
-      ),
+      navigationBar: defaultCupertinoAppBar('Select Routine'),
       child: SafeArea(
         child: CupertinoListSection.insetGrouped(
           header: Column(

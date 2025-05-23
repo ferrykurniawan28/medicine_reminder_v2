@@ -1,7 +1,7 @@
 part of '../widgets.dart';
 
 class OnceTwiceDailyPage extends StatefulWidget {
-  final ContainerModel container;
+  final DeviceContainer container;
   final bool isOnce;
 
   const OnceTwiceDailyPage({
@@ -48,9 +48,34 @@ class _OnceTwiceDailyPageState extends State<OnceTwiceDailyPage> {
       return;
     }
 
+    if (selectedTime == secondTime) {
+      _showErrorDialog('Please select different times for each intake.');
+      return;
+    }
+
+    if (selectedTime.hour == secondTime?.hour &&
+        selectedTime.minute == secondTime?.minute) {
+      _showErrorDialog('Please select different times for each intake.');
+      return;
+    }
+
+    // convert TimeOfDay to Time
+    final selectedTimeConverted = Time.fromDateTime(
+      DateTime(0, 0, 0, selectedTime.hour, selectedTime.minute),
+    );
+
+    final secondTimeConverted = secondTime != null
+        ? Time.fromDateTime(
+            DateTime(0, 0, 0, secondTime!.hour, secondTime!.minute),
+          )
+        : null;
+
     final reminder = Reminder(
       containerId: widget.container.id,
-      times: [selectedTime, if (secondTime != null) secondTime!],
+      times: [
+        selectedTimeConverted,
+        if (secondTime != null) secondTimeConverted!
+      ],
       dosage: [dose, if (secondDose != null) secondDose],
       isAlert: isCriticalAlertEnabled,
       type: widget.isOnce ? ReminderType.onceDaily : ReminderType.twiceDaily,
@@ -72,10 +97,8 @@ class _OnceTwiceDailyPageState extends State<OnceTwiceDailyPage> {
     return Scaffold(
       backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
       body: CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-          middle: Text(widget.container.medicineName ?? 'Empty'),
-        ),
-        backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+        navigationBar: defaultCupertinoAppBar(widget.container.medicineName!),
+        backgroundColor: kPrimaryColor,
         child: SafeArea(
           child: Stack(
             children: [

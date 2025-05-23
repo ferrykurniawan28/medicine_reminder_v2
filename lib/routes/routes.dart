@@ -50,12 +50,12 @@ class AppRoute extends Module {
           ),
         ],
       ),
-      ChildRoute('/device', child: (_) => const Device()),
+      ChildRoute('/device', child: (_) => const DeviceView()),
     ]);
-    r.child(
-      '/device/:deviceId',
-      child: (_) => const Device(),
-    );
+    // r.child(
+    //   '/device/:deviceId',
+    //   child: (_) => const DeviceView(),
+    // );
     r.module('/auth', module: AuthRoutes());
     r.module('/reminder', module: AddReminderModule());
   }

@@ -9,16 +9,16 @@ sealed class DeviceEvent extends Equatable {
 }
 
 final class DeviceFetch extends DeviceEvent {
-  final int userId;
+  final int deviceId;
 
-  const DeviceFetch(this.userId);
+  const DeviceFetch(this.deviceId);
 
   @override
-  List<Object> get props => [userId];
+  List<Object> get props => [deviceId];
 }
 
 final class LoadDeviceDetail extends DeviceEvent {
-  final DeviceModel device;
+  final Device device;
 
   const LoadDeviceDetail(this.device);
 
@@ -29,7 +29,7 @@ final class LoadDeviceDetail extends DeviceEvent {
 final class DeviceRefresh extends DeviceEvent {}
 
 final class DeviceUpdate extends DeviceEvent {
-  final DeviceModel device;
+  final Device device;
 
   const DeviceUpdate(this.device);
 

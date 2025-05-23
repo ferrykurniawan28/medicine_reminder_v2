@@ -1,6 +1,6 @@
 part of '../widgets.dart';
 
-void addMedicine(BuildContext ctx, ContainerModel container) {
+void addMedicine(BuildContext ctx, DeviceContainer container) {
   showModalBottomSheet(
     context: ctx,
     isScrollControlled: true,
@@ -9,7 +9,7 @@ void addMedicine(BuildContext ctx, ContainerModel container) {
 }
 
 class _MedicineForm extends StatefulWidget {
-  final ContainerModel container;
+  final DeviceContainer container;
   const _MedicineForm({required this.container});
 
   @override
@@ -47,6 +47,20 @@ class _MedicineFormState extends State<_MedicineForm> {
         child: SingleChildScrollView(
           child: Container(
             padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
             child: Form(
               key: formKey,
               child: Column(
@@ -98,8 +112,12 @@ class _MedicineFormState extends State<_MedicineForm> {
                                 quantity: int.parse(dosageController.text),
                               ),
                             );
-                        Modular.to.popUntil(
-                            (route) => route.settings.name == '/home/device');
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Medicine added successfully'),
+                          ),
+                        );
                       }
                     },
                     child: const Text('Add Medicine'),
@@ -114,7 +132,7 @@ class _MedicineFormState extends State<_MedicineForm> {
   }
 }
 
-void resetDialog(BuildContext ctx, ContainerModel container) {
+void resetDialog(BuildContext ctx, DeviceContainer container) {
   AwesomeDialog(
     context: ctx,
     dialogType: DialogType.warning,
@@ -125,13 +143,12 @@ void resetDialog(BuildContext ctx, ContainerModel container) {
     btnOkText: 'Reset',
     btnCancelOnPress: () {},
     btnOkOnPress: () {
-      print("ResetContainer event sent for ID: ${container.containerId}");
       ctx.read<DeviceBloc>().add(ResetContainer(container.containerId));
     },
   ).show();
 }
 
-void poopUpMenuContainer(BuildContext ctx, ContainerModel container,
+void poopUpMenuContainer(BuildContext ctx, DeviceContainer container,
     GlobalKey key, double popupHeight) {
   final RenderBox? renderBox =
       key.currentContext?.findRenderObject() as RenderBox?;

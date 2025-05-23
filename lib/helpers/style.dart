@@ -36,11 +36,27 @@ BoxShadow defaultShadow = BoxShadow(
 
 AppBar defaultAppBar(String title, {Widget? leading, List<Widget>? actions}) {
   return AppBar(
-    backgroundColor: Colors.white,
+    // backgroundColor: Colors.white,
     title: Text(title),
     centerTitle: true,
-    elevation: 0,
+    elevation: 2.5,
     leading: leading,
     actions: actions,
+    shadowColor: Colors.grey,
+  );
+}
+
+CupertinoNavigationBar defaultCupertinoAppBar(String title) {
+  return CupertinoNavigationBar(
+    middle: Text(title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        )),
+    backgroundColor: Colors.white,
+    leading: const CupertinoNavigationBarBackButton(
+      color: Colors.white,
+    ),
   );
 }

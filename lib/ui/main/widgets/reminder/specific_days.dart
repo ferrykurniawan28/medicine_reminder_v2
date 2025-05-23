@@ -27,11 +27,15 @@ class _SpecificDaysState extends State<SpecificDays> {
 
     Reminder newReminder = Reminder(
       type: ReminderType.specificDays,
-      times: [selectedTime],
-      medicineName: widget.container.medicineName!,
+      times: [
+        Time.fromDateTime(
+            DateTime(0, 0, 0, selectedTime.hour, selectedTime.minute))
+      ],
+      medicineName: widget.container.medicineName ?? 'Empty',
       medicineLeft: widget.container.quantity,
       dosage: [dosage],
       isAlert: isCriticalAlert,
+      daysofWeek: widget.days,
     );
 
     context.read<ReminderBloc>().add(
@@ -68,12 +72,8 @@ class _SpecificDaysState extends State<SpecificDays> {
       body: Stack(
         children: [
           CupertinoPageScaffold(
-            backgroundColor: Colors.white,
-            navigationBar: const CupertinoNavigationBar(
-              middle: Text(
-                'Specific Days',
-              ),
-            ),
+            backgroundColor: kPrimaryColor,
+            navigationBar: defaultCupertinoAppBar('Specific Days'),
             child: SafeArea(
               child: CupertinoListSection.insetGrouped(
                 header: Column(
