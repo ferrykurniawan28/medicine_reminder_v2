@@ -1,6 +1,6 @@
 part of '../widgets.dart';
 
-void addMedicine(BuildContext ctx, ContainerModel container) {
+void addMedicine(BuildContext ctx, DeviceContainer container) {
   showModalBottomSheet(
     context: ctx,
     isScrollControlled: true,
@@ -9,7 +9,7 @@ void addMedicine(BuildContext ctx, ContainerModel container) {
 }
 
 class _MedicineForm extends StatefulWidget {
-  final ContainerModel container;
+  final DeviceContainer container;
   const _MedicineForm({required this.container});
 
   @override
@@ -132,7 +132,7 @@ class _MedicineFormState extends State<_MedicineForm> {
   }
 }
 
-void resetDialog(BuildContext ctx, ContainerModel container) {
+void resetDialog(BuildContext ctx, DeviceContainer container) {
   AwesomeDialog(
     context: ctx,
     dialogType: DialogType.warning,
@@ -143,13 +143,12 @@ void resetDialog(BuildContext ctx, ContainerModel container) {
     btnOkText: 'Reset',
     btnCancelOnPress: () {},
     btnOkOnPress: () {
-      print("ResetContainer event sent for ID: ${container.containerId}");
       ctx.read<DeviceBloc>().add(ResetContainer(container.containerId));
     },
   ).show();
 }
 
-void poopUpMenuContainer(BuildContext ctx, ContainerModel container,
+void poopUpMenuContainer(BuildContext ctx, DeviceContainer container,
     GlobalKey key, double popupHeight) {
   final RenderBox? renderBox =
       key.currentContext?.findRenderObject() as RenderBox?;

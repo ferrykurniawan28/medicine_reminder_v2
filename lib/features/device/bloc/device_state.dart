@@ -13,7 +13,7 @@ final class DeviceInitial extends DeviceState {}
 final class DeviceLoading extends DeviceState {}
 
 final class DeviceLoaded extends DeviceState {
-  final DeviceModel device;
+  final Device device;
 
   const DeviceLoaded(this.device);
 
@@ -22,7 +22,7 @@ final class DeviceLoaded extends DeviceState {
 }
 
 final class ContainerUpdated extends DeviceState {
-  final DeviceModel device;
+  final Device device;
 
   const ContainerUpdated(this.device);
 

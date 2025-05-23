@@ -8,6 +8,7 @@ import 'package:medicine_reminder/features/reminder/domain/usecases/delete_remin
     as usecase_delete;
 import 'package:medicine_reminder/features/reminder/domain/usecases/update_reminder.dart'
     as usecase_update;
+import 'package:medicine_reminder/features/reminder/data/repositories/reminder_repository_impl.dart';
 
 part 'reminder_event.dart';
 part 'reminder_state.dart';
@@ -18,12 +19,14 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
   final usecase_delete.DeleteReminder deleteReminder;
   final usecase_update.UpdateReminder updateReminder;
 
-  ReminderBloc({
-    required this.getReminders,
-    required this.addReminder,
-    required this.deleteReminder,
-    required this.updateReminder,
-  }) : super(ReminderInitial()) {
+  ReminderBloc()
+      : getReminders = GetReminders(ReminderRepositoryImpl()),
+        addReminder = usecase_add.AddReminder(ReminderRepositoryImpl()),
+        deleteReminder =
+            usecase_delete.DeleteReminder(ReminderRepositoryImpl()),
+        updateReminder =
+            usecase_update.UpdateReminder(ReminderRepositoryImpl()),
+        super(ReminderInitial()) {
     on<LoadReminders>(_onFetchReminders);
     on<AddReminder>(_addReminder);
     on<UpdateReminder>(_updateReminder);

@@ -1,7 +1,7 @@
 part of '../widgets.dart';
 
 class OnceTwiceDailyPage extends StatefulWidget {
-  final ContainerModel container;
+  final DeviceContainer container;
   final bool isOnce;
 
   const OnceTwiceDailyPage({

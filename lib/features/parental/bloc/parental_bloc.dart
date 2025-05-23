@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:medicine_reminder/features/device/data/models/device_model.dart';
+import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/models/models.dart';
 
@@ -77,7 +79,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
       LoadDeviceParental event, Emitter<ParentalState> emit) async {
     emit(ParentalLoading());
     try {
-      _deviceModel = dummyDevice;
+      _deviceModel = null;
       // final deviceModel =
       //     await _deviceRepository.getDevice(event.parentalId);
       emit(DeviceParentalLoaded(_deviceModel!));

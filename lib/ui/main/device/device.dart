@@ -1,13 +1,14 @@
 part of '../main.dart';
 
-class Device extends StatefulWidget {
-  const Device({super.key});
+class DeviceView extends StatefulWidget {
+  const DeviceView({super.key});
 
   @override
-  State<Device> createState() => _DeviceState();
+  State<DeviceView> createState() => _DeviceState();
 }
 
-class _DeviceState extends State<Device> {
+// TODO: work on device
+class _DeviceState extends State<DeviceView> {
   @override
   void initState() {
     super.initState();
@@ -22,7 +23,7 @@ class _DeviceState extends State<Device> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: defaultAppBar('Device', actions: [
-        IconButton(onPressed: () {}, icon: const Icon(Icons.settings))
+        IconButton(onPressed: () {}, icon: const Icon(Icons.playlist_remove))
       ]),
       backgroundColor: Colors.white,
       body: RefreshIndicator(
@@ -124,6 +125,24 @@ class _DeviceState extends State<Device> {
                 },
               );
             } else if (state is DeviceError) {
+              if (state.message == 'Device not found') {
+                return Column(
+                  children: [
+                    Text(
+                      state.message,
+                      style: bodyTextStyle,
+                    ),
+                    spacerHeight(20),
+                    // add a button to add device
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<DeviceBloc>().add(const DeviceFetch(1));
+                      },
+                      child: const Text('Add Device'),
+                    ),
+                  ],
+                );
+              }
               return Center(
                 child: Text(
                   state.message,

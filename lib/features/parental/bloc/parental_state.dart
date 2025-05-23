@@ -59,7 +59,7 @@ final class AppointmentParentalLoaded extends ParentalState {
 }
 
 final class DeviceParentalLoaded extends ParentalState {
-  final DeviceModel devices;
+  final Device devices;
 
   const DeviceParentalLoaded(this.devices);
 

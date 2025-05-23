@@ -1,7 +1,7 @@
 part of '../widgets.dart';
 
 class RoutineSelectionScreen extends StatelessWidget {
-  final ContainerModel container;
+  final DeviceContainer container;
 
   const RoutineSelectionScreen({super.key, required this.container});
 

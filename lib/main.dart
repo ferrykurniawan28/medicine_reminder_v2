@@ -2,15 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:medicine_reminder/features/features.dart';
-import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource.dart';
-import 'package:medicine_reminder/features/reminder/data/repositories/reminder_repository_impl.dart';
-import 'package:medicine_reminder/features/reminder/domain/usecases/get_reminders.dart';
-import 'package:medicine_reminder/features/reminder/domain/usecases/add_reminder.dart'
-    as usecases;
-import 'package:medicine_reminder/features/reminder/domain/usecases/delete_reminder.dart'
-    as usecases;
-import 'package:medicine_reminder/features/reminder/domain/usecases/update_reminder.dart'
-    as usecases;
+// import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:medicine_reminder/routes/routes.dart';
 
@@ -32,12 +24,7 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => ParentalBloc()),
         BlocProvider(create: (context) => AppointmentBloc()),
         BlocProvider(
-          create: (context) => ReminderBloc(
-            getReminders: GetReminders(ReminderRepositoryImpl()),
-            addReminder: usecases.AddReminder(ReminderRepositoryImpl()),
-            deleteReminder: usecases.DeleteReminder(ReminderRepositoryImpl()),
-            updateReminder: usecases.UpdateReminder(ReminderRepositoryImpl()),
-          ),
+          create: (context) => ReminderBloc(),
         ),
       ],
       child: MaterialApp.router(
@@ -68,6 +55,15 @@ class MainApp extends StatelessWidget {
           switchTheme: const SwitchThemeData(
             thumbColor: WidgetStatePropertyAll(Colors.white),
             // trackColor: WidgetStatePropertyAll(kPrimaryColor),
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimaryColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
           ),
           textTheme: const TextTheme(
             titleLarge: TextStyle(

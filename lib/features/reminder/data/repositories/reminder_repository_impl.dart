@@ -1,9 +1,10 @@
 import '../../domain/entities/reminder.dart' as domain;
 import '../../domain/repositories/reminder_repository.dart';
-import '../datasources/reminder_local_datasource.dart';
+import '../datasources/reminder_local_datasource_impl.dart';
+import '../datasources/reminder_local_datasource_interface.dart';
 
 class ReminderRepositoryImpl implements ReminderRepository {
-  final ReminderLocalDataSource localDataSource = ReminderLocalDataSource();
+  final ReminderLocalDataSource localDataSource = ReminderLocalDataSourceImpl();
 
   @override
   Future<List<domain.Reminder>> getReminders() {

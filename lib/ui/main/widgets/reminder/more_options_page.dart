@@ -1,7 +1,7 @@
 part of '../widgets.dart';
 
 class MoreOptionsPage extends StatefulWidget {
-  final ContainerModel container;
+  final DeviceContainer container;
   const MoreOptionsPage({super.key, required this.container});
 
   @override
