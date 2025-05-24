@@ -24,11 +24,10 @@ class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Center(
-          child: Text('Minder', style: titleTextStyle),
-        ),
+      backgroundColor: kPrimaryColor,
+      body: Center(
+        child: Text('Minder',
+            style: titleTextStyle.copyWith(color: Colors.white, fontSize: 30)),
       ),
     );
   }

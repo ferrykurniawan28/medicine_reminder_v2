@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:medicine_reminder/features/appointment/data/datasources/appointment_local_datasource_impl.dart';
 import 'package:medicine_reminder/features/features.dart';
 // import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
@@ -17,15 +18,13 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Modular.setInitialRoute('/');
-    // ReminderLocalDataSource().clearReminders();
+    // AppointmentLocalDataSourceImpl().deleteAllAppointments();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => DeviceBloc()),
         BlocProvider(create: (context) => ParentalBloc()),
         BlocProvider(create: (context) => AppointmentBloc()),
-        BlocProvider(
-          create: (context) => ReminderBloc(),
-        ),
+        BlocProvider(create: (context) => ReminderBloc()),
       ],
       child: MaterialApp.router(
         routeInformationParser: Modular.routeInformationParser,
@@ -65,6 +64,7 @@ class MainApp extends StatelessWidget {
               ),
             ),
           ),
+          scaffoldBackgroundColor: Colors.white,
           textTheme: const TextTheme(
             titleLarge: TextStyle(
                 fontFamily: 'Montserrat ',
