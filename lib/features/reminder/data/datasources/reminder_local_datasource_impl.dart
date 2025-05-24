@@ -45,8 +45,18 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
   @override
   Future<List<Reminder>> getReminders() async {
     final db = await database;
-    final maps = await db.query('reminders');
-    return maps
+    // Attach device.db to this connection so we can join containers
+    final dbPath = await getDatabasesPath();
+    final deviceDbPath = join(dbPath, 'device.db');
+    await db.execute("ATTACH DATABASE '$deviceDbPath' AS device_db");
+    final result = await db.rawQuery('''
+      SELECT r.*, c.medicine_name as container_medicine_name, c.quantity as container_quantity
+      FROM reminders r
+      LEFT JOIN device_db.containers c
+        ON r.deviceId = c.device_id AND r.containerId = c.container_id
+    ''');
+    await db.execute("DETACH DATABASE device_db");
+    return result
         .map((e) => Reminder(
               id: e['id'] != null && e['id'].toString().isNotEmpty
                   ? (e['id'] is int
@@ -70,7 +80,9 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
                       ? e['containerId'] as int
                       : int.tryParse(e['containerId'].toString()))
                   : null,
-              medicineName: (e['medicineName'] ?? '') as String,
+              medicineName: (e['container_medicine_name'] ??
+                  e['medicineName'] ??
+                  '') as String,
               dosage:
                   (e['dosage'] is String && (e['dosage'] as String).isNotEmpty)
                       ? (e['dosage'] as String)
@@ -79,12 +91,17 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
                           .map((v) => int.tryParse(v) ?? 0)
                           .toList()
                       : <int>[],
-              medicineLeft: e['medicineLeft'] != null &&
-                      e['medicineLeft'].toString().isNotEmpty
-                  ? (e['medicineLeft'] is int
-                      ? e['medicineLeft'] as int
-                      : int.tryParse(e['medicineLeft'].toString()))
-                  : null,
+              medicineLeft: e['container_quantity'] != null &&
+                      e['container_quantity'].toString().isNotEmpty
+                  ? (e['container_quantity'] is int
+                      ? e['container_quantity'] as int
+                      : int.tryParse(e['container_quantity'].toString()))
+                  : (e['medicineLeft'] != null &&
+                          e['medicineLeft'].toString().isNotEmpty
+                      ? (e['medicineLeft'] is int
+                          ? e['medicineLeft'] as int
+                          : int.tryParse(e['medicineLeft'].toString()))
+                      : null),
               isActive: (e['isActive'] is int
                       ? e['isActive']
                       : int.tryParse(e['isActive']?.toString() ?? '')) ==

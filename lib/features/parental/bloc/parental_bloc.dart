@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
@@ -66,7 +67,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
       LoadAppointmentParental event, Emitter<ParentalState> emit) async {
     emit(ParentalLoading());
     try {
-      _appointments = dummyAppointment;
+      _appointments = [];
       // final appointments =
       //     await _appointmentRepository.getAppointment(event.parentalId);
       emit(AppointmentParentalLoaded(_appointments!));

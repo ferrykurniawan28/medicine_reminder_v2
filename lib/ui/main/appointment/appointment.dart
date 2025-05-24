@@ -37,7 +37,16 @@ class _AppointmentState extends State<Appointment> {
         } else if (state is AppointmentLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is AppointmentError) {
-          return Center(child: Text(state.message));
+          if (state.message == 'No appointments found') {
+            return const Center(
+                child: Text('You have no appointments yet, add one!'));
+          }
+          return Center(
+              child: Column(
+            children: [
+              Text(state.message),
+            ],
+          ));
         } else {
           return const Center(child: CircularProgressIndicator());
         }
