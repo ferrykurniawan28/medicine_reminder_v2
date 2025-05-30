@@ -31,7 +31,7 @@ GestureDetector appointmentCard(BuildContext ctx,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  appointment.doctor.name,
+                  appointment.doctor,
                   style: subtitleTextStyle,
                 ),
                 if (appointment.note != null) ...[

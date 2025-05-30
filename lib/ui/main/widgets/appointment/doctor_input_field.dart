@@ -3,7 +3,7 @@ part of '../widgets.dart';
 class DoctorInputField extends StatefulWidget {
   final Function(String) onDoctorChanged;
   final Function(String) onNoteChanged;
-  final Doctor? doctor;
+  final String? doctor;
   final String? note;
   const DoctorInputField({
     super.key,
@@ -26,7 +26,7 @@ class DoctorInputFieldState extends State<DoctorInputField>
   void initState() {
     super.initState();
     if (widget.doctor != null) {
-      _doctorController.text = widget.doctor!.name;
+      _doctorController.text = widget.doctor!;
       _isExpanded = true;
     }
     if (widget.note != null && widget.note!.isNotEmpty) {

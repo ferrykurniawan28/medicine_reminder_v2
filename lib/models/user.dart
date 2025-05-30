@@ -1,46 +1,41 @@
 part of 'models.dart';
 
-class User {
-  final int userId;
-  final String userName;
-  final UserRole? role;
+// class User {
+//   final int userId;
+//   final String userName;
+//   final String email;
 
-  User({
-    required this.userId,
-    required this.userName,
-    this.role,
-  });
+//   User({
+//     required this.userId,
+//     required this.userName,
+//     required this.email,
+//   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      userId: json['userId'],
-      userName: json['userName'],
-      role: UserRole.values[json['role']],
-    );
-  }
+//   factory User.fromJson(Map<String, dynamic> json) {
+//     return User(
+//       userId: json['id'],
+//       userName: json['username'],
+//       email: json['email'] ?? '', // Assuming email is optional
+//     );
+//   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'userId': userId,
-      'userName': userName,
-      'role': role?.index,
-    };
-  }
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'id': userId,
+//       'username': userName,
+//       'email': email,
+//     };
+//   }
 
-  User copyWith({
-    int? userId,
-    String? userName,
-    UserRole? role,
-  }) {
-    return User(
-      userId: userId ?? this.userId,
-      userName: userName ?? this.userName,
-      role: role,
-    );
-  }
-}
-
-enum UserRole {
-  admin,
-  member,
-}
+//   User copyWith({
+//     int? userId,
+//     String? userName,
+//     String? email,
+//   }) {
+//     return User(
+//       userId: userId ?? this.userId,
+//       userName: userName ?? this.userName,
+//       email: email ?? this.email,
+//     );
+//   }
+// }

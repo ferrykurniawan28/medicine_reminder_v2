@@ -44,6 +44,7 @@ class ReminderModel extends Reminder {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -56,7 +57,7 @@ class ReminderModel extends Reminder {
       'isActive': isActive,
       'isAlert': isAlert,
       'note': note,
-      'type': type.index,
+      'type': ReminderTypeHelper.getName(type),
       'times': times
           .map((t) => DateTime(0, 1, 1, t.hour, t.minute).toIso8601String())
           .toList(),

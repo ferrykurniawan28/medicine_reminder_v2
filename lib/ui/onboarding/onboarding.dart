@@ -52,7 +52,7 @@ class _OnboardingState extends State<Onboarding> {
               radius: 50.0,
               lineWidth: 10.0,
               percent: (_currentIndex + 1) / 3,
-              progressColor: Colors.blue,
+              progressColor: kPrimaryColor,
               backgroundColor: Colors.grey[300]!,
               center: IconButton(
                 onPressed: () async {

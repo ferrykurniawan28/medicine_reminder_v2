@@ -66,6 +66,27 @@ class Reminder {
       endDate: endDate ?? this.endDate,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'deviceId': deviceId,
+      'userId': userId,
+      'containerId': containerId,
+      'medicineName': medicineName,
+      'dosage': dosage,
+      'medicineLeft': medicineLeft,
+      'isActive': isActive,
+      'isAlert': isAlert,
+      'note': note,
+      'type': type.index,
+      'times': times
+          .map((t) => DateTime(0, 1, 1, t.hour, t.minute).toIso8601String())
+          .toList(),
+      'daysofWeek': daysofWeek?.map((e) => e.index).toList(),
+      'endDate': endDate?.toIso8601String(),
+    };
+  }
 }
 
 enum ReminderType {

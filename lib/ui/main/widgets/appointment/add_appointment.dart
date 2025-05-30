@@ -106,10 +106,15 @@ void addAppointment(BuildContext ctx) {
                                 context.read<AppointmentBloc>().add(
                                       AppointmentAdd(
                                         Appointment(
-                                          user: User(
+                                          userAssigned: User(
                                               userId: 1,
-                                              userName: 'Abraham Lincoln'),
-                                          doctor: Doctor(name: name),
+                                              userName: "test",
+                                              email: "email@email.com"),
+                                          userCreated: User(
+                                              userId: 1,
+                                              userName: "test",
+                                              email: "email@email.com"),
+                                          doctor: name,
                                           note: note,
                                           time: DateTime(
                                             selectedDate.year,

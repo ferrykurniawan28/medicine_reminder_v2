@@ -46,7 +46,8 @@ AppBar defaultAppBar(String title, {Widget? leading, List<Widget>? actions}) {
   );
 }
 
-CupertinoNavigationBar defaultCupertinoAppBar(String title) {
+CupertinoNavigationBar defaultCupertinoAppBar(String title,
+    {BuildContext? context}) {
   return CupertinoNavigationBar(
     middle: Text(title,
         style: const TextStyle(
@@ -55,8 +56,8 @@ CupertinoNavigationBar defaultCupertinoAppBar(String title) {
           fontWeight: FontWeight.bold,
         )),
     backgroundColor: Colors.white,
-    leading: const CupertinoNavigationBarBackButton(
-      color: Colors.white,
-    ),
+    leading: (context != null && Navigator.canPop(context))
+        ? const CupertinoNavigationBarBackButton(color: Colors.white)
+        : null,
   );
 }

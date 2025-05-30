@@ -45,17 +45,24 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
   @override
   Future<List<Reminder>> getReminders() async {
     final db = await database;
-    // Attach device.db to this connection so we can join containers
     final dbPath = await getDatabasesPath();
     final deviceDbPath = join(dbPath, 'device.db');
-    await db.execute("ATTACH DATABASE '$deviceDbPath' AS device_db");
+    // Check if device_db is already attached
+    final attachedDbs = await db.rawQuery("PRAGMA database_list;");
+    final alreadyAttached =
+        attachedDbs.any((row) => row['name'] == 'device_db');
+    if (!alreadyAttached) {
+      await db.execute("ATTACH DATABASE '$deviceDbPath' AS device_db");
+    }
     final result = await db.rawQuery('''
       SELECT r.*, c.medicine_name as container_medicine_name, c.quantity as container_quantity
       FROM reminders r
       LEFT JOIN device_db.containers c
         ON r.deviceId = c.device_id AND r.containerId = c.container_id
     ''');
-    await db.execute("DETACH DATABASE device_db");
+    if (!alreadyAttached) {
+      await db.execute("DETACH DATABASE device_db");
+    }
     return result
         .map((e) => Reminder(
               id: e['id'] != null && e['id'].toString().isNotEmpty
@@ -91,13 +98,11 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
                           .map((v) => int.tryParse(v) ?? 0)
                           .toList()
                       : <int>[],
-              medicineLeft: e['container_quantity'] != null &&
-                      e['container_quantity'].toString().isNotEmpty
-                  ? (e['container_quantity'] is int
-                      ? e['container_quantity'] as int
-                      : int.tryParse(e['container_quantity'].toString()))
-                  : (e['medicineLeft'] != null &&
-                          e['medicineLeft'].toString().isNotEmpty
+              medicineLeft: e['quantity'] != null
+                  ? (e['quantity'] is int
+                      ? e['quantity'] as int
+                      : int.tryParse(e['quantity'].toString()))
+                  : (e['medicineLeft'] != null
                       ? (e['medicineLeft'] is int
                           ? e['medicineLeft'] as int
                           : int.tryParse(e['medicineLeft'].toString()))

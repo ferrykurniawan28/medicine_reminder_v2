@@ -15,9 +15,41 @@ class _MainPageState extends State<MainPage> {
     Modular.to.navigate('/home/reminder');
   }
 
+  Map<int, AppBar> get appBars => {
+        0: defaultAppBar(
+          'Reminders',
+          actions: [
+            IconButton(
+              onPressed: () {
+                Modular.to.pushNamed('/reminder/');
+              },
+              icon: const Icon(Icons.add),
+            ),
+          ],
+        ),
+        1: defaultAppBar('Appointment', actions: [
+          IconButton(
+              onPressed: () => addAppointment(context),
+              icon: const Icon(Icons.add)),
+        ]),
+        2: defaultAppBar('Parental', actions: [
+          IconButton(
+            onPressed: () {
+              // Modular.to.pushNamed('/group/add');
+            },
+            icon: const Icon(Icons.add),
+          )
+        ]),
+        3: defaultAppBar('Device', actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.playlist_remove))
+        ]),
+      };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: _selectedIndex == 2 ? null : appBars[_selectedIndex],
+      // appBar: appBars[_selectedIndex],
       body: const RouterOutlet(),
       bottomNavigationBar: SizedBox(
         child: Stack(

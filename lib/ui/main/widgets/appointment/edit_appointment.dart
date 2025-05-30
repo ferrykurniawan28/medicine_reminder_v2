@@ -3,7 +3,7 @@ part of '../widgets.dart';
 void editAppointment(BuildContext ctx, Appointment appointment) {
   DateTime selectedDate = appointment.time;
   TimeOfDay selectedTime = TimeOfDay.fromDateTime(appointment.time);
-  String name = appointment.doctor.name;
+  String name = appointment.doctor;
   String note = appointment.note ?? '';
 
   showModalBottomSheet(
@@ -110,7 +110,7 @@ void editAppointment(BuildContext ctx, Appointment appointment) {
                                       selectedTime.hour,
                                       selectedTime.minute,
                                     ),
-                                    doctor: Doctor(name: name),
+                                    doctor: name,
                                     note: note,
                                   )),
                                 );

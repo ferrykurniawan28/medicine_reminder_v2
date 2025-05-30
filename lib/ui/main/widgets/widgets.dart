@@ -7,6 +7,7 @@ import 'package:flutter_modular/flutter_modular.dart'
     show ChildRoute, Modular, ModularRoute, Module, RouterOutlet;
 import 'package:intl/intl.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
+import 'package:medicine_reminder/features/appointment/domain/entities/doctor.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/container.dart';
 import 'package:medicine_reminder/features/doctor/domain/entities/doctor.dart';
@@ -14,6 +15,7 @@ import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/time.dart';
+import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 import 'package:medicine_reminder/models/models.dart';
 import 'package:medicine_reminder/ui/main/main.dart' show YourDevice;
 import 'package:popup_menu_plus/popup_menu_plus.dart';

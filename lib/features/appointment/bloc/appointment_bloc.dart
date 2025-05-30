@@ -79,7 +79,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     try {
       print('Adding appointment: ${event.appointment.toJson()}');
       await addAppointmentUseCase(event.appointment);
-      add(AppointmentsFetch(event.appointment.user.userId));
+      add(AppointmentsFetch(event.appointment.userAssigned.userId));
     } catch (e) {
       emit(AppointmentError(e.toString()));
     }
@@ -90,7 +90,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     emit(AppointmentLoading());
     try {
       await updateAppointmentUseCase(_toDomain(event.appointment));
-      add(AppointmentsFetch(event.appointment.user.userId));
+      add(AppointmentsFetch(event.appointment.userAssigned.userId));
     } catch (e) {
       emit(AppointmentError(e.toString()));
     }
@@ -101,7 +101,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     emit(AppointmentLoading());
     try {
       await deleteAppointmentUseCase(event.appointment.id!);
-      add(AppointmentsFetch(event.appointment.user.userId));
+      add(AppointmentsFetch(event.appointment.userAssigned.userId));
     } catch (e) {
       emit(AppointmentError(e.toString()));
     }
@@ -111,7 +111,8 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
   Appointment _toDomain(Appointment appointment) {
     return Appointment(
       id: appointment.id,
-      user: appointment.user,
+      userCreated: appointment.userCreated,
+      userAssigned: appointment.userAssigned,
       doctor: appointment.doctor,
       note: appointment.note,
       time: appointment.time,

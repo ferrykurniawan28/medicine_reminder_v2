@@ -39,6 +39,7 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
     emit(ReminderLoading());
     try {
       final reminders = await getReminders();
+      print(reminders.map((r) => r.toJson()).toList());
       emit(ReminderLoaded(reminders));
     } catch (e) {
       print('Error fetching reminders: $e');
@@ -50,6 +51,7 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
       AddReminder event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
     try {
+      print(event.reminder.toJson());
       final newReminder = await addReminder.call(event.reminder);
       emit(ReminderAdded(newReminder));
       add(LoadReminders());

@@ -37,14 +37,14 @@ class Parental {
 List<Parental> dummyParental = [
   Parental(
     id: 1,
-    user: User(userId: 1, userName: 'Jude'),
+    user: User(userId: 1, userName: 'Jude', email: "jude@jude.com"),
   ),
   Parental(
     id: 2,
-    user: User(userId: 2, userName: 'Mbappe'),
+    user: User(userId: 2, userName: 'Mbappe', email: "mbappe@mbappe.com"),
   ),
   Parental(
     id: 3,
-    user: User(userId: 3, userName: 'Vini'),
+    user: User(userId: 3, userName: 'Vini', email: "vini@vini.com"),
   ),
 ];
