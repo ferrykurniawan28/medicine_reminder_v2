@@ -18,38 +18,108 @@ class _MainPageState extends State<MainPage> {
   Map<int, AppBar> get appBars => {
         0: defaultAppBar(
           'Reminders',
+          // actions: [
+          //   IconButton(
+          //     onPressed: () {
+          //       Modular.to.pushNamed('/reminder/');
+          //     },
+          //     icon: const Icon(Icons.add),
+          //   ),
+          // ],
+        ),
+        1: defaultAppBar(
+          'Appointment',
+          // actions: [
+          //   IconButton(
+          //       onPressed: () => addAppointment(context),
+          //       icon: const Icon(Icons.add)),
+          // ],
+        ),
+        2: defaultAppBar(
+          'Parental',
+          // actions: [
+          //   IconButton(
+          //     onPressed: () {
+          //       // Modular.to.pushNamed('/group/add');
+          //     },
+          //     icon: const Icon(Icons.add),
+          //   )
+          // ],
+        ),
+        3: defaultAppBar(
+          'Device',
           actions: [
             IconButton(
-              onPressed: () {
-                Modular.to.pushNamed('/reminder/');
-              },
-              icon: const Icon(Icons.add),
-            ),
+                onPressed: () {}, icon: const Icon(Icons.playlist_remove))
           ],
         ),
-        1: defaultAppBar('Appointment', actions: [
-          IconButton(
-              onPressed: () => addAppointment(context),
-              icon: const Icon(Icons.add)),
-        ]),
-        2: defaultAppBar('Parental', actions: [
-          IconButton(
-            onPressed: () {
-              // Modular.to.pushNamed('/group/add');
-            },
-            icon: const Icon(Icons.add),
-          )
-        ]),
-        3: defaultAppBar('Device', actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.playlist_remove))
-        ]),
       };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: kPrimaryColor,
+              ),
+              child: Text(
+                'Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 0;
+                });
+                Modular.to.navigate('/home/reminder');
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_today),
+              title: const Text('Appointment'),
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 1;
+                });
+                Modular.to.navigate('/home/appointment');
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.group),
+              title: const Text('Parental'),
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 2;
+                });
+                Modular.to.navigate('/home/parental/list');
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.medical_services),
+              title: const Text('Device'),
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 3;
+                });
+                Modular.to.navigate('/home/device');
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
       // appBar: _selectedIndex == 2 ? null : appBars[_selectedIndex],
-      // appBar: appBars[_selectedIndex],
+      appBar: appBars[_selectedIndex],
       body: const RouterOutlet(),
       bottomNavigationBar: SizedBox(
         child: Stack(

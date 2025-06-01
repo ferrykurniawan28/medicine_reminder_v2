@@ -18,11 +18,11 @@ class _AppointmentState extends State<Appointment> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: defaultAppBar('Appointment', actions: [
-        IconButton(
-            onPressed: () => addAppointment(context),
-            icon: const Icon(Icons.add)),
-      ]),
+      // appBar: defaultAppBar('Appointment', actions: [
+      //   IconButton(
+      //       onPressed: () => addAppointment(context),
+      //       icon: const Icon(Icons.add)),
+      // ]),
       body: BlocBuilder<AppointmentBloc, AppointmentState>(
           builder: (context, state) {
         if (state is AppointmentsLoaded) {
@@ -51,6 +51,17 @@ class _AppointmentState extends State<Appointment> {
           return const Center(child: CircularProgressIndicator());
         }
       }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => addAppointment(context),
+        backgroundColor: kPrimaryColor,
+        shape: const CircleBorder(),
+        tooltip: 'Add Appointment',
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 30,
+        ),
+      ),
     );
   }
 }

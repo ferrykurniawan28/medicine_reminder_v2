@@ -160,18 +160,21 @@ void poopUpMenuContainer(BuildContext ctx, DeviceContainer container,
   PopupMenu menu = PopupMenu(
     context: ctx,
     config: const MenuConfig(
-      backgroundColor: Colors.blue,
+      backgroundColor: kPrimaryColor,
+      lineColor: kAccentColor,
       // lineColor: Colors.greenAccent,
-      highlightColor: Colors.lightGreenAccent,
+      // highlightColor: Colors.lightGreenAccent,
     ),
     items: [
       PopUpMenuItem(
         title: 'Reset',
-        image: const Icon(Icons.refresh),
+        textStyle: const TextStyle(color: Colors.white, fontSize: 12),
+        image: const Icon(Icons.refresh, color: Colors.white),
       ),
       PopUpMenuItem(
         title: 'Add/Refill',
-        image: const Icon(Icons.add_circle_outline),
+        textStyle: const TextStyle(color: Colors.white, fontSize: 12),
+        image: const Icon(Icons.add_circle_outline, color: Colors.white),
       ),
     ],
     onClickMenu: (PopUpMenuItemProvider item) {

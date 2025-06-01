@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:medicine_reminder/features/appointment/data/datasources/appointment_local_datasource_impl.dart';
+import 'package:medicine_reminder/features/auth/bloc/auth_bloc.dart';
 import 'package:medicine_reminder/features/features.dart';
+import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
 // import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:medicine_reminder/routes/routes.dart';
@@ -25,6 +27,11 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => ParentalBloc()),
         BlocProvider(create: (context) => AppointmentBloc()),
         BlocProvider(create: (context) => ReminderBloc()),
+        BlocProvider(create: (context) => UserBloc()),
+        BlocProvider(
+            create: (context) => AuthBloc(
+                  userBloc: ReadContext(context).read<UserBloc>(),
+                )),
       ],
       child: MaterialApp.router(
         routeInformationParser: Modular.routeInformationParser,

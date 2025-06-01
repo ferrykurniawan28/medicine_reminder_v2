@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medicine_reminder/helpers/helpers.dart';
 
 class CustomOverlay {
   static OverlayEntry? _currentOverlay;
@@ -26,5 +27,32 @@ class CustomOverlay {
     _currentOverlay?.remove();
     _currentOverlay = null;
     if (onDismiss != null) onDismiss();
+  }
+
+  static void showLoading(BuildContext context, {String? message}) {
+    show(
+      context,
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+            ),
+            const SizedBox(height: 16),
+            if (message != null)
+              Text(
+                message,
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

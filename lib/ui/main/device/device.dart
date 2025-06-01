@@ -22,9 +22,9 @@ class _DeviceState extends State<DeviceView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: defaultAppBar('Device', actions: [
-        IconButton(onPressed: () {}, icon: const Icon(Icons.playlist_remove))
-      ]),
+      // appBar: defaultAppBar('Device', actions: [
+      //   IconButton(onPressed: () {}, icon: const Icon(Icons.playlist_remove))
+      // ]),
       backgroundColor: Colors.white,
       body: RefreshIndicator(
         onRefresh: () async {
@@ -82,7 +82,7 @@ class _DeviceState extends State<DeviceView> {
                       style: captionTextStyle,
                     ),
                     onTap: () {
-                      poopUpMenuContainer(context, container, key, 0);
+                      poopUpMenuContainer(context, container, key, 80);
                     },
                   );
                 },

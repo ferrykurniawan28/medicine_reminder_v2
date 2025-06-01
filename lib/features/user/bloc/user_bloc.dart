@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:medicine_reminder/features/user/data/datasources/user_local_datasource_impl.dart';
+import 'package:medicine_reminder/features/user/data/repositories/user_repository_impl.dart';
 import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 import 'package:medicine_reminder/features/user/domain/usecases/user_usecases.dart';
 
@@ -7,21 +9,16 @@ part 'user_event.dart';
 part 'user_state.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
-  final GetUsers getUsers;
-  final GetUser getUser;
-  final AddUser addUser;
-  final UpdateUser updateUser;
-  final DeleteUser deleteUser;
-  final DeleteAllUsers deleteAllUsers;
+  static final _userRepository = UserRepositoryImpl(UserLocalDataSourceImpl());
 
-  UserBloc({
-    required this.getUsers,
-    required this.getUser,
-    required this.addUser,
-    required this.updateUser,
-    required this.deleteUser,
-    required this.deleteAllUsers,
-  }) : super(UserInitial()) {
+  final GetUsers getUsers = GetUsers(_userRepository);
+  final GetUser getUser = GetUser(_userRepository);
+  final AddUser addUser = AddUser(_userRepository);
+  final UpdateUser updateUser = UpdateUser(_userRepository);
+  final DeleteUser deleteUser = DeleteUser(_userRepository);
+  final DeleteAllUsers deleteAllUsers = DeleteAllUsers(_userRepository);
+
+  UserBloc() : super(UserInitial()) {
     on<LoadUsers>(_onLoadUsers);
     on<LoadUser>(_onLoadUser);
     on<CreateUser>(_onCreateUser);
