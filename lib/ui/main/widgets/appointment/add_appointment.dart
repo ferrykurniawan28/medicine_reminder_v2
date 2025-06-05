@@ -101,19 +101,23 @@ void addAppointment(BuildContext ctx) {
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                         onPressed: name != ''
-                            ? () {
-                                print(name);
+                            ? () async {
+                                final userId =
+                                    await SharedPreference.getInt('userId');
+                                if (!context.mounted) return;
                                 context.read<AppointmentBloc>().add(
                                       AppointmentAdd(
                                         Appointment(
                                           userAssigned: User(
-                                              userId: 1,
-                                              userName: "test",
-                                              email: "email@email.com"),
+                                            userId: userId,
+                                            // userName: "test",
+                                            // email: "email@email.com",
+                                          ),
                                           userCreated: User(
-                                              userId: 1,
-                                              userName: "test",
-                                              email: "email@email.com"),
+                                            userId: userId,
+                                            // userName: "test",
+                                            // email: "email@email.com",
+                                          ),
                                           doctor: name,
                                           note: note,
                                           time: DateTime(

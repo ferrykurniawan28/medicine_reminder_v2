@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:medicine_reminder/features/appointment/data/datasources/appointment_remote_datasource_impl.dart';
 import 'package:medicine_reminder/features/appointment/data/datasources/appointment_local_datasource_impl.dart';
+import 'package:medicine_reminder/features/appointment/data/repositories/appointment_repository_impl.dart';
+import 'package:medicine_reminder/core/network/network_service.dart';
 import 'package:medicine_reminder/features/auth/bloc/auth_bloc.dart';
 import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
@@ -25,7 +28,22 @@ class MainApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => DeviceBloc()),
         BlocProvider(create: (context) => ParentalBloc()),
-        BlocProvider(create: (context) => AppointmentBloc()),
+        BlocProvider(
+          create: (context) {
+            final localDataSource = AppointmentLocalDataSourceImpl();
+            final remoteDataSource =
+                AppointmentRemoteDataSourceImpl(NetworkService());
+            // Replace with your actual connectivity check
+            bool isOnline() =>
+                true; // TODO: Replace with real connectivity logic
+            final repo = AppointmentRepositoryImpl(
+              localDataSource,
+              remoteDataSource: remoteDataSource,
+              isOnline: isOnline,
+            );
+            return AppointmentBloc(repo);
+          },
+        ),
         BlocProvider(create: (context) => ReminderBloc()),
         BlocProvider(create: (context) => UserBloc()),
         BlocProvider(

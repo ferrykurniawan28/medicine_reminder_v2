@@ -22,7 +22,7 @@ class _ParentalDetailState extends State<ParentalDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: defaultAppBar(
-        widget.parental.user.userName,
+        widget.parental.user.userName!,
         actions: [],
         leading: IconButton(
           onPressed: () {

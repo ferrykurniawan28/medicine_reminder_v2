@@ -18,13 +18,14 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
     final path = join(dbPath, 'reminders.db');
     return await openDatabase(
       path,
-      version: 4,
+      version: 6, // Bump version for migration
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE reminders(
             id INTEGER PRIMARY KEY,
             deviceId INTEGER,
-            userId INTEGER,
+            createdBy INTEGER,
+            assignedTo INTEGER,
             containerId INTEGER,
             medicineName TEXT,
             dosage TEXT,
@@ -35,9 +36,28 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
             type INTEGER,
             times TEXT,
             daysofWeek TEXT,
-            endDate TEXT
+            endDate TEXT,
+            is_synced INTEGER DEFAULT 0
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 6) {
+          // Add new columns for migration
+          await db
+              .execute('ALTER TABLE reminders ADD COLUMN createdBy INTEGER');
+          await db
+              .execute('ALTER TABLE reminders ADD COLUMN assignedTo INTEGER');
+          // Optionally, migrate userId data if needed
+          await db.execute(
+              'UPDATE reminders SET createdBy = userId, assignedTo = userId WHERE userId IS NOT NULL');
+          await db.execute(
+              'ALTER TABLE reminders DROP COLUMN userId'); // Not supported in SQLite, so just ignore or leave as is
+        }
+        if (oldVersion < 5) {
+          await db.execute(
+              'ALTER TABLE reminders ADD COLUMN is_synced INTEGER DEFAULT 0');
+        }
       },
     );
   }
@@ -54,12 +74,20 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
     if (!alreadyAttached) {
       await db.execute("ATTACH DATABASE '$deviceDbPath' AS device_db");
     }
-    final result = await db.rawQuery('''
-      SELECT r.*, c.medicine_name as container_medicine_name, c.quantity as container_quantity
-      FROM reminders r
-      LEFT JOIN device_db.containers c
-        ON r.deviceId = c.device_id AND r.containerId = c.container_id
-    ''');
+    List<Map<String, Object?>> result = [];
+    try {
+      result = await db.rawQuery('''
+        SELECT r.*, c.medicine_name as container_medicine_name, c.quantity as container_quantity
+        FROM reminders r
+        LEFT JOIN device_db.containers c
+          ON r.deviceId = c.device_id AND r.containerId = c.container_id
+      ''');
+    } catch (e) {
+      print(
+          '[ReminderLocalDataSourceImpl] Fallback: device_db.containers missing, using reminders only. Error: '
+          '$e');
+      result = await db.query('reminders');
+    }
     if (!alreadyAttached) {
       await db.execute("DETACH DATABASE device_db");
     }
@@ -76,10 +104,17 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
                           ? e['deviceId'] as int
                           : int.tryParse(e['deviceId'].toString()))
                       : null,
-              userId: e['userId'] != null && e['userId'].toString().isNotEmpty
-                  ? (e['userId'] is int
-                      ? e['userId'] as int
-                      : int.tryParse(e['userId'].toString()))
+              createdBy:
+                  e['createdBy'] != null && e['createdBy'].toString().isNotEmpty
+                      ? (e['createdBy'] is int
+                          ? e['createdBy'] as int
+                          : int.tryParse(e['createdBy'].toString()))
+                      : null,
+              assignedTo: e['assignedTo'] != null &&
+                      e['assignedTo'].toString().isNotEmpty
+                  ? (e['assignedTo'] is int
+                      ? e['assignedTo'] as int
+                      : int.tryParse(e['assignedTo'].toString()))
                   : null,
               containerId: e['containerId'] != null &&
                       e['containerId'].toString().isNotEmpty
@@ -146,7 +181,8 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
     final db = await database;
     final data = {
       'deviceId': reminder.deviceId,
-      'userId': reminder.userId,
+      'createdBy': reminder.createdBy,
+      'assignedTo': reminder.assignedTo,
       'containerId': reminder.containerId,
       'medicineName': reminder.medicineName,
       'dosage': reminder.dosage.join(','),
@@ -158,6 +194,7 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
       'times': reminder.times.map((t) => t.toString()).join(';'),
       'daysofWeek': reminder.daysofWeek?.map((d) => d.index).join(','),
       'endDate': reminder.endDate?.toIso8601String(),
+      'is_synced': 0, // Always mark as not synced on local add
     };
     final id = await db.insert(
       'reminders',
@@ -174,7 +211,8 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
       'reminders',
       {
         'deviceId': reminder.deviceId,
-        'userId': reminder.userId,
+        'createdBy': reminder.createdBy,
+        'assignedTo': reminder.assignedTo,
         'containerId': reminder.containerId,
         'medicineName': reminder.medicineName,
         'dosage': reminder.dosage.join(','),
@@ -186,6 +224,7 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
         'times': reminder.times.map((t) => t.toString()).join(';'),
         'daysofWeek': reminder.daysofWeek?.map((d) => d.index).join(','),
         'endDate': reminder.endDate?.toIso8601String(),
+        'is_synced': 0, // Always mark as not synced on local update
       },
       where: 'id = ?',
       whereArgs: [reminder.id],

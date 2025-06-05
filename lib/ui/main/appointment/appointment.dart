@@ -8,10 +8,39 @@ class Appointment extends StatefulWidget {
 }
 
 class _AppointmentState extends State<Appointment> {
+  bool _isFetching = false; // Add a flag to prevent duplicate fetches
+
   @override
   void initState() {
     super.initState();
-    context.read<AppointmentBloc>().add(const AppointmentsFetch(1));
+    _fetchAppointments();
+  }
+
+  Future<void> _fetchAppointments() async {
+    if (_isFetching) {
+      print('Fetch already in progress, skipping duplicate call.');
+      return;
+    }
+
+    _isFetching = true; // Set fetching flag to true
+
+    try {
+      final userId = await SharedPreference.getInt('userId');
+      print('Fetching appointments for userId: $userId');
+
+      if (userId == null) {
+        print('User ID is null, cannot fetch appointments');
+        return;
+      }
+
+      if (!mounted) return;
+
+      context.read<AppointmentBloc>().add(AppointmentsFetch(userId));
+    } catch (e) {
+      print('Error fetching appointments: $e');
+    } finally {
+      _isFetching = false; // Reset fetching flag
+    }
   }
 
   @override

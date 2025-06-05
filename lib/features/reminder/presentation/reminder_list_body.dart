@@ -9,34 +9,39 @@ class ReminderListBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ReminderBloc, ReminderState>(
-      listener: (context, state) {
-        // No need for setState here, the builder will be called automatically
+    return RefreshIndicator(
+      onRefresh: () async {
+        BlocProvider.of<ReminderBloc>(context).add(LoadReminders());
       },
-      builder: (context, state) {
-        if (state is ReminderLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is ReminderLoaded) {
-          if (state.reminders.isEmpty) {
-            return Center(
-                child: Text(
-              'You have no reminders yet, add one!',
-              style: subtitleTextStyle,
-            ));
+      child: BlocConsumer<ReminderBloc, ReminderState>(
+        listener: (context, state) {
+          // No need for setState here, the builder will be called automatically
+        },
+        builder: (context, state) {
+          if (state is ReminderLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is ReminderLoaded) {
+            if (state.reminders.isEmpty) {
+              return const Center(
+                  child: Text(
+                'You have no reminders yet, add one!',
+                // style: subtitleTextStyle,
+              ));
+            }
+            return ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: state.reminders.length,
+              itemBuilder: (context, index) {
+                return CardReminder(reminder: state.reminders[index]);
+              },
+            );
+          } else if (state is ReminderError) {
+            return Center(child: Text(state.message));
+          } else {
+            return const Center(child: Text('No reminders found'));
           }
-          return ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: state.reminders.length,
-            itemBuilder: (context, index) {
-              return CardReminder(reminder: state.reminders[index]);
-            },
-          );
-        } else if (state is ReminderError) {
-          return Center(child: Text(state.message));
-        } else {
-          return const Center(child: Text('No reminders found'));
-        }
-      },
+        },
+      ),
     );
   }
 }

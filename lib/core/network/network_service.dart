@@ -33,12 +33,46 @@ class NetworkService {
 
   Future<ApiResponse<T>> post<T>(
     String url, {
+    // Map<String, String>? headers,
+    Object? body,
+    T Function(dynamic)? fromData,
+  }) async {
+    try {
+      print('POST request to $url with body: $body');
+      print('post');
+      final response = await _dio.post(
+        url,
+        data: body != null ? json.encode(body) : null,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          sendTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+        ),
+      );
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+      print('response error: ${response.statusMessage}');
+      final jsonBody =
+          response.data is String ? json.decode(response.data) : response.data;
+      return ApiResponse<T>.fromJson(
+        jsonBody,
+        fromData: fromData,
+      ).copyWith(statusCode: response.statusCode);
+    } catch (e) {
+      return ApiResponse<T>(error: e.toString());
+    }
+  }
+
+  Future<ApiResponse<T>> put<T>(
+    String url, {
     Map<String, String>? headers,
     Object? body,
     T Function(dynamic)? fromData,
   }) async {
     try {
-      final response = await _dio.post(
+      final response = await _dio.put(
         url,
         data: body != null ? json.encode(body) : null,
         options: Options(headers: headers),
@@ -54,7 +88,24 @@ class NetworkService {
     }
   }
 
-  // Add put, delete, etc. as needed
+  Future<ApiResponse<T>> delete<T>(
+    String url, {
+    Map<String, String>? headers,
+    T Function(dynamic)? fromData,
+  }) async {
+    try {
+      final response =
+          await _dio.delete(url, options: Options(headers: headers));
+      final jsonBody =
+          response.data is String ? json.decode(response.data) : response.data;
+      return ApiResponse<T>.fromJson(
+        jsonBody,
+        fromData: fromData,
+      ).copyWith(statusCode: response.statusCode);
+    } catch (e) {
+      return ApiResponse<T>(error: e.toString());
+    }
+  }
 }
 
 extension ApiResponseCopyWith<T> on ApiResponse<T> {

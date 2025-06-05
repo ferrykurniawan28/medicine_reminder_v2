@@ -17,7 +17,7 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
     final path = join(dbPath, 'device.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // Bump version for migration
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE device(
@@ -25,7 +25,8 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
             uuid TEXT,
             current_state INTEGER,
             temperature INTEGER,
-            humidity INTEGER
+            humidity INTEGER,
+            is_synced INTEGER DEFAULT 0
           )
         ''');
         await db.execute('''
@@ -34,9 +35,18 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
             device_id INTEGER,
             container_id INTEGER,
             medicine_name TEXT,
-            quantity INTEGER
+            quantity INTEGER,
+            is_synced INTEGER DEFAULT 0
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+              'ALTER TABLE device ADD COLUMN is_synced INTEGER DEFAULT 0');
+          await db.execute(
+              'ALTER TABLE containers ADD COLUMN is_synced INTEGER DEFAULT 0');
+        }
       },
     );
   }
@@ -107,6 +117,7 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
       'current_state': device.currentState,
       'temperature': device.temperature,
       'humidity': device.humidity,
+      'is_synced': 0, // Always mark as not synced on local update
     });
     // Insert up to 5 containers
     for (final container in device.containers.take(5)) {
@@ -115,6 +126,7 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
         'container_id': container.containerId,
         'medicine_name': container.medicineName,
         'quantity': container.quantity,
+        'is_synced': 0, // Always mark as not synced on local update
       });
     }
   }

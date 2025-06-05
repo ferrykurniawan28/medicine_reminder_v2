@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:medicine_reminder/core/network/network_service.dart';
+import 'package:medicine_reminder/core/services/services.dart';
 import 'package:medicine_reminder/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
 import 'package:medicine_reminder/features/user/domain/entities/user.dart';
@@ -34,6 +35,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final user = response.data!;
         // Add user to local user table via UserBloc
         userBloc?.add(CreateUser(user));
+        SharedPreference.setInt('userId', user.userId!);
         emit(AuthAuthenticated(user: user));
       } else {
         emit(AuthError(response.message ?? response.error ?? 'Login failed'));
@@ -64,6 +66,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final user = response.data!;
         // Add user to local user table via UserBloc
         userBloc?.add(CreateUser(user));
+        SharedPreference.setInt('userId', user.userId!);
         emit(AuthAuthenticated(user: user));
       } else {
         emit(AuthError(

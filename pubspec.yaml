@@ -11,6 +11,7 @@ dependencies:
   awesome_datetime_picker: ^0.1.1
   awesome_dialog: ^3.2.1
   bloc: ^9.0.0
+  connectivity_plus: ^6.1.4
   cupertino_calendar_picker: ^2.2.3
   dio: ^5.8.0+1
   equatable: ^2.0.7
@@ -21,6 +22,7 @@ dependencies:
   flutter_modular: ^6.3.4
   intl: ^0.19.0
   meta: ^1.16.0
+  mockito: ^5.4.6
   path: ^1.9.1
   percent_indicator: ^4.2.4
   popup_menu_plus: ^0.0.6

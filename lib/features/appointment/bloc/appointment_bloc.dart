@@ -1,7 +1,7 @@
+import 'package:medicine_reminder/features/appointment/domain/repositories/appointment_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:medicine_reminder/features/appointment/data/datasources/appointment_local_datasource_impl.dart';
-import 'package:medicine_reminder/features/appointment/data/repositories/appointment_repository_impl.dart';
+
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/appointment/domain/usecases/add_appointment.dart';
 import 'package:medicine_reminder/features/appointment/domain/usecases/delete_appointment.dart';
@@ -22,17 +22,12 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
   List<Appointment> _appointments = [];
   Appointment? _appointment;
 
-  AppointmentBloc()
-      : getAppointments = GetAppointments(
-            AppointmentRepositoryImpl(AppointmentLocalDataSourceImpl())),
-        getAppointment = GetAppointment(
-            AppointmentRepositoryImpl(AppointmentLocalDataSourceImpl())),
-        addAppointmentUseCase = AddAppointment(
-            AppointmentRepositoryImpl(AppointmentLocalDataSourceImpl())),
-        updateAppointmentUseCase = UpdateAppointment(
-            AppointmentRepositoryImpl(AppointmentLocalDataSourceImpl())),
-        deleteAppointmentUseCase = DeleteAppointment(
-            AppointmentRepositoryImpl(AppointmentLocalDataSourceImpl())),
+  AppointmentBloc(AppointmentRepository repository)
+      : getAppointments = GetAppointments(repository),
+        getAppointment = GetAppointment(repository),
+        addAppointmentUseCase = AddAppointment(repository),
+        updateAppointmentUseCase = UpdateAppointment(repository),
+        deleteAppointmentUseCase = DeleteAppointment(repository),
         super(AppointmentInitial()) {
     on<AppointmentsFetch>(_onFetchAppointments);
     on<AppointmentFetch>(_onFetchAppointment);
@@ -45,14 +40,18 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
       AppointmentsFetch event, Emitter<AppointmentState> emit) async {
     emit(AppointmentListLoading());
     try {
-      _appointments = (await getAppointments()).cast<Appointment>();
+      _appointments = (await getAppointments(event.userId));
+      print('Fetched appointments: ${_appointments.length}');
+      for (var appointment in _appointments) {
+        print('Appointment details: ${appointment.toString()}');
+      }
       if (_appointments.isEmpty) {
         emit(const AppointmentError('No appointments found'));
         return;
       }
       emit(AppointmentsLoaded(_appointments));
     } catch (e) {
-      print('Error adding appointment: $e');
+      print('Error fetching appointments: $e');
       emit(AppointmentError(e.toString()));
     }
   }
@@ -77,9 +76,8 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
       AppointmentAdd event, Emitter<AppointmentState> emit) async {
     emit(AppointmentLoading());
     try {
-      print('Adding appointment: ${event.appointment.toJson()}');
       await addAppointmentUseCase(event.appointment);
-      add(AppointmentsFetch(event.appointment.userAssigned.userId));
+      add(AppointmentsFetch(event.appointment.userAssigned.userId!));
     } catch (e) {
       emit(AppointmentError(e.toString()));
     }
@@ -90,7 +88,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     emit(AppointmentLoading());
     try {
       await updateAppointmentUseCase(_toDomain(event.appointment));
-      add(AppointmentsFetch(event.appointment.userAssigned.userId));
+      add(AppointmentsFetch(event.appointment.userAssigned.userId!));
     } catch (e) {
       emit(AppointmentError(e.toString()));
     }
@@ -101,7 +99,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     emit(AppointmentLoading());
     try {
       await deleteAppointmentUseCase(event.appointment.id!);
-      add(AppointmentsFetch(event.appointment.userAssigned.userId));
+      add(AppointmentsFetch(event.appointment.userAssigned.userId!));
     } catch (e) {
       emit(AppointmentError(e.toString()));
     }

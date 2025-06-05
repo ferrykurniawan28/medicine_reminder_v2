@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter_modular/flutter_modular.dart'
     show Modular, RouterOutlet;
+import 'package:medicine_reminder/core/services/services.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/features.dart';

@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../../domain/entities/user.dart';
 import 'user_local_datasource.dart';
+import '../../data/models/user_model.dart';
 
 class UserLocalDataSourceImpl implements UserLocalDataSource {
   static Database? _database;
@@ -17,15 +18,22 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
     final path = join(dbPath, 'users.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // Bump version for migration
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE users(
             id INTEGER PRIMARY KEY,
             username TEXT,
-            email TEXT
+            email TEXT,
+            is_synced INTEGER DEFAULT 0
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+              'ALTER TABLE users ADD COLUMN is_synced INTEGER DEFAULT 0');
+        }
       },
     );
   }
@@ -34,7 +42,7 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
   Future<List<User>> getUsers() async {
     final db = await database;
     final maps = await db.query('users');
-    return maps.map((e) => User.fromJson(e)).toList();
+    return maps.map((e) => UserModel.fromJson(e)).toList();
   }
 
   @override
@@ -42,24 +50,31 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
     final db = await database;
     final maps = await db.query('users', where: 'id = ?', whereArgs: [id]);
     if (maps.isEmpty) return null;
-    return User.fromJson(maps.first);
+    return UserModel.fromJson(maps.first);
   }
 
   @override
   Future<void> addUser(User user) async {
     final db = await database;
-    final data = user.toJson();
-    if (data['id'] == null) {
-      data.remove('id');
-    }
+    final userModel = user is UserModel
+        ? user
+        : UserModel(
+            userId: user.userId, userName: user.userName, email: user.email);
+    final data = userModel.toJson();
+    data['is_synced'] = 0; // Always mark as not synced on local add
     await db.insert('users', data);
   }
 
   @override
   Future<void> updateUser(User user) async {
     final db = await database;
-    await db.update('users', user.toJson(),
-        where: 'id = ?', whereArgs: [user.userId]);
+    final userModel = user is UserModel
+        ? user
+        : UserModel(
+            userId: user.userId, userName: user.userName, email: user.email);
+    final data = userModel.toJson();
+    data['is_synced'] = 0; // Always mark as not synced on local update
+    await db.update('users', data, where: 'id = ?', whereArgs: [user.userId]);
   }
 
   @override

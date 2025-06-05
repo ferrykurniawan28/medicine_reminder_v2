@@ -18,33 +18,12 @@ class _MainPageState extends State<MainPage> {
   Map<int, AppBar> get appBars => {
         0: defaultAppBar(
           'Reminders',
-          // actions: [
-          //   IconButton(
-          //     onPressed: () {
-          //       Modular.to.pushNamed('/reminder/');
-          //     },
-          //     icon: const Icon(Icons.add),
-          //   ),
-          // ],
         ),
         1: defaultAppBar(
           'Appointment',
-          // actions: [
-          //   IconButton(
-          //       onPressed: () => addAppointment(context),
-          //       icon: const Icon(Icons.add)),
-          // ],
         ),
         2: defaultAppBar(
           'Parental',
-          // actions: [
-          //   IconButton(
-          //     onPressed: () {
-          //       // Modular.to.pushNamed('/group/add');
-          //     },
-          //     icon: const Icon(Icons.add),
-          //   )
-          // ],
         ),
         3: defaultAppBar(
           'Device',
@@ -57,6 +36,23 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget body;
+    switch (_selectedIndex) {
+      case 0:
+        body = const Home(); // ReminderHomePage -> Home
+        break;
+      case 1:
+        body = const Appointment(); // AppointmentHomePage -> Appointment
+        break;
+      case 2:
+        body = const ListParental(); // ParentalHomePage -> ListParental
+        break;
+      case 3:
+        body = const DeviceView(); // DeviceHomePage -> DeviceView
+        break;
+      default:
+        body = const Home();
+    }
     return Scaffold(
       drawer: Drawer(
         child: ListView(
@@ -118,9 +114,8 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
       ),
-      // appBar: _selectedIndex == 2 ? null : appBars[_selectedIndex],
       appBar: appBars[_selectedIndex],
-      body: const RouterOutlet(),
+      body: body,
       bottomNavigationBar: SizedBox(
         child: Stack(
           clipBehavior: Clip.none,
@@ -205,7 +200,6 @@ class _MainPageState extends State<MainPage> {
                       width: 24,
                       color: _selectedIndex == 3 ? kPrimaryColor : Colors.black,
                       height: 24,
-                      // fit: BoxFit.fill,
                     ),
                     label: 'Device',
                     isSelected: _selectedIndex == 3,
@@ -213,42 +207,6 @@ class _MainPageState extends State<MainPage> {
                 ],
               ),
             ),
-            // Positioned(
-            //   top: -30,
-            //   left: 0,
-            //   right: 0,
-            //   child: GestureDetector(
-            //     onTap: () {
-            //       addMedicine(context);
-            //     },
-            //     child: Container(
-            //       height: 60,
-            //       width: 60,
-            //       decoration: BoxDecoration(
-            //         shape: BoxShape.circle,
-            //         gradient: LinearGradient(
-            //           begin: Alignment.topLeft,
-            //           end: Alignment.bottomRight,
-            //           colors: [
-            //             primaryColor.darken(0.1),
-            //             softBlueColor.lighten(1),
-            //           ],
-            //         ),
-            //         boxShadow: const [
-            //           BoxShadow(
-            //             color: Colors.black12,
-            //             blurRadius: 5,
-            //           ),
-            //         ],
-            //       ),
-            //       child: const Icon(
-            //         Icons.add,
-            //         size: 40,
-            //         color: Colors.white,
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -299,3 +257,9 @@ class _CustomIconButtonState extends State<CustomIconButton> {
     );
   }
 }
+
+// Ensure the following parts are present in main.dart:
+// part 'home/home.dart';
+// part 'appointment/appointment.dart';
+// part 'parental/list_parental.dart';
+// part 'device/device.dart';

@@ -62,7 +62,7 @@ class _LoginState extends State<Login> {
                       children: [
                         const SizedBox(height: 40),
                         Text(
-                          'Welcome Back',
+                          'Welcome',
                           style: Theme.of(context)
                               .textTheme
                               .headlineMedium
@@ -74,7 +74,7 @@ class _LoginState extends State<Login> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Sign in to continue your journey',
+                          'Sign in to access your account',
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: kAccentColor.withOpacity(0.8),

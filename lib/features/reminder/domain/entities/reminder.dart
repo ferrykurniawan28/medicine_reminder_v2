@@ -3,7 +3,8 @@ import 'package:medicine_reminder/features/reminder/domain/entities/time.dart';
 class Reminder {
   final int? id;
   int? deviceId;
-  final int? userId;
+  final int? createdBy;
+  final int? assignedTo;
   int? containerId;
   String medicineName;
   List<int> dosage;
@@ -19,7 +20,8 @@ class Reminder {
   Reminder({
     this.id,
     this.deviceId,
-    this.userId,
+    this.createdBy,
+    this.assignedTo,
     this.containerId,
     required this.medicineName,
     required this.dosage,
@@ -36,7 +38,8 @@ class Reminder {
   Reminder copyWith({
     int? id,
     int? deviceId,
-    int? userId,
+    int? createdBy,
+    int? assignedTo,
     int? containerId,
     String? medicineName,
     List<int>? dosage,
@@ -52,7 +55,8 @@ class Reminder {
     return Reminder(
       id: id ?? this.id,
       deviceId: deviceId ?? this.deviceId,
-      userId: userId ?? this.userId,
+      createdBy: createdBy ?? this.createdBy,
+      assignedTo: assignedTo ?? this.assignedTo,
       containerId: containerId ?? this.containerId,
       medicineName: medicineName ?? this.medicineName,
       dosage: dosage ?? this.dosage,
@@ -71,7 +75,8 @@ class Reminder {
     return {
       'id': id,
       'deviceId': deviceId,
-      'userId': userId,
+      'createdBy': createdBy,
+      'assignedTo': assignedTo,
       'containerId': containerId,
       'medicineName': medicineName,
       'dosage': dosage,

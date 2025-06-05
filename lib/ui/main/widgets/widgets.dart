@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart'
     show ChildRoute, Modular, ModularRoute, Module, RouterOutlet;
 import 'package:intl/intl.dart';
+import 'package:medicine_reminder/core/services/services.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/doctor.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';

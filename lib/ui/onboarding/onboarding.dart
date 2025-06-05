@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:medicine_reminder/core/services/services.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
-import 'package:medicine_reminder/services/services.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 part 'page.dart';

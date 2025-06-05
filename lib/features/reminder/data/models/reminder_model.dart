@@ -2,10 +2,13 @@ import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dar
 import 'package:medicine_reminder/features/reminder/domain/entities/time.dart';
 
 class ReminderModel extends Reminder {
+  final int isSynced;
+
   ReminderModel({
     super.id,
     super.deviceId,
-    super.userId,
+    super.createdBy,
+    super.assignedTo,
     super.containerId,
     required super.medicineName,
     required super.dosage,
@@ -17,13 +20,15 @@ class ReminderModel extends Reminder {
     required super.times,
     super.daysofWeek,
     super.endDate,
+    this.isSynced = 0,
   });
 
   factory ReminderModel.fromJson(Map<String, dynamic> json) {
     return ReminderModel(
       id: json['id'] as int?,
       deviceId: json['deviceId'] as int?,
-      userId: json['userId'] as int?,
+      createdBy: json['createdBy'] as int?,
+      assignedTo: json['assignedTo'] as int?,
       containerId: json['containerId'] as int?,
       medicineName: json['medicineName'] as String,
       dosage: (json['dosage'] as List).map((e) => e as int).toList(),
@@ -41,6 +46,9 @@ class ReminderModel extends Reminder {
       endDate: json['endDate'] != null
           ? DateTime.tryParse(json['endDate'] as String)
           : null,
+      isSynced: json['is_synced'] is int
+          ? json['is_synced'] ?? 0
+          : int.tryParse(json['is_synced']?.toString() ?? '0') ?? 0,
     );
   }
 
@@ -49,7 +57,8 @@ class ReminderModel extends Reminder {
     return {
       'id': id,
       'deviceId': deviceId,
-      'userId': userId,
+      'createdBy': createdBy,
+      'assignedTo': assignedTo,
       'containerId': containerId,
       'medicineName': medicineName,
       'dosage': dosage,
@@ -63,6 +72,7 @@ class ReminderModel extends Reminder {
           .toList(),
       'daysofWeek': daysofWeek?.map((e) => e.index).toList(),
       'endDate': endDate?.toIso8601String(),
+      'is_synced': isSynced,
     };
   }
 }
@@ -133,7 +143,8 @@ List<ReminderModel> dummyReminders = [
   ReminderModel(
     id: 1,
     deviceId: 1,
-    userId: 1,
+    createdBy: 1,
+    assignedTo: 1,
     containerId: 1,
     medicineName: 'Paracetamol',
     dosage: [1],
@@ -153,7 +164,8 @@ List<ReminderModel> dummyReminders = [
   ReminderModel(
     id: 2,
     deviceId: 1,
-    userId: 1,
+    createdBy: 1,
+    assignedTo: 1,
     containerId: 1,
     medicineName: 'Ibuprofen',
     dosage: [2],
