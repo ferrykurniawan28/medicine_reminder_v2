@@ -37,8 +37,6 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
             ))
         .toList();
 
-    print(localMapped.map((m) => m.toJson()).toList());
-
     if (isOnline != null && isOnline!() && remoteDataSource != null) {
       try {
         final remote = await remoteDataSource!.fetchAppointments(userId);
@@ -62,6 +60,7 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
           await localDataSource.markAppointmentAsSynced(appointmentModel.id!);
         }
         // Return remote data if successful
+        print('remote: ${remoteMapped.map((m) => m.toJson()).toList()}');
 
         return remoteMapped;
       } catch (_) {
@@ -125,20 +124,22 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
       note: appointment.note,
       time: appointment.time,
     );
+
     if (isOnline != null && isOnline!() && remoteDataSource != null) {
       try {
+        // Update on remote server first
         await remoteDataSource!.updateAppointment(model);
 
+        // Then update locally without needing the `is_updated` flag
         await localDataSource.updateAppointment(model);
-        // Optionally: mark as synced in local DB
         await localDataSource.markAppointmentAsSynced(model.id!);
       } catch (_) {
-        // Remain unsynced
+        // Handle failure to sync with remote
+        print('Failed to update appointment on remote server.');
       }
     } else {
-      // If offline, just update locally
+      // If offline, update locally and set the `is_updated` flag
       await localDataSource.updateAppointment(model);
-      // Optionally: mark as unsynced
       await localDataSource.markAppointmentNotSynced(model.id!);
     }
   }
@@ -150,10 +151,13 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
     // Sync deletion with server if online
     if (isOnline != null && isOnline!() && remoteDataSource != null) {
       try {
+        print('Deleting appointment $id from local DB');
+        await localDataSource.deleteAppointment(id);
+
+        print('Syncing deletion for appointment $id');
         await remoteDataSource?.deleteAppointment(id);
 
         // Optionally: remove from local DB after successful sync
-        await localDataSource.deleteAppointment(id);
       } catch (_) {
         // Handle sync failure (e.g., retry or log)
         print('Failed to sync deletion for appointment $id');
@@ -201,27 +205,28 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
               await localDataSource.deleteAppointment(appointment
                   .id!); // Remove from local DB after successful sync
             }
-          } else {
-            // Sync new or updated appointments
-            if (appointment.isSynced == 0) {
-              print('Adding new appointment to remote DB');
-              final addedAppointment =
-                  await remoteDataSource?.addAppointment(appointment);
+          } else if (appointment.isUpdated == 1) {
+            // Sync updated appointments
+            print('Updating appointment with ID: ${appointment.id}');
+            await remoteDataSource?.updateAppointment(appointment);
+            await localDataSource.markAppointmentAsSynced(appointment.id!);
+            await localDataSource.markAppointmentAsNotUpdated(
+                appointment.id!); // Clear the updated flag
+          } else if (appointment.isSynced == 0) {
+            // Sync new appointments
+            print('Adding new appointment to remote DB');
+            final addedAppointment =
+                await remoteDataSource?.addAppointment(appointment);
 
-              if (addedAppointment != null) {
-                print('Added appointment with new ID: ${addedAppointment.id}');
-                // Update local DB with server-generated ID
-                await localDataSource
-                    .deleteAppointment(appointment.id!); // Remove old entry
-                await localDataSource.addAppointment(
-                    addedAppointment); // Add new entry with server ID
-                await localDataSource
-                    .markAppointmentAsSynced(addedAppointment.id!);
-              }
-            } else {
-              print('Updating appointment with ID: ${appointment.id}');
-              await remoteDataSource?.updateAppointment(appointment);
-              await localDataSource.markAppointmentAsSynced(appointment.id!);
+            if (addedAppointment != null) {
+              print('Added appointment with new ID: ${addedAppointment.id}');
+              // Update local DB with server-generated ID
+              await localDataSource
+                  .deleteAppointment(appointment.id!); // Remove old entry
+              await localDataSource.addAppointment(
+                  addedAppointment); // Add new entry with server ID
+              await localDataSource
+                  .markAppointmentAsSynced(addedAppointment.id!);
             }
           }
         }

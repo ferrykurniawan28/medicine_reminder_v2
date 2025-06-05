@@ -11,4 +11,6 @@ abstract class AppointmentLocalDataSource {
   Future<void> markAppointmentAsSynced(int id);
   Future<void> markAppointmentNotSynced(int id);
   Future<List<AppointmentModel>> getUnsyncedAppointments();
+  Future<void> markAppointmentAsNotUpdated(int id);
+  Future<void> markAppointmentAsUpdated(int id);
 }

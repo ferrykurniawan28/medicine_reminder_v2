@@ -41,17 +41,12 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     emit(AppointmentListLoading());
     try {
       _appointments = (await getAppointments(event.userId));
-      print('Fetched appointments: ${_appointments.length}');
-      for (var appointment in _appointments) {
-        print('Appointment details: ${appointment.toString()}');
-      }
       if (_appointments.isEmpty) {
         emit(const AppointmentError('No appointments found'));
         return;
       }
       emit(AppointmentsLoaded(_appointments));
     } catch (e) {
-      print('Error fetching appointments: $e');
       emit(AppointmentError(e.toString()));
     }
   }

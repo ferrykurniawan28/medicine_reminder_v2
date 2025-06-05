@@ -4,6 +4,7 @@ import '../../domain/entities/appointment.dart';
 class AppointmentModel extends Appointment {
   final int isSynced;
   final int isDeleted;
+  final int isUpdated;
 
   const AppointmentModel({
     super.id,
@@ -14,28 +15,19 @@ class AppointmentModel extends Appointment {
     required super.time,
     this.isSynced = 0,
     this.isDeleted = 0,
+    this.isUpdated = 0,
   });
 
   factory AppointmentModel.fromJson(Map<String, dynamic> json) {
     // Handle both API (Map) and DB (int) for user fields
     User parseUser(dynamic value) {
       if (value is Map<String, dynamic>) {
-        // Accepts API keys: id, username, email
-        return User(
-          userId: value['id'] is int
-              ? value['id']
-              : int.tryParse(value['id']?.toString() ?? '0') ?? 0,
-          userName: value['username'] ?? '',
-          email: value['email'] ?? '',
-        );
+        return User.fromJson(value);
       } else if (value is int) {
-        return User(userId: value, userName: '', email: '');
-      } else if (value != null && value.toString().isNotEmpty) {
-        // Try parsing string/int
-        final id = int.tryParse(value.toString());
-        if (id != null) return User(userId: id, userName: '', email: '');
+        return User(userId: value);
+      } else {
+        throw Exception('Invalid user value: $value');
       }
-      return User(userId: 0, userName: '', email: ''); // fallback
     }
 
     return AppointmentModel(
@@ -57,6 +49,9 @@ class AppointmentModel extends Appointment {
       isDeleted: json['is_deleted'] is int
           ? json['is_deleted'] ?? 0
           : int.tryParse(json['is_deleted']?.toString() ?? '0') ?? 0,
+      isUpdated: json['is_updated'] is int
+          ? json['is_updated'] ?? 0
+          : int.tryParse(json['is_updated']?.toString() ?? '0') ?? 0,
     );
   }
 
@@ -82,5 +77,6 @@ class AppointmentModel extends Appointment {
         'dates': time.toIso8601String(),
         'is_synced': isSynced,
         'is_deleted': isDeleted,
+        'is_updated': isUpdated,
       };
 }

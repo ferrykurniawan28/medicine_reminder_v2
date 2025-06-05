@@ -17,7 +17,7 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
     final path = join(dbPath, 'appointments.db');
     return await openDatabase(
       path,
-      version: 4, // Bump version for migration
+      version: 5, // Bump version for migration
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE appointments(
@@ -28,7 +28,8 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
             notes TEXT,
             dates TEXT,
             is_synced INTEGER DEFAULT 0,
-            is_deleted INTEGER DEFAULT 0
+            is_deleted INTEGER DEFAULT 0,
+            is_updated INTEGER DEFAULT 0
           )
         ''');
       },
@@ -36,6 +37,10 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
         if (oldVersion < 4) {
           await db.execute(
               'ALTER TABLE appointments ADD COLUMN is_deleted INTEGER DEFAULT 0');
+        }
+        if (oldVersion < 5) {
+          await db.execute(
+              'ALTER TABLE appointments ADD COLUMN is_updated INTEGER DEFAULT 0');
         }
       },
     );
@@ -95,6 +100,7 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
     final db = await database;
     final data = appointment.toJson();
     data['is_synced'] = 0; // Always mark as not synced on local update
+    data['is_updated'] = 1; // Mark as updated on local update
     await db.update('appointments', data,
         where: 'id = ?', whereArgs: [appointment.id]);
   }
@@ -179,5 +185,27 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
               'time': e['dates'],
             }))
         .toList();
+  }
+
+  @override
+  Future<void> markAppointmentAsNotUpdated(int id) async {
+    final db = await database;
+    await db.update(
+      'appointments',
+      {'is_updated': 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<void> markAppointmentAsUpdated(int id) async {
+    final db = await database;
+    await db.update(
+      'appointments',
+      {'is_updated': 1},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }

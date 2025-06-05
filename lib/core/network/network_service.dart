@@ -19,13 +19,35 @@ class NetworkService {
     T Function(dynamic)? fromData,
   }) async {
     try {
-      final response = await _dio.get(url, options: Options(headers: headers));
+      print('GET request to $url');
+      print('Starting GET request to $url');
+      final response = await _dio.get(
+        url,
+        options: Options(
+          headers: headers,
+          sendTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+        ),
+      );
       final jsonBody =
           response.data is String ? json.decode(response.data) : response.data;
       return ApiResponse<T>.fromJson(
         jsonBody,
         fromData: fromData,
       ).copyWith(statusCode: response.statusCode);
+    } on DioException catch (dioError) {
+      if (dioError.response != null) {
+        print(
+            'DioError: ${dioError.response?.statusCode} - ${dioError.response?.statusMessage}');
+        return ApiResponse<T>(
+          error:
+              'Error: ${dioError.response?.statusCode} - ${dioError.response?.statusMessage}',
+          statusCode: dioError.response?.statusCode,
+        );
+      } else {
+        print('DioError without response: ${dioError.message}');
+        return ApiResponse<T>(error: dioError.message);
+      }
     } catch (e) {
       return ApiResponse<T>(error: e.toString());
     }
@@ -60,6 +82,19 @@ class NetworkService {
         jsonBody,
         fromData: fromData,
       ).copyWith(statusCode: response.statusCode);
+    } on DioException catch (dioError) {
+      if (dioError.response != null) {
+        print(
+            'DioError: ${dioError.response?.statusCode} - ${dioError.response?.statusMessage}');
+        return ApiResponse<T>(
+          error:
+              'Error: ${dioError.response?.statusCode} - ${dioError.response?.statusMessage}',
+          statusCode: dioError.response?.statusCode,
+        );
+      } else {
+        print('DioError without response: ${dioError.message}');
+        return ApiResponse<T>(error: dioError.message);
+      }
     } catch (e) {
       return ApiResponse<T>(error: e.toString());
     }
@@ -83,6 +118,19 @@ class NetworkService {
         jsonBody,
         fromData: fromData,
       ).copyWith(statusCode: response.statusCode);
+    } on DioException catch (dioError) {
+      if (dioError.response != null) {
+        print(
+            'DioError: ${dioError.response?.statusCode} - ${dioError.response?.statusMessage}');
+        return ApiResponse<T>(
+          error:
+              'Error: ${dioError.response?.statusCode} - ${dioError.response?.statusMessage}',
+          statusCode: dioError.response?.statusCode,
+        );
+      } else {
+        print('DioError without response: ${dioError.message}');
+        return ApiResponse<T>(error: dioError.message);
+      }
     } catch (e) {
       return ApiResponse<T>(error: e.toString());
     }
@@ -94,14 +142,31 @@ class NetworkService {
     T Function(dynamic)? fromData,
   }) async {
     try {
+      print('DELETE request to $url');
+      print('Starting DELETE request to $url');
       final response =
           await _dio.delete(url, options: Options(headers: headers));
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
       final jsonBody =
           response.data is String ? json.decode(response.data) : response.data;
       return ApiResponse<T>.fromJson(
         jsonBody,
         fromData: fromData,
       ).copyWith(statusCode: response.statusCode);
+    } on DioException catch (dioError) {
+      if (dioError.response != null) {
+        print(
+            'DioError: ${dioError.response?.statusCode} - ${dioError.response?.statusMessage}');
+        return ApiResponse<T>(
+          error:
+              'Error: ${dioError.response?.statusCode} - ${dioError.response?.statusMessage}',
+          statusCode: dioError.response?.statusCode,
+        );
+      } else {
+        print('DioError without response: ${dioError.message}');
+        return ApiResponse<T>(error: dioError.message);
+      }
     } catch (e) {
       return ApiResponse<T>(error: e.toString());
     }

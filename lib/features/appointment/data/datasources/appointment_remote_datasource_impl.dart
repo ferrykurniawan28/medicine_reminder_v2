@@ -18,9 +18,14 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
           .toList(),
     );
 
+    print(response.statusCode);
+
     if (response.statusCode == 200) {
       final appointments = response.data;
       return appointments!;
+    } else if (response.statusCode == 404) {
+      // If no appointments found, return an empty list
+      return [];
     } else {
       throw Exception('Failed to load appointments');
     }
@@ -67,13 +72,14 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
 
   @override
   Future<void> updateAppointment(AppointmentModel appointment) async {
+    final body = {
+      'doctor': appointment.doctor,
+      'notes': appointment.note,
+      'dates': appointment.time.toUtc().toIso8601String(),
+    };
     final response = await networkService.put<AppointmentModel>(
       '$appointmentUrl/${appointment.id}',
-      body: {
-        'doctor': appointment.doctor,
-        'notes': appointment.note,
-        'dates': '${appointment.time.toUtc().toIso8601String()}Z',
-      },
+      body: body,
       fromData: (data) => AppointmentModel.fromJson(data),
     );
 
