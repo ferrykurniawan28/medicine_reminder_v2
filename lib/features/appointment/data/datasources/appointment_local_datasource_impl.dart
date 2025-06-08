@@ -118,7 +118,17 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
   @override
   Future<void> deleteAppointment(int id) async {
     final db = await database;
-    await db.delete('appointments', where: 'id = ?', whereArgs: [id]);
+    try {
+      final rowsAffected =
+          await db.delete('appointments', where: 'id = ?', whereArgs: [id]);
+      if (rowsAffected == 0) {
+        throw Exception('No appointment found with id $id to delete locally.');
+      }
+      print('Successfully deleted appointment with id $id locally.');
+    } catch (e) {
+      print('Failed to delete appointment with id $id locally: $e');
+      rethrow;
+    }
   }
 
   Future<void> deleteAllAppointments() async {

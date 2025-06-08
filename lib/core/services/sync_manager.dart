@@ -74,6 +74,7 @@ class SyncManager {
       final deletedAppointments =
           await appointmentLocalDataSource.getDeletedAppointments();
       for (var appointment in deletedAppointments) {
+        print('Syncing deleted appointment: ${appointment.toJson()}');
         await _syncDeletedAppointment(appointment);
       }
     } catch (e) {
@@ -83,8 +84,8 @@ class SyncManager {
 
   Future<void> _syncDeletedAppointment(AppointmentModel appointment) async {
     if (appointment.id != null) {
-      await appointmentRemoteDataSource.deleteAppointment(appointment.id!);
       await appointmentLocalDataSource.deleteAppointment(appointment.id!);
+      await appointmentRemoteDataSource.deleteAppointment(appointment.id!);
     }
   }
 
