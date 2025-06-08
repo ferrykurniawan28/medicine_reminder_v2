@@ -39,3 +39,13 @@ final class AppointmentError extends AppointmentState {
   @override
   List<Object> get props => [message];
 }
+
+final class AppointmentSyncing extends AppointmentState {}
+
+final class AppointmentSynced extends AppointmentState {}
+
+final class AppointmentSyncError extends AppointmentState {
+  final String error;
+
+  const AppointmentSyncError(this.error);
+}

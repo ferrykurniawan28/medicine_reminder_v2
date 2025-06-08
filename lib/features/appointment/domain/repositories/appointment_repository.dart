@@ -6,4 +6,6 @@ abstract class AppointmentRepository {
   Future<void> addAppointment(Appointment appointment);
   Future<void> updateAppointment(Appointment appointment);
   Future<void> deleteAppointment(int id);
+  Future<void> syncUnsyncedAppointments();
+  Future<void> syncDeletedAppointments();
 }

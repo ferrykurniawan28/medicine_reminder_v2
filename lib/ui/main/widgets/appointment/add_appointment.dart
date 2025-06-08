@@ -130,9 +130,6 @@ void addAppointment(BuildContext ctx) {
                                         ),
                                       ),
                                     );
-                                context
-                                    .read<AppointmentBloc>()
-                                    .add(const AppointmentsFetch(1));
                                 Navigator.of(context).pop();
                               }
                             : null,

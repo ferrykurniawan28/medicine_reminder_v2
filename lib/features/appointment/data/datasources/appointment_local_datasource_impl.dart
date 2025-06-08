@@ -12,6 +12,11 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
     return _database!;
   }
 
+  Database get databaseSync {
+    if (_database != null) return _database!;
+    throw Exception('Database is not initialized yet.');
+  }
+
   Future<Database> _initDB() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'appointments.db');
@@ -85,14 +90,19 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
 
   @override
   Future<void> addAppointment(AppointmentModel appointment) async {
-    final db = await database;
-    final data = appointment.toJson();
-    // Remove id if null so SQLite auto-increments
-    if (data['id'] == null) {
-      data.remove('id');
+    try {
+      final db = await database;
+      final data = appointment.toJson();
+      // Remove id if null so SQLite auto-increments
+      if (data['id'] == null) {
+        data.remove('id');
+      }
+      data['is_synced'] = 0; // Always mark as not synced on local add
+      await db.insert('appointments', data,
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    } catch (e) {
+      throw Exception('Failed to add appointment: $e');
     }
-    data['is_synced'] = 0; // Always mark as not synced on local add
-    await db.insert('appointments', data);
   }
 
   @override

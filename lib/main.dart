@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -11,35 +12,49 @@ import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
 // import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:medicine_reminder/routes/routes.dart';
+import 'package:flutter/services.dart';
+import 'package:medicine_reminder/core/services/sync_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(ModularApp(module: AppRoute(), child: const MainApp()));
+
+  // Initialize the database asynchronously
+  final localDataSource = AppointmentLocalDataSourceImpl();
+  final database = await localDataSource.database; // Use asynchronous getter
+
+  // Create SyncManager after database initialization
+  final syncManager = SyncManager(
+    db: database,
+    connectivity: Connectivity(),
+    appointmentLocalDataSource: localDataSource,
+    appointmentRemoteDataSource:
+        AppointmentRemoteDataSourceImpl(NetworkService()),
+  );
+
+  runApp(
+      ModularApp(module: AppRoute(), child: MainApp(syncManager: syncManager)));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final SyncManager syncManager;
+
+  const MainApp({required this.syncManager, super.key});
 
   @override
   Widget build(BuildContext context) {
     Modular.setInitialRoute('/');
-    // AppointmentLocalDataSourceImpl().deleteAllAppointments();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => DeviceBloc()),
         BlocProvider(create: (context) => ParentalBloc()),
         BlocProvider(
           create: (context) {
-            final localDataSource = AppointmentLocalDataSourceImpl();
-            final remoteDataSource =
-                AppointmentRemoteDataSourceImpl(NetworkService());
-            // Replace with your actual connectivity check
-            bool isOnline() =>
-                true; // TODO: Replace with real connectivity logic
             final repo = AppointmentRepositoryImpl(
-              localDataSource,
-              remoteDataSource: remoteDataSource,
-              isOnline: isOnline,
+              AppointmentLocalDataSourceImpl(),
+              remoteDataSource:
+                  AppointmentRemoteDataSourceImpl(NetworkService()),
+              isOnline: () => false,
+              syncManager: syncManager,
             );
             return AppointmentBloc(repo);
           },
@@ -78,7 +93,6 @@ class MainApp extends StatelessWidget {
           ),
           switchTheme: const SwitchThemeData(
             thumbColor: WidgetStatePropertyAll(Colors.white),
-            // trackColor: WidgetStatePropertyAll(kPrimaryColor),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(

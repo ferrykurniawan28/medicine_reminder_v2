@@ -18,11 +18,12 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
   final AddAppointment addAppointmentUseCase;
   final UpdateAppointment updateAppointmentUseCase;
   final DeleteAppointment deleteAppointmentUseCase;
+  final AppointmentRepository repository;
 
   List<Appointment> _appointments = [];
   Appointment? _appointment;
 
-  AppointmentBloc(AppointmentRepository repository)
+  AppointmentBloc(this.repository)
       : getAppointments = GetAppointments(repository),
         getAppointment = GetAppointment(repository),
         addAppointmentUseCase = AddAppointment(repository),
@@ -34,6 +35,16 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
     on<AppointmentAdd>(_addAppointment);
     on<AppointmentUpdate>(_updateAppointment);
     on<AppointmentDelete>(_deleteAppointment);
+    on<SyncAppointmentsEvent>((event, emit) async {
+      try {
+        emit(AppointmentSyncing());
+        await repository.syncUnsyncedAppointments();
+        await repository.syncDeletedAppointments();
+        emit(AppointmentSynced());
+      } catch (e) {
+        emit(AppointmentSyncError(e.toString()));
+      }
+    });
   }
 
   Future<void> _onFetchAppointments(

@@ -43,6 +43,8 @@ final class AppointmentUpdate extends AppointmentEvent {
   List<Object> get props => [appointment];
 }
 
+final class SyncAppointmentsEvent extends AppointmentEvent {}
+
 final class AppointmentDelete extends AppointmentEvent {
   final Appointment appointment;
 
