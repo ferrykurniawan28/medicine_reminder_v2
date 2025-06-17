@@ -9,12 +9,12 @@ sealed class DeviceEvent extends Equatable {
 }
 
 final class DeviceFetch extends DeviceEvent {
-  final int deviceId;
+  final int userId;
 
-  const DeviceFetch(this.deviceId);
+  const DeviceFetch(this.userId);
 
   @override
-  List<Object> get props => [deviceId];
+  List<Object> get props => [userId];
 }
 
 final class LoadDeviceDetail extends DeviceEvent {
@@ -68,4 +68,14 @@ final class ResetContainer extends DeviceEvent {
 
   @override
   List<Object> get props => [containerId];
+}
+
+final class DeviceAdd extends DeviceEvent {
+  final int userId;
+  final String deviceUid;
+
+  const DeviceAdd(this.userId, this.deviceUid);
+
+  @override
+  List<Object> get props => [userId, deviceUid];
 }

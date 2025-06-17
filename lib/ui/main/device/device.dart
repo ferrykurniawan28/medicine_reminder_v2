@@ -9,13 +9,41 @@ class DeviceView extends StatefulWidget {
 
 // TODO: work on device
 class _DeviceState extends State<DeviceView> {
+  bool _isFetching = false; // Flag to prevent duplicate fetches
+  int? userId;
+
   @override
   void initState() {
     super.initState();
-    if (context.read<DeviceBloc>().device == null) {
-      context.read<DeviceBloc>().add(DeviceFetch(1));
-    } else {
-      context.read<DeviceBloc>().add(DeviceRefresh());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchDevice();
+    });
+  }
+
+  Future<void> _fetchDevice() async {
+    if (_isFetching) {
+      print('Fetch already in progress, skipping duplicate call.');
+      return;
+    }
+
+    _isFetching = true; // Set fetching flag to true
+
+    try {
+      userId = await SharedPreference.getInt('userId');
+      print('Fetching device for userId: $userId');
+
+      if (userId == null) {
+        print('User ID is null, cannot fetch device');
+        return;
+      }
+
+      if (!mounted) return;
+
+      context.read<DeviceBloc>().add(DeviceFetch(userId!));
+    } catch (e) {
+      print('Error fetching device: $e');
+    } finally {
+      _isFetching = false; // Reset fetching flag
     }
   }
 
@@ -28,7 +56,7 @@ class _DeviceState extends State<DeviceView> {
       backgroundColor: Colors.white,
       body: RefreshIndicator(
         onRefresh: () async {
-          context.read<DeviceBloc>().add(DeviceRefresh());
+          // context.read<DeviceBloc>().add(DeviceRefresh());
         },
         child: ListView(children: [
           // const YourDevice(),
@@ -125,18 +153,83 @@ class _DeviceState extends State<DeviceView> {
                 },
               );
             } else if (state is DeviceError) {
-              if (state.message == 'Device not found') {
+              if (state.message == 'Exception: Device not found' ||
+                  state.message == 'No device found') {
                 return Column(
                   children: [
-                    Text(
-                      state.message,
-                      style: bodyTextStyle,
-                    ),
-                    spacerHeight(20),
+                    // Text(
+                    // state.message,
+                    //   style: bodyTextStyle,
+                    // ),
+                    // spacerHeight(20),
                     // add a button to add device
                     ElevatedButton(
                       onPressed: () {
-                        context.read<DeviceBloc>().add(const DeviceFetch(1));
+                        // open a dialog to add device
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            String deviceUid = '';
+                            return AlertDialog(
+                              title: const Text('Add Device'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextField(
+                                    onChanged: (value) {
+                                      deviceUid = value;
+                                    },
+                                    decoration: const InputDecoration(
+                                      labelText: 'Device UID',
+                                      hintText: 'Enter device UID',
+                                    ),
+                                  ),
+                                  // Add more fields if necessary
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    if (deviceUid.isEmpty) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Device UID cannot be empty'),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    if (userId == null) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                              Text('User ID is not available'),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    context.read<DeviceBloc>().add(
+                                          DeviceAdd(
+                                            userId!,
+                                            deviceUid,
+                                          ),
+                                        );
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Add Device'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       child: const Text('Add Device'),
                     ),

@@ -13,7 +13,7 @@ class DeviceModel extends Device {
 
   factory DeviceModel.fromJson(Map<String, dynamic> json) => DeviceModel(
         id: json['id'],
-        uuid: json['uuid'],
+        uuid: json['uid'],
         currentState: json['current_state'],
         temperature: json['temperature'],
         humidity: json['humidity'],
@@ -22,31 +22,37 @@ class DeviceModel extends Device {
             .toList(),
       );
 
+  @override
   Map<String, dynamic> toJson() => {
         'id': id,
-        'uuid': uuid,
+        'uid': uuid,
         'current_state': currentState,
         'temperature': temperature,
         'humidity': humidity,
         'containers':
             containers.map((x) => (x as ContainerModel).toJson()).toList(),
       };
+
+  DeviceModel copyWithContainers(List<DeviceContainer> newContainers) {
+    return DeviceModel(
+      id: id,
+      uuid: uuid,
+      currentState: currentState,
+      temperature: temperature,
+      humidity: humidity,
+      containers: newContainers,
+    );
+  }
 }
 
 class ContainerModel extends DeviceContainer {
   const ContainerModel({
-    int? id,
-    required int deviceId,
-    required int containerId,
-    String? medicineName,
-    int? quantity,
-  }) : super(
-          id: id,
-          deviceId: deviceId,
-          containerId: containerId,
-          medicineName: medicineName,
-          quantity: quantity,
-        );
+    super.id,
+    required super.deviceId,
+    required super.containerId,
+    super.medicineName,
+    super.quantity,
+  });
 
   factory ContainerModel.fromJson(Map<String, dynamic> json) => ContainerModel(
         id: json['id'],

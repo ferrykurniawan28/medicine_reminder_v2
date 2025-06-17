@@ -75,9 +75,16 @@ class NetworkService {
       );
       print('Response status: ${response.statusCode}');
       print('Response data: ${response.data}');
-      print('response error: ${response.statusMessage}');
+      print('response message: ${response.statusMessage}');
       final jsonBody =
           response.data is String ? json.decode(response.data) : response.data;
+
+      if (jsonBody == null || jsonBody.isEmpty) {
+        throw Exception('Response data is null or empty');
+      }
+
+      print('Parsed response data: $jsonBody');
+
       return ApiResponse<T>.fromJson(
         jsonBody,
         fromData: fromData,

@@ -1,7 +1,9 @@
+import 'package:medicine_reminder/features/device/data/models/device_model.dart';
+
 abstract class DeviceRemoteRepository {
-  Future<List<Map<String, dynamic>>> fetchDevices({int? userId});
-  Future<void> addDevice(Map<String, dynamic> deviceJson);
-  Future<void> updateDevice(int id, Map<String, dynamic> deviceJson);
+  Future<DeviceModel> fetchDevices({int? userId});
+  Future<void> addDevice(DeviceModel deviceJson);
+  Future<void> updateDevice(int id, DeviceModel deviceJson);
   Future<void> deleteDevice(int id);
   Future<void> syncDevices(List<Map<String, dynamic>> devicesToSync);
 }

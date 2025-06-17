@@ -17,16 +17,15 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
     final path = join(dbPath, 'device.db');
     return await openDatabase(
       path,
-      version: 2, // Bump version for migration
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE device(
             id INTEGER PRIMARY KEY,
             uuid TEXT,
             current_state INTEGER,
-            temperature INTEGER,
-            humidity INTEGER,
-            is_synced INTEGER DEFAULT 0
+            temperature REAL,
+            humidity REAL
           )
         ''');
         await db.execute('''
@@ -35,8 +34,14 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
             device_id INTEGER,
             container_id INTEGER,
             medicine_name TEXT,
-            quantity INTEGER,
-            is_synced INTEGER DEFAULT 0
+            quantity INTEGER
+          )
+        ''');
+        await db.execute('''
+          CREATE TABLE user_device(
+            user_id INTEGER,
+            device_id INTEGER,
+            PRIMARY KEY (user_id, device_id)
           )
         ''');
       },
@@ -52,57 +57,60 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
   }
 
   @override
-  Future<DeviceModel?> getDevice(int id) async {
+  Future<DeviceModel> getDevice(int deviceId) async {
     final db = await database;
-    final deviceMap =
-        await db.query('device', where: 'id = ?', whereArgs: [id]);
-    if (deviceMap.isEmpty) return null;
-    final containersMap =
-        await db.query('containers', where: 'device_id = ?', whereArgs: [id]);
+    final deviceData =
+        await db.query('device', where: 'id = ?', whereArgs: [deviceId]);
+
+    if (deviceData.isEmpty) throw Exception('Device not found');
+
+    final containerData = await db
+        .query('containers', where: 'device_id = ?', whereArgs: [deviceId]);
+
+    final containers = containerData
+        .map((container) => ContainerModel(
+              id: container['id'] as int,
+              deviceId: container['device_id'] as int,
+              containerId: container['container_id'] as int,
+              medicineName: container['medicine_name'] as String?,
+              quantity: container['quantity'] as int,
+            ))
+        .toList();
+
     return DeviceModel(
-      id: deviceMap[0]['id'] as int?,
-      uuid: deviceMap[0]['uuid'] as String,
-      currentState: deviceMap[0]['current_state'] as int,
-      temperature: deviceMap[0]['temperature'] as int?,
-      humidity: deviceMap[0]['humidity'] as int?,
-      containers: containersMap
-          .map((c) => ContainerModel(
-                id: c['id'] as int?,
-                deviceId: c['device_id'] as int,
-                containerId: c['container_id'] as int,
-                medicineName: c['medicine_name'] as String?,
-                quantity: c['quantity'] as int?,
-              ))
-          .toList(),
+      id: deviceData.first['id'] as int,
+      uuid: deviceData.first['uuid'] as String,
+      currentState: deviceData.first['current_state'] as int,
+      temperature: deviceData.first['temperature'] as double?,
+      humidity: deviceData.first['humidity'] as double?,
+      containers: containers,
     );
   }
 
   @override
-  Future<List<DeviceModel>> getDevices() async {
+  Future<void> addDevice(DeviceModel device) async {
     final db = await database;
-    final deviceMaps = await db.query('device');
-    List<DeviceModel> devices = [];
-    for (final device in deviceMaps) {
-      final containersMap = await db.query('containers',
-          where: 'device_id = ?', whereArgs: [device['id']]);
-      devices.add(DeviceModel(
-        id: device['id'] as int?,
-        uuid: device['uuid'] as String,
-        currentState: device['current_state'] as int,
-        temperature: device['temperature'] as int?,
-        humidity: device['humidity'] as int?,
-        containers: containersMap
-            .map((c) => ContainerModel(
-                  id: c['id'] as int?,
-                  deviceId: c['device_id'] as int,
-                  containerId: c['container_id'] as int,
-                  medicineName: c['medicine_name'] as String?,
-                  quantity: c['quantity'] as int?,
-                ))
-            .toList(),
-      ));
+    // Enforce only one device and 5 containers: clear tables before insert
+    await db.delete('device');
+    await db.delete('containers');
+    // Insert the device
+    await db.insert('device', {
+      'id': device.id,
+      'uuid': device.uuid,
+      'current_state': device.currentState,
+      'temperature': device.temperature,
+      'humidity': device.humidity,
+    });
+    // Insert up to 5 containers
+    for (final container in device.containers.take(5)) {
+      await db.insert('containers', {
+        'id': container.id,
+        'device_id': container.deviceId,
+        'container_id': container.containerId,
+        'medicine_name': container.medicineName,
+        'quantity': container.quantity,
+      });
     }
-    return devices;
   }
 
   @override
@@ -117,30 +125,55 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
       'current_state': device.currentState,
       'temperature': device.temperature,
       'humidity': device.humidity,
-      'is_synced': 0, // Always mark as not synced on local update
     });
     // Insert up to 5 containers
-    for (final container in device.containers.take(5)) {
+    for (final container in device.containers) {
       await db.insert('containers', {
         'device_id': container.deviceId,
         'container_id': container.containerId,
         'medicine_name': container.medicineName,
         'quantity': container.quantity,
-        'is_synced': 0, // Always mark as not synced on local update
       });
     }
   }
 
   @override
-  Future<void> refreshDevice() async {
-    // No-op for local only, or could re-fetch from db
-    await Future.delayed(const Duration(milliseconds: 200));
+  Future<void> deleteDevice(int deviceId) async {
+    final db = await database;
+    await db.delete('device', where: 'id = ?', whereArgs: [deviceId]);
   }
 
   @override
-  Future<void> deleteDevice() async {
+  Future<void> addUserDevice(int userId, int deviceId) async {
     final db = await database;
-    await db.delete('containers');
-    await db.delete('device');
+    await db.insert('user_device', {
+      'user_id': userId,
+      'device_id': deviceId,
+    });
+  }
+
+  @override
+  Future<int?> getDeviceIdByUserId(int userId) async {
+    final db = await database;
+    final result = await db.query(
+      'user_device',
+      columns: ['device_id'],
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
+    if (result.isNotEmpty) {
+      return result.first['device_id'] as int?;
+    }
+    return null;
+  }
+
+  @override
+  Future<void> deleteUserDevice(int userId, int deviceId) async {
+    final db = await database;
+    await db.delete(
+      'user_device',
+      where: 'user_id = ? AND device_id = ?',
+      whereArgs: [userId, deviceId],
+    );
   }
 }

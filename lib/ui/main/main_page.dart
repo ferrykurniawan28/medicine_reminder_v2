@@ -9,212 +9,193 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
+  late final List<BottomNavItem> _navItems;
+
   @override
   void initState() {
     super.initState();
+    _navItems = _initializeNavItems();
     Modular.to.navigate('/home/reminder');
   }
 
-  Map<int, AppBar> get appBars => {
-        0: defaultAppBar(
-          'Reminders',
+  List<BottomNavItem> _initializeNavItems() => [
+        BottomNavItem(
+          index: 0,
+          route: '/home/reminder',
+          label: 'Home',
+          iconPath: 'assets/icons/home.png',
+          selectedIconPath: 'assets/icons/home-selected.png',
         ),
-        1: defaultAppBar(
-          'Appointment',
+        BottomNavItem(
+          index: 1,
+          route: '/home/appointment',
+          label: 'Appointment',
+          iconPath: 'assets/icons/calendar.png',
+          selectedIconPath: 'assets/icons/calendar-selected.png',
         ),
-        2: defaultAppBar(
-          'Parental',
+        BottomNavItem(
+          index: 2,
+          route: '/home/parental/list',
+          label: 'Parental',
+          iconPath: 'assets/icons/family.png',
+          selectedIconPath: 'assets/icons/family-selected.png',
         ),
-        3: defaultAppBar(
-          'Device',
-          actions: [
-            IconButton(
-                onPressed: () {}, icon: const Icon(Icons.playlist_remove))
-          ],
+        BottomNavItem(
+          index: 3,
+          route: '/home/device',
+          label: 'Device',
+          iconPath: 'assets/icons/pill-dosage.png',
+          selectedIconPath: 'assets/icons/pill-dosage-selected.png',
         ),
-      };
+      ];
+
+  final Map<int, Widget> _bodyMap = {
+    0: const Home(),
+    1: const Appointment(),
+    2: const ListParental(),
+    3: const DeviceView(),
+  };
+
+  final Map<int, AppBar> _appBarMap = {
+    0: defaultAppBar(
+      'Reminders',
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.notifications),
+        ),
+      ],
+    ),
+    1: defaultAppBar(
+      'Appointment',
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.notifications),
+        ),
+      ],
+    ),
+    2: defaultAppBar('Parental'),
+    3: defaultAppBar(
+      'Device',
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.playlist_remove),
+        ),
+      ],
+    ),
+  };
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    Modular.to.navigate(_navItems[index].route);
+  }
 
   @override
   Widget build(BuildContext context) {
-    Widget body;
-    switch (_selectedIndex) {
-      case 0:
-        body = const Home(); // ReminderHomePage -> Home
-        break;
-      case 1:
-        body = const Appointment(); // AppointmentHomePage -> Appointment
-        break;
-      case 2:
-        body = const ListParental(); // ParentalHomePage -> ListParental
-        break;
-      case 3:
-        body = const DeviceView(); // DeviceHomePage -> DeviceView
-        break;
-      default:
-        body = const Home();
-    }
     return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: kPrimaryColor,
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(color: Colors.white, fontSize: 24),
-              ),
+      drawer: _buildDrawer(),
+      appBar: _appBarMap[_selectedIndex],
+      body: _bodyMap[_selectedIndex] ?? const Home(),
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
+
+  Widget _buildDrawer() {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(color: kPrimaryColor),
+            child: Text(
+              'Menu',
+              style: TextStyle(color: Colors.white, fontSize: 24),
             ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 0;
-                });
-                Modular.to.navigate('/home/reminder');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.calendar_today),
-              title: const Text('Appointment'),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 1;
-                });
-                Modular.to.navigate('/home/appointment');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.group),
-              title: const Text('Parental'),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 2;
-                });
-                Modular.to.navigate('/home/parental/list');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.medical_services),
-              title: const Text('Device'),
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 3;
-                });
-                Modular.to.navigate('/home/device');
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-      appBar: appBars[_selectedIndex],
-      body: body,
-      bottomNavigationBar: SizedBox(
-        child: Stack(
-          clipBehavior: Clip.none,
-          fit: StackFit.passthrough,
-          children: [
-            Container(
-              height: 80,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 5,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  CustomIconButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedIndex = 0;
-                      });
-                      Modular.to.navigate('/home/reminder');
-                    },
-                    icon: Image.asset(
-                      _selectedIndex == 0
-                          ? 'assets/icons/home-selected.png'
-                          : 'assets/icons/home.png',
-                      width: 24,
-                      color: _selectedIndex == 0 ? kPrimaryColor : Colors.black,
-                    ),
-                    label: 'Home',
-                    isSelected: _selectedIndex == 0,
-                  ),
-                  CustomIconButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedIndex = 1;
-                      });
-                      Modular.to.navigate('/home/appointment');
-                    },
-                    icon: Image.asset(
-                      _selectedIndex == 1
-                          ? 'assets/icons/calendar-selected.png'
-                          : 'assets/icons/calendar.png',
-                      width: 24,
-                      color: _selectedIndex == 1 ? kPrimaryColor : Colors.black,
-                    ),
-                    label: 'Appointment',
-                    isSelected: _selectedIndex == 1,
-                  ),
-                  CustomIconButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedIndex = 2;
-                      });
-                      Modular.to.navigate('/home/parental/list');
-                    },
-                    icon: Image.asset(
-                      _selectedIndex == 2
-                          ? 'assets/icons/family-selected.png'
-                          : 'assets/icons/family.png',
-                      width: 24,
-                      color: _selectedIndex == 2 ? kPrimaryColor : Colors.black,
-                    ),
-                    label: 'Parental',
-                    isSelected: _selectedIndex == 2,
-                  ),
-                  CustomIconButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedIndex = 3;
-                      });
-                      Modular.to.navigate('/home/device');
-                    },
-                    icon: Image.asset(
-                      _selectedIndex == 3
-                          ? 'assets/icons/pill-dosage-selected.png'
-                          : 'assets/icons/pill-dosage.png',
-                      width: 24,
-                      color: _selectedIndex == 3 ? kPrimaryColor : Colors.black,
-                      height: 24,
-                    ),
-                    label: 'Device',
-                    isSelected: _selectedIndex == 3,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+          ..._navItems.map((item) => ListTile(
+                leading: _getDrawerIcon(item.index),
+                title: Text(item.label),
+                onTap: () {
+                  _onItemTapped(item.index);
+                  Navigator.pop(context);
+                },
+              )),
+        ],
       ),
     );
   }
+
+  Widget _buildBottomNavBar() {
+    return Container(
+      height: 80,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 5,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: _navItems
+            .map((item) => CustomIconButton(
+                  onPressed: () => _onItemTapped(item.index),
+                  icon: Image.asset(
+                    _selectedIndex == item.index
+                        ? item.selectedIconPath
+                        : item.iconPath,
+                    width: 24,
+                    color: _selectedIndex == item.index
+                        ? kPrimaryColor
+                        : Colors.black,
+                  ),
+                  label: item.label,
+                  isSelected: _selectedIndex == item.index,
+                ))
+            .toList(),
+      ),
+    );
+  }
+
+  Icon _getDrawerIcon(int index) {
+    switch (index) {
+      case 0:
+        return const Icon(Icons.home);
+      case 1:
+        return const Icon(Icons.calendar_today);
+      case 2:
+        return const Icon(Icons.group);
+      case 3:
+        return const Icon(Icons.medical_services);
+      default:
+        return const Icon(Icons.home);
+    }
+  }
 }
 
-class CustomIconButton extends StatefulWidget {
+class BottomNavItem {
+  final int index;
+  final String route;
+  final String label;
+  final String iconPath;
+  final String selectedIconPath;
+
+  BottomNavItem({
+    required this.index,
+    required this.route,
+    required this.label,
+    required this.iconPath,
+    required this.selectedIconPath,
+  });
+}
+
+class CustomIconButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Widget icon;
   final String label;
@@ -229,26 +210,20 @@ class CustomIconButton extends StatefulWidget {
   });
 
   @override
-  State<CustomIconButton> createState() => _CustomIconButtonState();
-}
-
-class _CustomIconButtonState extends State<CustomIconButton> {
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onPressed,
+      onTap: onPressed,
       child: SizedBox(
         width: 75,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            widget.icon,
+            icon,
             Text(
-              widget.label,
+              label,
               style: TextStyle(
-                color: widget.isSelected ? kPrimaryColor : Colors.black,
-                fontWeight:
-                    widget.isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? kPrimaryColor : Colors.black,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
           ],
@@ -257,9 +232,3 @@ class _CustomIconButtonState extends State<CustomIconButton> {
     );
   }
 }
-
-// Ensure the following parts are present in main.dart:
-// part 'home/home.dart';
-// part 'appointment/appointment.dart';
-// part 'parental/list_parental.dart';
-// part 'device/device.dart';

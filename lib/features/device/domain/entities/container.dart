@@ -1,5 +1,6 @@
 // Container entity for clean architecture
 import 'package:equatable/equatable.dart';
+import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 
 class DeviceContainer extends Equatable {
   final int? id;
@@ -29,6 +30,31 @@ class DeviceContainer extends Equatable {
       containerId: containerId ?? this.containerId,
       medicineName: medicineName ?? this.medicineName,
       quantity: quantity ?? this.quantity,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'deviceId': deviceId,
+      'containerId': containerId,
+      'medicineName': medicineName,
+      'quantity': quantity,
+    };
+  }
+
+  static Future<DeviceContainer> fromModel(DeviceContainer container) {
+    if (container.id == null) {
+      return Future.value(null);
+    }
+    return Future.value(
+      DeviceContainer(
+        id: container.id,
+        deviceId: container.deviceId,
+        containerId: container.containerId,
+        medicineName: container.medicineName,
+        quantity: container.quantity,
+      ),
     );
   }
 

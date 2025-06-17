@@ -7,6 +7,7 @@ import 'package:medicine_reminder/features/appointment/data/datasources/appointm
 import 'package:medicine_reminder/features/appointment/data/repositories/appointment_repository_impl.dart';
 import 'package:medicine_reminder/core/network/network_service.dart';
 import 'package:medicine_reminder/features/auth/bloc/auth_bloc.dart';
+import 'package:medicine_reminder/features/device/data/repositories/device_repository_impl.dart';
 import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
 // import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource.dart';
@@ -14,6 +15,8 @@ import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:medicine_reminder/routes/routes.dart';
 import 'package:flutter/services.dart';
 import 'package:medicine_reminder/core/services/sync_manager.dart';
+import 'package:medicine_reminder/features/device/data/datasources/device_local_datasource_impl.dart';
+import 'package:medicine_reminder/features/device/data/datasources/device_remote_datasource_impl.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +48,16 @@ class MainApp extends StatelessWidget {
     Modular.setInitialRoute('/');
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => DeviceBloc()),
+        BlocProvider(
+          create: (context) {
+            final deviceRepo = DeviceRepositoryImpl(
+              localDataSource: DeviceLocalDataSourceImpl(),
+              remoteDataSource: DeviceRemoteDataSourceImpl(NetworkService()),
+              isOnline: () => true,
+            );
+            return DeviceBloc(deviceRepo);
+          },
+        ),
         BlocProvider(create: (context) => ParentalBloc()),
         BlocProvider(
           create: (context) {
@@ -53,7 +65,7 @@ class MainApp extends StatelessWidget {
               AppointmentLocalDataSourceImpl(),
               remoteDataSource:
                   AppointmentRemoteDataSourceImpl(NetworkService()),
-              isOnline: () => false,
+              isOnline: () => true,
               syncManager: syncManager,
             );
             return AppointmentBloc(repo);
