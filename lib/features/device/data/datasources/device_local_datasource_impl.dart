@@ -46,12 +46,12 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
         ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
-          await db.execute(
-              'ALTER TABLE device ADD COLUMN is_synced INTEGER DEFAULT 0');
-          await db.execute(
-              'ALTER TABLE containers ADD COLUMN is_synced INTEGER DEFAULT 0');
-        }
+        // if (oldVersion < 2) {
+        //   await db.execute(
+        //       'ALTER TABLE device ADD COLUMN is_synced INTEGER DEFAULT 0');
+        //   await db.execute(
+        //       'ALTER TABLE containers ADD COLUMN is_synced INTEGER DEFAULT 0');
+        // }
       },
     );
   }
