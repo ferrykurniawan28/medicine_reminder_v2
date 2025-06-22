@@ -16,6 +16,7 @@ class NetworkService {
   Future<ApiResponse<T>> get<T>(
     String url, {
     Map<String, String>? headers,
+    Object? body,
     T Function(dynamic)? fromData,
   }) async {
     try {
@@ -23,6 +24,7 @@ class NetworkService {
       print('Starting GET request to $url');
       final response = await _dio.get(
         url,
+        data: body != null ? json.encode(body) : null,
         options: Options(
           headers: headers,
           sendTimeout: const Duration(seconds: 10),

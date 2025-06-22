@@ -1,5 +1,6 @@
 import 'package:medicine_reminder/core/constant/url.dart';
 import 'package:medicine_reminder/core/network/network_service.dart';
+import 'package:medicine_reminder/features/device/data/models/device_control_model.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'device_remote_datasource.dart';
 
@@ -32,6 +33,28 @@ class DeviceRemoteDataSourceImpl implements DeviceRemoteDataSource {
     } else {
       throw Exception('Failed to fetch devices: ${response.statusCode}');
     }
+  }
+
+  @override
+  Future<List<DeviceControlModel>> fetchDeviceControl(int deviceId,
+      {int? limit, int? offset}) async {
+    String url = '$deviceControlUrl/$deviceId';
+    Map<String, dynamic> queryParams = {};
+    if (limit != null) queryParams['limit'] = limit;
+    if (offset != null) queryParams['offset'] = offset;
+    final response = await networkService.get(url, body: queryParams);
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to fetch device controls: ${response.statusCode}');
+    }
+    final controlsJson = response.data;
+    if (controlsJson == null || controlsJson.isEmpty) {
+      return [];
+    }
+    print('Device controls fetched successfully: $controlsJson');
+    return (controlsJson as List)
+        .map((control) => DeviceControlModel.fromJson(control))
+        .toList();
   }
 
   @override
@@ -101,5 +124,21 @@ class DeviceRemoteDataSourceImpl implements DeviceRemoteDataSource {
     if (response.statusCode != 204) {
       throw Exception('Failed to delete device: ${response.statusCode}');
     }
+  }
+
+  @override
+  Future<int> getDeviceControlCount(int deviceId) async {
+    final response =
+        await networkService.get('$deviceControlCountUrl/$deviceId');
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to fetch device control count: ${response.statusCode}');
+    }
+    final count = response.data;
+    if (count == null) {
+      throw Exception(
+          'No count data returned from device control count request');
+    }
+    return count as int;
   }
 }

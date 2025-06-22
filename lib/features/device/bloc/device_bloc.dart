@@ -2,7 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
+import 'package:medicine_reminder/features/device/domain/entities/device_control.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/get_device.dart';
+import 'package:medicine_reminder/features/device/domain/usecases/get_device_control_count.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/reset_container.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/update_container.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/add_device.dart';
@@ -15,18 +17,22 @@ part 'device_state.dart';
 
 class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
   Device? device;
+  List<DeviceControl>? deviceControls;
+  int? deviceControlsCount;
 
   final AddDevice addDevice;
   final GetDevice getDevice;
   final ContainerUpdate updateContainer;
   final ContainerReset resetContainer;
   final DeviceRepository deviceRepository;
+  final GetDeviceControlCount getDeviceControlCount;
 
   DeviceBloc(this.deviceRepository)
       : addDevice = AddDevice(deviceRepository),
         getDevice = GetDevice(deviceRepository),
         updateContainer = ContainerUpdate(deviceRepository),
         resetContainer = ContainerReset(deviceRepository),
+        getDeviceControlCount = GetDeviceControlCount(deviceRepository),
         super(DeviceInitial()) {
     on<DeviceFetch>(_onFetchDevice);
     on<DeviceRefresh>(_onRefreshDevices);
@@ -42,9 +48,10 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
     emit(DeviceLoading());
     try {
       device = await getDevice(event.userId);
-      print('Fetched device: ${device?.toJson()}');
       if (device != null) {
-        emit(DeviceLoaded(device!));
+        deviceControlsCount = await getDeviceControlCount(device!.id!);
+        print('Device controls count: $deviceControlsCount');
+        emit(DeviceLoaded(device!, deviceControlsCount: deviceControlsCount));
       } else {
         emit(const DeviceError('No device found'));
       }
@@ -58,7 +65,6 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
     emit(DeviceLoading());
     try {
       device = await addDevice(event.userId, event.deviceUid);
-      print('Added device: ${device?.toJson()}');
       if (device != null) {
         emit(DeviceLoaded(device!));
       } else {

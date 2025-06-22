@@ -4,9 +4,17 @@ class ApiResponse<T> {
   final int? statusCode;
   final String? message;
   final String? token;
+  final int? length;
+  final int? totalLength;
 
   ApiResponse(
-      {this.data, this.error, this.statusCode, this.message, this.token});
+      {this.data,
+      this.error,
+      this.statusCode,
+      this.message,
+      this.token,
+      this.length,
+      this.totalLength});
 
   bool get isSuccess =>
       error == null &&
@@ -31,11 +39,13 @@ class ApiResponse<T> {
       statusCode: json['statusCode'],
       message: json['message'],
       token: json['token'],
+      length: json['length'],
+      totalLength: json['total_length'],
     );
   }
 
   @override
   String toString() {
-    return 'ApiResponse(data: $data, error: $error, statusCode: $statusCode, message: $message, token: $token)';
+    return 'ApiResponse(data: $data, error: $error, statusCode: $statusCode, message: $message, token: $token, length: $length, totalLength: $totalLength)';
   }
 }

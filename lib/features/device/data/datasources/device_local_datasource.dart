@@ -1,4 +1,5 @@
 import '../models/device_model.dart';
+import '../models/device_control_model.dart';
 
 abstract class DeviceLocalDataSource {
   Future<DeviceModel> getDevice(int deviceId);
@@ -8,4 +9,6 @@ abstract class DeviceLocalDataSource {
   Future<void> addUserDevice(int userId, int deviceId);
   Future<int?> getDeviceIdByUserId(int userId);
   Future<void> deleteUserDevice(int userId);
+  Future<void> addDeviceControl(DeviceControlModel control);
+  Future<int> getDeviceControlCount(int deviceId);
 }

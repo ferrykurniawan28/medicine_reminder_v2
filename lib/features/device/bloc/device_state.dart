@@ -14,11 +14,13 @@ final class DeviceLoading extends DeviceState {}
 
 final class DeviceLoaded extends DeviceState {
   final Device device;
+  final int? deviceControlsCount;
 
-  const DeviceLoaded(this.device);
+  const DeviceLoaded(this.device, {this.deviceControlsCount});
 
   @override
-  List<Object> get props => [device];
+  List<Object> get props =>
+      [device, if (deviceControlsCount != null) deviceControlsCount!];
 }
 
 final class ContainerUpdated extends DeviceState {

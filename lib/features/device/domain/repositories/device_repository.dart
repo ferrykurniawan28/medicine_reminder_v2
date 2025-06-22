@@ -10,4 +10,5 @@ abstract class DeviceRepository {
   Future<void> updateContainer(int userId, DeviceContainer container);
   Future<void> resetContainer(int userId, int containerId);
   Future<void> deleteDevice(int userId, int deviceId);
+  Future<int> getDeviceControlCount(int deviceId);
 }

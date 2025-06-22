@@ -172,4 +172,18 @@ class DeviceRepositoryImpl implements DeviceRepository {
       throw Exception('Cannot delete device while offline');
     }
   }
+
+  @override
+  Future<int> getDeviceControlCount(int deviceId) async {
+    if (isOnline != null && isOnline!()) {
+      try {
+        return await remoteDataSource.getDeviceControlCount(deviceId);
+      } catch (e) {
+        print('Error fetching device control count: $e');
+        rethrow;
+      }
+    } else {
+      return await localDataSource.getDeviceControlCount(deviceId);
+    }
+  }
 }

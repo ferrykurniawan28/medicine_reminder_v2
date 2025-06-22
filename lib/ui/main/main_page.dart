@@ -81,7 +81,39 @@ class _MainPageState extends State<MainPage> {
       actions: [
         IconButton(
           onPressed: () {},
-          icon: const Icon(Icons.playlist_remove),
+          icon: Stack(
+            children: [
+              const Icon(Icons.pending_actions_outlined),
+              Positioned(
+                left: 0,
+                bottom: 0,
+                child: BlocBuilder<DeviceBloc, DeviceState>(
+                  builder: (context, state) {
+                    if (state is DeviceLoaded) {
+                      return Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          context
+                              .read<DeviceBloc>()
+                              .deviceControlsCount
+                              .toString(),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 12),
+                        ),
+                      );
+                    } else if (state is DeviceError) {
+                      return const SizedBox.shrink();
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     ),

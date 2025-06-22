@@ -10,3 +10,6 @@ const deviceUserUrl = '$deviceUrl/user';
 const deviceRegisterUrl = '$deviceUrl/register-user';
 
 const containerUrl = '$baseUrl/container';
+
+const deviceControlUrl = '$deviceUrl/controls';
+const deviceControlCountUrl = '$deviceUrl/control/count';

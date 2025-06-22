@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'device_local_datasource.dart';
 import '../models/device_model.dart';
+import '../models/device_control_model.dart';
 
 class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
   static Database? _database;
@@ -42,6 +43,19 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
             user_id INTEGER,
             device_id INTEGER,
             PRIMARY KEY (user_id, device_id)
+          )
+        ''');
+        await db.execute('''
+          CREATE TABLE device_control(
+            id INTEGER PRIMARY KEY,
+            action TEXT,
+            container_id INTEGER,
+            device_id INTEGER,
+            medicine_name TEXT,
+            notes TEXT,
+            quantity INTEGER,
+            requested_by INTEGER,
+            status TEXT
           )
         ''');
       },
@@ -175,5 +189,22 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
       where: 'user_id = ?',
       whereArgs: [userId],
     );
+  }
+
+  @override
+  Future<void> addDeviceControl(DeviceControlModel control) async {
+    final db = await database;
+    await db.insert('device_control', control.toJson());
+  }
+
+  @override
+  Future<int> getDeviceControlCount(int deviceId) async {
+    final db = await database;
+    final result = await db.query(
+      'device_control',
+      where: 'device_id = ?',
+      whereArgs: [deviceId, "status = 'pending'"],
+    );
+    return result.length;
   }
 }
