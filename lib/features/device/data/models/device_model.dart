@@ -62,6 +62,7 @@ class ContainerModel extends DeviceContainer {
         quantity: json['quantity'],
       );
 
+  @override
   Map<String, dynamic> toJson() => {
         'id': id,
         'device_id': deviceId,

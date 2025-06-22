@@ -53,7 +53,7 @@ class MainApp extends StatelessWidget {
             final deviceRepo = DeviceRepositoryImpl(
               localDataSource: DeviceLocalDataSourceImpl(),
               remoteDataSource: DeviceRemoteDataSourceImpl(NetworkService()),
-              isOnline: () => false,
+              isOnline: () => true,
             );
             return DeviceBloc(deviceRepo);
           },

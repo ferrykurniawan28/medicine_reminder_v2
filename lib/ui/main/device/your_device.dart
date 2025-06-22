@@ -74,7 +74,10 @@ class YourDevice extends StatelessWidget {
                         style: subtitleTextStyle,
                       ),
                       Text(
-                        device.containers[index].medicineName ?? 'Add Medicine',
+                        (device.containers[index].medicineName == null ||
+                                device.containers[index].medicineName == "")
+                            ? 'Add Medicine'
+                            : device.containers[index].medicineName ?? '',
                         style: captionTextStyle,
                       )
                     ],

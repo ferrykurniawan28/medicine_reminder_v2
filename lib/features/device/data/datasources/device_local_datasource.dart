@@ -7,5 +7,5 @@ abstract class DeviceLocalDataSource {
   Future<void> deleteDevice(int deviceId);
   Future<void> addUserDevice(int userId, int deviceId);
   Future<int?> getDeviceIdByUserId(int userId);
-  Future<void> deleteUserDevice(int userId, int deviceId);
+  Future<void> deleteUserDevice(int userId);
 }

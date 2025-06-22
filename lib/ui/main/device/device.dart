@@ -102,7 +102,10 @@ class _DeviceState extends State<DeviceView> {
                       style: bodyTextStyle,
                     ),
                     subtitle: Text(
-                      container.medicineName ?? 'Empty',
+                      (container.medicineName == null ||
+                              container.medicineName == "")
+                          ? 'Empty'
+                          : container.medicineName ?? 'No Medicine',
                       style: captionTextStyle,
                     ),
                     trailing: Text(
@@ -110,7 +113,7 @@ class _DeviceState extends State<DeviceView> {
                       style: captionTextStyle,
                     ),
                     onTap: () {
-                      poopUpMenuContainer(context, container, key, 80);
+                      poopUpMenuContainer(context, container, key, 0);
                     },
                   );
                 },

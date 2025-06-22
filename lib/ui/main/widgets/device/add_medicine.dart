@@ -132,7 +132,10 @@ class _MedicineFormState extends State<_MedicineForm> {
   }
 }
 
-void resetDialog(BuildContext ctx, DeviceContainer container) {
+void resetDialog(BuildContext ctx, DeviceContainer container) async {
+  final userId = await SharedPreference.getInt('userId');
+  if (!ctx.mounted) return; // Ensure context is still valid
+
   AwesomeDialog(
     context: ctx,
     dialogType: DialogType.warning,
@@ -143,7 +146,28 @@ void resetDialog(BuildContext ctx, DeviceContainer container) {
     btnOkText: 'Reset',
     btnCancelOnPress: () {},
     btnOkOnPress: () {
-      ctx.read<DeviceBloc>().add(ResetContainer(container.containerId));
+      if (ctx.mounted) {
+        ctx
+            .read<DeviceBloc>()
+            .add(ResetContainer(userId, container.containerId));
+        showAfterResetDialog(ctx);
+      }
+    },
+  ).show();
+}
+
+void showAfterResetDialog(BuildContext ctx) {
+  AwesomeDialog(
+    context: ctx,
+    dialogType: DialogType.success,
+    animType: AnimType.scale,
+    title: 'Container Reset',
+    desc:
+        'Container reset has been requested successfully. Please confirm on the dispenser.',
+    btnOkOnPress: () {
+      // if (ctx.mounted) {
+      //   Navigator.of(ctx).pop(); // Close the dialog
+      // }
     },
   ).show();
 }

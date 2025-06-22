@@ -3,7 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/get_device.dart';
-import 'package:medicine_reminder/features/device/domain/usecases/update_device.dart';
+import 'package:medicine_reminder/features/device/domain/usecases/reset_container.dart';
+import 'package:medicine_reminder/features/device/domain/usecases/update_container.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/add_device.dart';
 import 'package:medicine_reminder/features/device/domain/repositories/device_repository.dart';
 import 'package:medicine_reminder/features/device/domain/entities/container.dart';
@@ -17,13 +18,15 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
 
   final AddDevice addDevice;
   final GetDevice getDevice;
-  final UpdateDevice updateDevice;
+  final ContainerUpdate updateContainer;
+  final ContainerReset resetContainer;
   final DeviceRepository deviceRepository;
 
   DeviceBloc(this.deviceRepository)
       : addDevice = AddDevice(deviceRepository),
         getDevice = GetDevice(deviceRepository),
-        updateDevice = UpdateDevice(deviceRepository),
+        updateContainer = ContainerUpdate(deviceRepository),
+        resetContainer = ContainerReset(deviceRepository),
         super(DeviceInitial()) {
     on<DeviceFetch>(_onFetchDevice);
     on<DeviceRefresh>(_onRefreshDevices);
@@ -123,24 +126,7 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
   Future<void> _onResetContainer(
       ResetContainer event, Emitter<DeviceState> emit) async {
     try {
-      if (device == null) {
-        emit(const DeviceError('Device not loaded'));
-        return;
-      }
-      final containerIndex = device!.containers
-          .indexWhere((c) => c.containerId == event.containerId);
-      if (containerIndex == -1) {
-        emit(const DeviceError('Container not found'));
-        return;
-      }
-      final updatedContainers = List<DeviceContainer>.from(device!.containers);
-      updatedContainers[containerIndex] =
-          updatedContainers[containerIndex].copyWith(
-        medicineName: null,
-        quantity: 0,
-      );
-      device = device!.copyWith(containers: updatedContainers) as DeviceModel;
-      emit(DeviceLoaded(device!));
+      await resetContainer(event.userId, event.containerId);
     } catch (e) {
       emit(DeviceError(e.toString()));
     }

@@ -168,12 +168,12 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
   }
 
   @override
-  Future<void> deleteUserDevice(int userId, int deviceId) async {
+  Future<void> deleteUserDevice(int userId) async {
     final db = await database;
     await db.delete(
       'user_device',
-      where: 'user_id = ? AND device_id = ?',
-      whereArgs: [userId, deviceId],
+      where: 'user_id = ?',
+      whereArgs: [userId],
     );
   }
 }

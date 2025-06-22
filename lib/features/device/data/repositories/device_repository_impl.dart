@@ -1,6 +1,7 @@
 import 'package:medicine_reminder/features/device/data/datasources/device_local_datasource.dart';
 import 'package:medicine_reminder/features/device/data/datasources/device_remote_datasource.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
+import 'package:medicine_reminder/features/device/domain/entities/container.dart';
 import 'package:medicine_reminder/features/device/domain/repositories/device_repository.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 
@@ -91,35 +92,84 @@ class DeviceRepositoryImpl implements DeviceRepository {
     }
   }
 
+  // @override
+  // Future<void> updateDevice(Device device) async {
+  //   if (isOnline != null && isOnline!()) {
+  //     try {
+  //       final deviceModel = DeviceModel(
+  //         id: device.id,
+  //         uuid: device.uuid,
+  //         currentState: device.currentState,
+  //         temperature: device.temperature,
+  //         humidity: device.humidity,
+  //         containers: device.containers
+  //             .map((container) => ContainerModel(
+  //                   id: container.id,
+  //                   deviceId: container.deviceId,
+  //                   containerId: container.containerId,
+  //                   medicineName: container.medicineName,
+  //                   quantity: container.quantity,
+  //                 ))
+  //             .toList(),
+  //       );
+  //       await remoteDataSource.updateDevice(deviceModel);
+  //     } catch (e) {
+  //       print('Error updating device: $e');
+  //       rethrow;
+  //     }
+  //   } else {
+  //     throw Exception('Cannot update device while offline');
+  //   }
+  // }
+
   @override
-  Future<void> updateDevice(Device device) async {
-    final deviceModel = DeviceModel(
-      id: device.id,
-      uuid: device.uuid,
-      currentState: device.currentState,
-      temperature: device.temperature,
-      humidity: device.humidity,
-      containers: device.containers
-          .map((container) => ContainerModel(
-                id: container.id,
-                deviceId: container.deviceId,
-                containerId: container.containerId,
-                medicineName: container.medicineName,
-                quantity: container.quantity,
-              ))
-          .toList(),
-    );
-    await localDataSource.updateDevice(deviceModel);
+  Future<void> updateContainer(int userId, DeviceContainer container) async {
     if (isOnline != null && isOnline!()) {
-      await remoteDataSource.updateDevice(deviceModel);
+      try {
+        final containerModel = ContainerModel(
+          id: container.id,
+          deviceId: container.deviceId,
+          containerId: container.containerId,
+          medicineName: container.medicineName,
+          quantity: container.quantity,
+        );
+        await remoteDataSource.updateContainer(userId, containerModel);
+      } catch (e) {
+        print('Error updating container: $e');
+        rethrow;
+      }
+    } else {
+      throw Exception('Cannot update container while offline');
     }
   }
 
   @override
-  Future<void> deleteDevice(int deviceId) async {
-    await localDataSource.deleteDevice(deviceId);
+  Future<void> resetContainer(int userId, int containerId) async {
     if (isOnline != null && isOnline!()) {
-      await remoteDataSource.deleteDevice(deviceId);
+      try {
+        await remoteDataSource.resetContainer(userId, containerId);
+      } catch (e) {
+        print('Error resetting container: $e');
+        rethrow;
+      }
+    } else {
+      throw Exception('Cannot reset container while offline');
+    }
+  }
+
+  @override
+  Future<void> deleteDevice(int userId, int deviceId) async {
+    if (isOnline != null && isOnline!()) {
+      try {
+        await remoteDataSource.deleteDevice(deviceId);
+        await localDataSource.deleteDevice(deviceId);
+        await localDataSource.deleteUserDevice(userId);
+      } catch (e) {
+        print('Error deleting device: $e');
+        rethrow;
+      }
+    } else {
+      throw Exception('Cannot delete device while offline');
     }
   }
 }

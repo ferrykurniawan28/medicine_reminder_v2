@@ -62,12 +62,13 @@ final class UpdateContainer extends DeviceEvent {
 }
 
 final class ResetContainer extends DeviceEvent {
+  final int userId;
   final int containerId;
 
-  const ResetContainer(this.containerId);
+  const ResetContainer(this.userId, this.containerId);
 
   @override
-  List<Object> get props => [containerId];
+  List<Object> get props => [userId, containerId];
 }
 
 final class DeviceAdd extends DeviceEvent {

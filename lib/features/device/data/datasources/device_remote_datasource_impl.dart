@@ -14,10 +14,20 @@ class DeviceRemoteDataSourceImpl implements DeviceRemoteDataSource {
     final response = await networkService.get('$deviceUserUrl/$userId');
     if (response.statusCode == 200) {
       final devicesJson = response.data;
-      if (devicesJson.isNotEmpty) {
-        return DeviceModel.fromJson(devicesJson);
-      } else {
-        throw Exception('No devices found for user ID: $userId');
+      print('Response data: $devicesJson');
+      try {
+        if (devicesJson is List && devicesJson.isNotEmpty) {
+          print('Devices found for user ID: $userId');
+          final device = DeviceModel.fromJson(devicesJson.first);
+          print('Device fetched successfully: ${device.toJson()}');
+          return device;
+        } else {
+          print('No devices found for user ID: $userId');
+          throw Exception('No devices found for user ID: $userId');
+        }
+      } catch (e) {
+        print('Error parsing device data: $e');
+        throw Exception('Failed to parse device data: $e');
       }
     } else {
       throw Exception('Failed to fetch devices: ${response.statusCode}');
@@ -48,12 +58,40 @@ class DeviceRemoteDataSourceImpl implements DeviceRemoteDataSource {
     return device;
   }
 
+  // @override
+  // Future<void> updateDevice(DeviceModel device) async {
+  //   final response = await networkService.put('$deviceUserUrl/${device.id}',
+  //       body: device.toJson());
+  //   if (response.statusCode != 200) {
+  //     throw Exception('Failed to update device: ${response.statusCode}');
+  //   }
+  // }
+
   @override
-  Future<void> updateDevice(DeviceModel device) async {
-    final response = await networkService.put('$deviceUserUrl/${device.id}',
-        body: device.toJson());
+  Future<void> updateContainer(int userId, ContainerModel container) async {
+    final body = {
+      'user_id': userId,
+      'action': 'refill',
+      'medicine_name': container.medicineName,
+      'quantity': container.quantity,
+    };
+    final response =
+        await networkService.put('$containerUrl/${container.id}', body: body);
     if (response.statusCode != 200) {
-      throw Exception('Failed to update device: ${response.statusCode}');
+      throw Exception('Failed to update container: ${response.statusCode}');
+    }
+  }
+
+  @override
+  Future<void> resetContainer(int userId, int containerId) async {
+    final body = {
+      'user_id': userId,
+      'action': 'reset',
+    };
+    final response =
+        await networkService.put('$containerUrl/$containerId', body: body);
+    if (response.statusCode != 200) {
+      throw Exception('Failed to reset container: ${response.statusCode}');
     }
   }
 
