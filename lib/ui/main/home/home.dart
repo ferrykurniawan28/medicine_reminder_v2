@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+//TODO: fix this import path
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -8,12 +9,49 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool _isFetching = false;
+  int? userId;
+  bool _hasError = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      BlocProvider.of<ReminderBloc>(context).add(LoadReminders());
+      _fetchReminders();
     });
+  }
+
+  Future<void> _fetchReminders() async {
+    if (_isFetching) return;
+
+    setState(() {
+      _isFetching = true;
+      _hasError = false;
+    });
+
+    try {
+      userId = await SharedPreference.getInt('userId');
+
+      if (userId == null) {
+        setState(() => _hasError = true);
+        return;
+      }
+
+      if (!mounted) return;
+      context.read<ReminderBloc>().add(LoadReminders(userId!));
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _hasError = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching reminders: $e'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isFetching = false);
+      }
+    }
   }
 
   @override
@@ -30,7 +68,28 @@ class _HomeState extends State<Home> {
       //     ),
       //   ],
       // ),
-      body: const ReminderListBody(),
+      body: _isFetching
+          ? const CircularProgressIndicator()
+          : _hasError || userId == null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline,
+                          size: 48, color: Colors.red),
+                      const SizedBox(height: 16),
+                      const Text('Failed to load reminders'),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _fetchReminders,
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: kPrimaryColor),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
+              : ReminderListBody(userId: userId!),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Modular.to.pushNamed('/reminder/');

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:medicine_reminder/core/services/services.dart';
 import 'package:medicine_reminder/features/reminder/bloc/reminder_bloc.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:medicine_reminder/ui/main/widgets/widgets.dart';
 
 class ReminderListBody extends StatelessWidget {
-  const ReminderListBody({super.key});
+  final int userId;
+  const ReminderListBody({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
-        BlocProvider.of<ReminderBloc>(context).add(LoadReminders());
+        BlocProvider.of<ReminderBloc>(context).add(LoadReminders(userId));
       },
       child: BlocConsumer<ReminderBloc, ReminderState>(
         listener: (context, state) {

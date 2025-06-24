@@ -13,3 +13,6 @@ const containerUrl = '$baseUrl/container';
 
 const deviceControlUrl = '$deviceUrl/controls';
 const deviceControlCountUrl = '$deviceUrl/control/count';
+
+const reminderUrl = '$baseUrl/reminder';
+const reminderUserUrl = '$reminderUrl/user';

@@ -1,5 +1,6 @@
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/time.dart';
+import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 
 class ReminderModel extends Reminder {
   final int isSynced;
@@ -27,16 +28,23 @@ class ReminderModel extends Reminder {
     return ReminderModel(
       id: json['id'] as int?,
       deviceId: json['deviceId'] as int?,
-      createdBy: json['createdBy'] as int?,
-      assignedTo: json['assignedTo'] as int?,
+      createdBy:
+          json['createdBy'] != null ? User.fromJson(json['createdBy']) : null,
+      assignedTo:
+          json['assignedTo'] != null ? User.fromJson(json['assignedTo']) : null,
       containerId: json['containerId'] as int?,
       medicineName: json['medicineName'] as String,
-      dosage: (json['dosage'] as List).map((e) => e as int).toList(),
+      dosage: (json['dosage'] as List<dynamic>).map((e) => e as int).toList(),
       medicineLeft: json['medicineLeft'] as int?,
       isActive: json['isActive'] as bool,
       isAlert: json['isAlert'] as bool? ?? false,
       note: json['note'] as String?,
-      type: ReminderType.values[json['type'] as int],
+      type: json['type'] != null && json['type'].isNotEmpty
+          ? ReminderType.values.firstWhere(
+              (e) => ReminderTypeHelper.getName(e) == json['type'],
+              orElse: () => ReminderType.onceDaily,
+            )
+          : ReminderType.onceDaily,
       times: (json['times'] as List<dynamic>)
           .map((e) => Time.fromDateTime(DateTime.parse(e)))
           .toList(),
@@ -139,51 +147,51 @@ class ReminderDayHelper {
   }
 }
 
-List<ReminderModel> dummyReminders = [
-  ReminderModel(
-    id: 1,
-    deviceId: 1,
-    createdBy: 1,
-    assignedTo: 1,
-    containerId: 1,
-    medicineName: 'Paracetamol',
-    dosage: [1],
-    medicineLeft: 10,
-    isActive: true,
-    note: 'Take medication',
-    type: ReminderType.onceDaily,
-    times: const [
-      Time(
-        9,
-        0,
-      ),
-    ],
-    daysofWeek: null,
-    endDate: DateTime.now().add(const Duration(days: 30)),
-  ),
-  ReminderModel(
-    id: 2,
-    deviceId: 1,
-    createdBy: 1,
-    assignedTo: 1,
-    containerId: 1,
-    medicineName: 'Ibuprofen',
-    dosage: [2],
-    medicineLeft: 5,
-    isActive: false,
-    note: 'Check blood pressure',
-    type: ReminderType.twiceDaily,
-    times: const [
-      Time(
-        8,
-        0,
-      ),
-      Time(
-        18,
-        0,
-      ),
-    ],
-    daysofWeek: null,
-    endDate: DateTime.now().add(const Duration(days: 15)),
-  ),
-];
+// List<ReminderModel> dummyReminders = [
+//   ReminderModel(
+//     id: 1,
+//     deviceId: 1,
+//     createdBy: 1,
+//     assignedTo: 1,
+//     containerId: 1,
+//     medicineName: 'Paracetamol',
+//     dosage: [1],
+//     medicineLeft: 10,
+//     isActive: true,
+//     note: 'Take medication',
+//     type: ReminderType.onceDaily,
+//     times: const [
+//       Time(
+//         9,
+//         0,
+//       ),
+//     ],
+//     daysofWeek: null,
+//     endDate: DateTime.now().add(const Duration(days: 30)),
+//   ),
+//   ReminderModel(
+//     id: 2,
+//     deviceId: 1,
+//     createdBy: 1,
+//     assignedTo: 1,
+//     containerId: 1,
+//     medicineName: 'Ibuprofen',
+//     dosage: [2],
+//     medicineLeft: 5,
+//     isActive: false,
+//     note: 'Check blood pressure',
+//     type: ReminderType.twiceDaily,
+//     times: const [
+//       Time(
+//         8,
+//         0,
+//       ),
+//       Time(
+//         18,
+//         0,
+//       ),
+//     ],
+//     daysofWeek: null,
+//     endDate: DateTime.now().add(const Duration(days: 15)),
+//   ),
+// ];

@@ -55,9 +55,9 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
       LoadReminderParental event, Emitter<ParentalState> emit) async {
     emit(ParentalLoading());
     try {
-      _reminders = dummyReminders;
+      // _reminders = dummyReminders;
       // final reminders = await _reminderRepository.getReminder(event.parentalId);
-      emit(ReminderParentalLoaded(_reminders!));
+      emit(ReminderParentalLoaded(_reminders ?? []));
     } catch (e) {
       emit(ParentalError(e.toString()));
     }

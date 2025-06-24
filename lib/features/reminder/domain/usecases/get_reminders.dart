@@ -6,7 +6,7 @@ class GetReminders {
 
   GetReminders(this.repository);
 
-  Future<List<Reminder>> call() async {
-    return await repository.getReminders();
+  Future<List<Reminder>> call(int userId) async {
+    return await repository.getReminders(userId);
   }
 }

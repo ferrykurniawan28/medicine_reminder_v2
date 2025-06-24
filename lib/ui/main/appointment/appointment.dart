@@ -16,7 +16,7 @@ class _AppointmentState extends State<Appointment> {
     _fetchAppointments();
   }
 
-  Future<void> _fetchAppointments() async {
+  void _fetchAppointments() {
     if (_isFetching) {
       print('Fetch already in progress, skipping duplicate call.');
       return;
@@ -25,17 +25,18 @@ class _AppointmentState extends State<Appointment> {
     _isFetching = true; // Set fetching flag to true
 
     try {
-      final userId = await SharedPreference.getInt('userId');
-      print('Fetching appointments for userId: $userId');
-
-      if (userId == null) {
-        print('User ID is null, cannot fetch appointments');
-        return;
+      final userState = context.read<UserBloc>().state;
+      if (userState is CurrentUser) {
+        final userId = userState.user.userId; // Access userId from CurrentUser
+        context.read<AppointmentBloc>().add(AppointmentsFetch(userId!));
+        Navigator.of(context).pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No user is currently logged in.'),
+          ),
+        );
       }
-
-      if (!mounted) return;
-
-      context.read<AppointmentBloc>().add(AppointmentsFetch(userId));
     } catch (e) {
       print('Error fetching appointments: $e');
     } finally {

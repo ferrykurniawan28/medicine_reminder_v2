@@ -9,7 +9,7 @@ class DeviceControlList extends StatefulWidget {
 
 class _DeviceControlListState extends State<DeviceControlList> {
   bool _isFetching = false; // Flag to prevent duplicate fetches
-  int? userId;
+  // int? userId;
 
   @override
   initState() {
@@ -28,18 +28,8 @@ class _DeviceControlListState extends State<DeviceControlList> {
     _isFetching = true; // Set fetching flag to true
 
     try {
-      userId = await SharedPreference.getInt('userId');
-
-      if (userId == null) {
-        return;
-      }
-
-      if (!mounted) return;
-
       context.read<DeviceBloc>().add(DeviceControlFetch());
     } catch (e) {
-      if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error fetching device: $e'),
@@ -58,8 +48,19 @@ class _DeviceControlListState extends State<DeviceControlList> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            context.read<DeviceBloc>().add(DeviceFetch(userId!));
-            Navigator.of(context).pop();
+            final userState = context.read<UserBloc>().state;
+            if (userState is CurrentUser) {
+              final userId =
+                  userState.user.userId; // Access userId from CurrentUser
+              context.read<DeviceBloc>().add(DeviceFetch(userId!));
+              Navigator.of(context).pop();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('No user is currently logged in.'),
+                ),
+              );
+            }
           },
         ),
       ),

@@ -18,14 +18,13 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
   final usecase_add.AddReminder addReminder;
   final usecase_delete.DeleteReminder deleteReminder;
   final usecase_update.UpdateReminder updateReminder;
+  final ReminderRepositoryImpl reminderRepository;
 
-  ReminderBloc()
-      : getReminders = GetReminders(ReminderRepositoryImpl()),
-        addReminder = usecase_add.AddReminder(ReminderRepositoryImpl()),
-        deleteReminder =
-            usecase_delete.DeleteReminder(ReminderRepositoryImpl()),
-        updateReminder =
-            usecase_update.UpdateReminder(ReminderRepositoryImpl()),
+  ReminderBloc({required this.reminderRepository})
+      : getReminders = GetReminders(reminderRepository),
+        addReminder = usecase_add.AddReminder(reminderRepository),
+        deleteReminder = usecase_delete.DeleteReminder(reminderRepository),
+        updateReminder = usecase_update.UpdateReminder(reminderRepository),
         super(ReminderInitial()) {
     on<LoadReminders>(_onFetchReminders);
     on<AddReminder>(_addReminder);
@@ -38,7 +37,7 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
       LoadReminders event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
     try {
-      final reminders = await getReminders();
+      final reminders = await getReminders(event.userId);
       print(reminders.map((r) => r.toJson()).toList());
       emit(ReminderLoaded(reminders));
     } catch (e) {
@@ -54,7 +53,7 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
       print(event.reminder.toJson());
       final newReminder = await addReminder.call(event.reminder);
       emit(ReminderAdded(newReminder));
-      add(LoadReminders());
+      add(LoadReminders(event.reminder.assignedTo!.userId!));
     } catch (e) {
       emit(ReminderError(e.toString()));
     }
@@ -64,9 +63,9 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
       DeleteReminder event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
     try {
-      await deleteReminder.call(event.reminderId);
-      emit(ReminderDeleted(event.reminderId));
-      add(LoadReminders());
+      await deleteReminder.call(event.reminder.id!);
+      emit(ReminderDeleted(event.reminder.id!));
+      add(LoadReminders(event.reminder.assignedTo!.userId!));
     } catch (e) {
       emit(ReminderError(e.toString()));
     }
@@ -77,7 +76,7 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
     emit(ReminderLoading());
     try {
       await updateReminder.call(event.reminder);
-      add(LoadReminders());
+      add(LoadReminders(event.reminder.assignedTo!.userId!));
     } catch (e) {
       emit(ReminderError(e.toString()));
     }

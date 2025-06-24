@@ -12,12 +12,14 @@ class _SplashState extends State<Splash> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () async {
-      Modular.to.pushReplacementNamed('/boarding');
-      // TODO: Uncomment the code below
-      // final bool isFirst = await SharedPreference.getBool('isFirst');
-      // isFirst
-      //     ? Modular.to.pushReplacementNamed('/auth')
-      //     : Modular.to.pushReplacementNamed('/boarding');
+      if (!mounted) return;
+      final userBloc = BlocProvider.of<UserBloc>(context);
+      final userState = userBloc.state;
+      if (userState is CurrentUser) {
+        Modular.to.pushReplacementNamed('/home');
+      } else {
+        Modular.to.pushReplacementNamed('/boarding');
+      }
     });
   }
 

@@ -81,7 +81,9 @@ class _MainPageState extends State<MainPage> {
       actions: [
         IconButton(
           onPressed: () {
-            Modular.to.pushNamed('/device-control-list');
+            Modular.to.pushNamed(
+              '/device-control-list',
+            );
           },
           icon: Stack(
             children: [

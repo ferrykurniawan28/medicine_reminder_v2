@@ -1,10 +1,11 @@
 import 'package:medicine_reminder/features/reminder/domain/entities/time.dart';
+import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 
 class Reminder {
   final int? id;
   int? deviceId;
-  final int? createdBy;
-  final int? assignedTo;
+  final User? createdBy;
+  final User? assignedTo;
   int? containerId;
   String medicineName;
   List<int> dosage;
@@ -35,11 +36,42 @@ class Reminder {
     this.endDate,
   });
 
+  factory Reminder.fromJson(Map<String, dynamic> json) {
+    return Reminder(
+      id: json['id'] as int?,
+      deviceId: json['deviceId'] as int?,
+      createdBy: User.fromJson(json['createdBy']),
+      assignedTo: User.fromJson(json['assignedTo']),
+      containerId: json['containerId'] as int?,
+      medicineName: json['medicineName'] as String,
+      dosage: (json['dosage'] as String)
+          .split(',')
+          .map((v) => int.tryParse(v) ?? 0)
+          .toList(),
+      medicineLeft: json['medicineLeft'] as int?,
+      isActive: json['isActive'] == 1,
+      isAlert: json['isAlert'] == 1,
+      note: json['note'] as String?,
+      type: ReminderType.values[json['type'] as int],
+      times: (json['times'] as String)
+          .split(';')
+          .map((v) => Time.fromString(v))
+          .toList(),
+      daysofWeek: (json['daysofWeek'] as String?)
+          ?.split(',')
+          .map((v) => Days.values[int.parse(v)])
+          .toList(),
+      endDate: json['endDate'] != null
+          ? DateTime.parse(json['endDate'] as String)
+          : null,
+    );
+  }
+
   Reminder copyWith({
     int? id,
     int? deviceId,
-    int? createdBy,
-    int? assignedTo,
+    User? createdBy,
+    User? assignedTo,
     int? containerId,
     String? medicineName,
     List<int>? dosage,
@@ -79,16 +111,14 @@ class Reminder {
       'assignedTo': assignedTo,
       'containerId': containerId,
       'medicineName': medicineName,
-      'dosage': dosage,
+      'dosage': dosage.join(','),
       'medicineLeft': medicineLeft,
-      'isActive': isActive,
-      'isAlert': isAlert,
+      'isActive': isActive ? 1 : 0,
+      'isAlert': isAlert ? 1 : 0,
       'note': note,
       'type': type.index,
-      'times': times
-          .map((t) => DateTime(0, 1, 1, t.hour, t.minute).toIso8601String())
-          .toList(),
-      'daysofWeek': daysofWeek?.map((e) => e.index).toList(),
+      'times': times.map((t) => t.toString()).join(';'),
+      'daysofWeek': daysofWeek?.map((d) => d.index).join(','),
       'endDate': endDate?.toIso8601String(),
     };
   }

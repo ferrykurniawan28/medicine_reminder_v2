@@ -7,7 +7,14 @@ sealed class ReminderEvent extends Equatable {
   List<Object> get props => [];
 }
 
-final class LoadReminders extends ReminderEvent {}
+final class LoadReminders extends ReminderEvent {
+  final int userId;
+
+  const LoadReminders(this.userId);
+
+  @override
+  List<Object> get props => [userId];
+}
 
 final class AddReminder extends ReminderEvent {
   final Reminder reminder;
@@ -28,12 +35,12 @@ final class UpdateReminder extends ReminderEvent {
 }
 
 final class DeleteReminder extends ReminderEvent {
-  final int reminderId;
+  final Reminder reminder;
 
-  const DeleteReminder(this.reminderId);
+  const DeleteReminder(this.reminder);
 
   @override
-  List<Object> get props => [reminderId];
+  List<Object> get props => [reminder];
 }
 
 final class UpdateReminderStatus extends ReminderEvent {

@@ -195,6 +195,17 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
   @override
   Future<void> addDeviceControl(DeviceControlModel control) async {
     final db = await database;
+    if (control.requestedBy != null) {
+      await db.insert(
+        'users',
+        {
+          'userId': control.requestedBy.userId,
+          'username': control.requestedBy.userName,
+          'email': control.requestedBy.email,
+        },
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
     final deviceControl = {
       'id': control.id,
       'action': control.action,

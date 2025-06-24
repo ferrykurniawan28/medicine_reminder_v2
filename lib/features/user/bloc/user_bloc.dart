@@ -45,7 +45,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(const UserError('User not found'));
         return;
       }
-      emit(UserLoaded(user));
+      emit(CurrentUser(user));
     } catch (e) {
       emit(UserError(e.toString()));
     }
@@ -55,6 +55,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     emit(UserLoading());
     try {
       await addUser(event.user);
+      emit(CurrentUser(event.user));
       add(LoadUsers());
     } catch (e) {
       emit(UserError(e.toString()));

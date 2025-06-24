@@ -171,7 +171,7 @@ class ReminderDetail extends StatelessWidget {
             onPressed: () {
               Navigator.pop(actionSheetContext);
               Navigator.pop(bottomSheetContext);
-              context.read<ReminderBloc>().add(DeleteReminder(reminder.id!));
+              context.read<ReminderBloc>().add(DeleteReminder(reminder));
             },
             child: const Text('Delete Reminder'),
           ),

@@ -30,3 +30,11 @@ class UserError extends UserState {
   @override
   List<Object?> get props => [message];
 }
+
+class CurrentUser extends UserState {
+  final User user;
+  const CurrentUser(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}

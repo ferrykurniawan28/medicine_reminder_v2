@@ -28,19 +28,20 @@ class _DeviceState extends State<DeviceView> {
     _isFetching = true; // Set fetching flag to true
 
     try {
-      userId = await SharedPreference.getInt('userId');
-
-      if (userId == null) {
-        return;
+      final userState = context.read<UserBloc>().state;
+      if (userState is CurrentUser) {
+        userId = userState.user.userId;
+        context.read<DeviceBloc>().add(DeviceFetch(userId!));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No user is currently logged in.'),
+          ),
+        );
       }
-
-      if (!mounted) return;
-
-      context.read<DeviceBloc>().add(DeviceFetch(userId!));
     } catch (e) {
       if (!mounted) return;
 
-      // context.read<DeviceBloc>().add(DeviceError(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error fetching device: $e'),
