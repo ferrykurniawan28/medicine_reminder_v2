@@ -7,6 +7,7 @@ import 'package:flutter_modular/flutter_modular.dart'
 import 'package:medicine_reminder/core/services/services.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
+import 'package:medicine_reminder/features/device/domain/entities/device_control.dart';
 import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/features/reminder/presentation/reminder_list_body.dart';
 import 'package:medicine_reminder/models/models.dart';
@@ -19,6 +20,7 @@ part 'home/home.dart';
 part 'appointment/appointment.dart';
 part 'device/device.dart';
 part 'device/your_device.dart';
+part 'device/device_control_list.dart';
 part 'parental/list_parental.dart';
 part 'parental/parental_detail.dart';
 part 'parental/parental.dart';

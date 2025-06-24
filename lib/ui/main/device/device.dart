@@ -7,7 +7,7 @@ class DeviceView extends StatefulWidget {
   State<DeviceView> createState() => _DeviceState();
 }
 
-// TODO: work on device
+// TODO: fix RenderBox was not laid out
 class _DeviceState extends State<DeviceView> {
   bool _isFetching = false; // Flag to prevent duplicate fetches
   int? userId;
@@ -22,7 +22,6 @@ class _DeviceState extends State<DeviceView> {
 
   Future<void> _fetchDevice() async {
     if (_isFetching) {
-      print('Fetch already in progress, skipping duplicate call.');
       return;
     }
 
@@ -30,10 +29,8 @@ class _DeviceState extends State<DeviceView> {
 
     try {
       userId = await SharedPreference.getInt('userId');
-      print('Fetching device for userId: $userId');
 
       if (userId == null) {
-        print('User ID is null, cannot fetch device');
         return;
       }
 
@@ -41,7 +38,14 @@ class _DeviceState extends State<DeviceView> {
 
       context.read<DeviceBloc>().add(DeviceFetch(userId!));
     } catch (e) {
-      print('Error fetching device: $e');
+      if (!mounted) return;
+
+      // context.read<DeviceBloc>().add(DeviceError(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching device: $e'),
+        ),
+      );
     } finally {
       _isFetching = false; // Reset fetching flag
     }
@@ -58,7 +62,7 @@ class _DeviceState extends State<DeviceView> {
         onRefresh: () async {
           // context.read<DeviceBloc>().add(DeviceRefresh());
         },
-        child: ListView(children: [
+        child: Column(children: [
           // const YourDevice(),
           BlocBuilder<DeviceBloc, DeviceState>(builder: (context, state) {
             if (state is DeviceLoaded) {
@@ -89,7 +93,7 @@ class _DeviceState extends State<DeviceView> {
             if (state is DeviceLoaded) {
               return ListView.builder(
                 shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+                // physics: const NeverScrollableScrollPhysics(),
                 itemCount: state.device.containers.length,
                 itemBuilder: (context, index) {
                   final container = state.device.containers[index];
@@ -120,8 +124,8 @@ class _DeviceState extends State<DeviceView> {
               );
             } else if (state is DeviceLoading) {
               return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+                // shrinkWrap: true,
+                // physics: const NeverScrollableScrollPhysics(),
                 itemCount: 5,
                 itemBuilder: (context, index) {
                   return ListTile(

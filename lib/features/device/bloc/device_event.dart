@@ -80,3 +80,12 @@ final class DeviceAdd extends DeviceEvent {
   @override
   List<Object> get props => [userId, deviceUid];
 }
+
+final class DeviceControlFetch extends DeviceEvent {
+  // final int deviceId;
+
+  // const DeviceControlFetch(, this.deviceId);
+
+  // @override
+  // List<Object> get props => [userId, deviceId];
+}

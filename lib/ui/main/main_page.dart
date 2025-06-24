@@ -80,13 +80,15 @@ class _MainPageState extends State<MainPage> {
       'Device',
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Modular.to.pushNamed('/device-control-list');
+          },
           icon: Stack(
             children: [
               const Icon(Icons.pending_actions_outlined),
               Positioned(
-                left: 0,
-                bottom: 0,
+                right: 0,
+                bottom: -5,
                 child: BlocBuilder<DeviceBloc, DeviceState>(
                   builder: (context, state) {
                     if (state is DeviceLoaded) {

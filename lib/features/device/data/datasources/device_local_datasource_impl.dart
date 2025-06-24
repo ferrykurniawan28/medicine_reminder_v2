@@ -1,3 +1,4 @@
+import 'package:medicine_reminder/features/user/data/models/user_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'device_local_datasource.dart';
@@ -194,7 +195,19 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
   @override
   Future<void> addDeviceControl(DeviceControlModel control) async {
     final db = await database;
-    await db.insert('device_control', control.toJson());
+    final deviceControl = {
+      'id': control.id,
+      'action': control.action,
+      'container_id': control.containerId,
+      'device_id': control.deviceId,
+      'medicine_name': control.medicineName,
+      'notes': control.notes,
+      'quantity': control.quantity,
+      'requested_by': control.requestedBy.userId,
+      'status': control.status,
+    };
+    await db.insert('device_control', deviceControl,
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   @override
@@ -206,5 +219,48 @@ class DeviceLocalDataSourceImpl implements DeviceLocalDataSource {
       whereArgs: [deviceId, "status = 'pending'"],
     );
     return result.length;
+  }
+
+  @override
+  Future<List<DeviceControlModel>?> getDeviceControls(int deviceId) async {
+    final db = await database;
+    final result = await db.query(
+      'device_control',
+      where: 'device_id = ?',
+      whereArgs: [deviceId],
+    );
+
+    if (result.isEmpty) {
+      return null;
+    }
+
+    final controls = <DeviceControlModel>[];
+
+    for (final control in result) {
+      final user = await db.query(
+        'users',
+        columns: ['id', 'user_name', 'email'],
+        where: 'id = ?',
+        whereArgs: [control['requested_by']],
+      );
+
+      controls.add(DeviceControlModel(
+        id: control['id'] as int,
+        action: control['action'] as String,
+        containerId: control['container_id'] as int,
+        deviceId: control['device_id'] as int,
+        medicineName: control['medicine_name'] as String?,
+        notes: control['notes'] as String?,
+        quantity: control['quantity'] as int?,
+        requestedBy: UserModel(
+          userId: user.first['id'] as int,
+          userName: user.first['user_name'] as String,
+          email: user.first['email'] as String,
+        ),
+        status: control['status'] as String,
+      ));
+    }
+
+    return controls;
   }
 }

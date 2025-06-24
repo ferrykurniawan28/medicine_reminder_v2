@@ -10,4 +10,5 @@ abstract class DeviceRemoteDataSource {
   Future<void> resetContainer(int userId, int containerId);
   Future<void> deleteDevice(int deviceId);
   Future<int> getDeviceControlCount(int deviceId);
+  Future<List<DeviceControlModel>?> fetchDeviceControls(int deviceId);
 }

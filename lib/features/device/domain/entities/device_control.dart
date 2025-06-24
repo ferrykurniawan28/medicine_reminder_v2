@@ -1,14 +1,16 @@
 import 'package:equatable/equatable.dart';
+import 'package:medicine_reminder/features/device/data/models/device_control_model.dart';
+import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 
 class DeviceControl extends Equatable {
   final int id;
   final String action;
   final int containerId;
   final int deviceId;
-  final String medicineName;
-  final String notes;
-  final int quantity;
-  final int requestedBy;
+  final String? medicineName;
+  final String? notes;
+  final int? quantity;
+  final User requestedBy;
   final String status;
 
   const DeviceControl({
@@ -16,9 +18,9 @@ class DeviceControl extends Equatable {
     required this.action,
     required this.containerId,
     required this.deviceId,
-    required this.medicineName,
-    required this.notes,
-    required this.quantity,
+    this.medicineName,
+    this.notes,
+    this.quantity,
     required this.requestedBy,
     required this.status,
   });
@@ -44,7 +46,7 @@ class DeviceControl extends Equatable {
     String? medicineName,
     String? notes,
     int? quantity,
-    int? requestedBy,
+    User? requestedBy,
     String? status,
   }) {
     return DeviceControl(
@@ -57,6 +59,20 @@ class DeviceControl extends Equatable {
       quantity: quantity ?? this.quantity,
       requestedBy: requestedBy ?? this.requestedBy,
       status: status ?? this.status,
+    );
+  }
+
+  factory DeviceControl.fromModel(DeviceControlModel model) {
+    return DeviceControl(
+      id: model.id,
+      action: model.action,
+      containerId: model.containerId,
+      deviceId: model.deviceId,
+      medicineName: model.medicineName,
+      notes: model.notes,
+      quantity: model.quantity,
+      requestedBy: model.requestedBy, // Assuming requestedBy is a UserModel
+      status: model.status,
     );
   }
 }

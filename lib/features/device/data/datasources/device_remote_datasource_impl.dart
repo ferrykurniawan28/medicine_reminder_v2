@@ -141,4 +141,20 @@ class DeviceRemoteDataSourceImpl implements DeviceRemoteDataSource {
     }
     return count as int;
   }
+
+  @override
+  Future<List<DeviceControlModel>?> fetchDeviceControls(int deviceId) async {
+    final response = await networkService.get('$deviceControlUrl/$deviceId');
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to fetch device controls: ${response.statusCode}');
+    }
+    final controlsJson = response.data;
+    if (controlsJson == null || controlsJson.isEmpty) {
+      return [];
+    }
+    return (controlsJson as List)
+        .map((control) => DeviceControlModel.fromJson(control))
+        .toList();
+  }
 }

@@ -4,6 +4,7 @@ import 'package:medicine_reminder/features/device/data/models/device_model.dart'
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device_control.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/get_device.dart';
+import 'package:medicine_reminder/features/device/domain/usecases/get_device_control.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/get_device_control_count.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/reset_container.dart';
 import 'package:medicine_reminder/features/device/domain/usecases/update_container.dart';
@@ -26,6 +27,7 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
   final ContainerReset resetContainer;
   final DeviceRepository deviceRepository;
   final GetDeviceControlCount getDeviceControlCount;
+  final GetDeviceControl getDeviceControl;
 
   DeviceBloc(this.deviceRepository)
       : addDevice = AddDevice(deviceRepository),
@@ -33,6 +35,7 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
         updateContainer = ContainerUpdate(deviceRepository),
         resetContainer = ContainerReset(deviceRepository),
         getDeviceControlCount = GetDeviceControlCount(deviceRepository),
+        getDeviceControl = GetDeviceControl(deviceRepository),
         super(DeviceInitial()) {
     on<DeviceFetch>(_onFetchDevice);
     on<DeviceRefresh>(_onRefreshDevices);
@@ -41,6 +44,7 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
     on<UpdateContainer>(_onUpdateContainer);
     on<ResetContainer>(_onResetContainer);
     on<DeviceAdd>(_onAddDevice);
+    on<DeviceControlFetch>(_onFetchDeviceControl);
   }
 
   Future<void> _onFetchDevice(
@@ -133,6 +137,25 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
       ResetContainer event, Emitter<DeviceState> emit) async {
     try {
       await resetContainer(event.userId, event.containerId);
+    } catch (e) {
+      emit(DeviceError(e.toString()));
+    }
+  }
+
+  Future<void> _onFetchDeviceControl(
+      DeviceControlFetch event, Emitter<DeviceState> emit) async {
+    try {
+      if (device == null) {
+        emit(const DeviceError('Device not loaded'));
+        return;
+      }
+
+      deviceControls = await getDeviceControl(device!.id!);
+      if (deviceControls != null) {
+        emit(DeviceControlLoaded(deviceControls!));
+      } else {
+        emit(const DeviceError('No device controls found'));
+      }
     } catch (e) {
       emit(DeviceError(e.toString()));
     }

@@ -10,8 +10,9 @@ class YourDevice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ListView(
+      shrinkWrap: true,
+      // crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         FlutterCarousel.builder(
           itemCount: 5,

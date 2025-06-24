@@ -1,14 +1,15 @@
 import 'package:equatable/equatable.dart';
+import 'package:medicine_reminder/features/user/data/models/user_model.dart';
 
 class DeviceControlModel extends Equatable {
   final int id;
   final String action;
   final int containerId;
   final int deviceId;
-  final String medicineName;
-  final String notes;
-  final int quantity;
-  final int requestedBy;
+  final String? medicineName;
+  final String? notes;
+  final int? quantity;
+  final UserModel requestedBy;
   final String status;
 
   const DeviceControlModel({
@@ -16,9 +17,9 @@ class DeviceControlModel extends Equatable {
     required this.action,
     required this.containerId,
     required this.deviceId,
-    required this.medicineName,
-    required this.notes,
-    required this.quantity,
+    this.medicineName,
+    this.notes,
+    this.quantity,
     required this.requestedBy,
     required this.status,
   });
@@ -32,7 +33,7 @@ class DeviceControlModel extends Equatable {
       medicineName: json['medicine_name'],
       notes: json['notes'],
       quantity: json['quantity'],
-      requestedBy: json['requested_by'],
+      requestedBy: UserModel.fromJson(json['requested_by']),
       status: json['status'],
     );
   }

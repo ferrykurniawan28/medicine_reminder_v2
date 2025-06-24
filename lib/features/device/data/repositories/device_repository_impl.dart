@@ -2,6 +2,7 @@ import 'package:medicine_reminder/features/device/data/datasources/device_local_
 import 'package:medicine_reminder/features/device/data/datasources/device_remote_datasource.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/container.dart';
+import 'package:medicine_reminder/features/device/domain/entities/device_control.dart';
 import 'package:medicine_reminder/features/device/domain/repositories/device_repository.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 
@@ -184,6 +185,22 @@ class DeviceRepositoryImpl implements DeviceRepository {
       }
     } else {
       return await localDataSource.getDeviceControlCount(deviceId);
+    }
+  }
+
+  @override
+  Future<List<DeviceControl>?> getDeviceControl(int deviceId) async {
+    if (isOnline != null && isOnline!()) {
+      try {
+        final remoteControls = await remoteDataSource.fetchDeviceControl(deviceId);
+        return remoteControls.map((control) => DeviceControl.fromModel(control)).toList();
+      } catch (e) {
+        print('Error fetching device controls: $e');
+        rethrow;
+      }
+    } else {
+      final localControls = await localDataSource.getDeviceControls(deviceId);
+      return localControls?.map((control) => DeviceControl.fromModel(control)).toList();
     }
   }
 }

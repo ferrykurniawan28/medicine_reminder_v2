@@ -11,4 +11,5 @@ abstract class DeviceLocalDataSource {
   Future<void> deleteUserDevice(int userId);
   Future<void> addDeviceControl(DeviceControlModel control);
   Future<int> getDeviceControlCount(int deviceId);
+  Future<List<DeviceControlModel>?> getDeviceControls(int deviceId);
 }

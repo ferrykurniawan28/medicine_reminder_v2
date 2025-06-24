@@ -40,3 +40,12 @@ final class DeviceError extends DeviceState {
   @override
   List<Object> get props => [message];
 }
+
+final class DeviceControlLoaded extends DeviceState {
+  final List<DeviceControl> deviceControls;
+
+  const DeviceControlLoaded(this.deviceControls);
+
+  @override
+  List<Object> get props => [deviceControls];
+}
