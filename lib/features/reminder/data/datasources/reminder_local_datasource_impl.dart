@@ -5,6 +5,7 @@ import 'reminder_local_datasource_interface.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/time.dart';
 import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 
+//TODO: fix users table attachment
 class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
   static Database? _database;
 
