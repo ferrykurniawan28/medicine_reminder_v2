@@ -18,7 +18,6 @@ class _AppointmentState extends State<Appointment> {
 
   void _fetchAppointments() {
     if (_isFetching) {
-      print('Fetch already in progress, skipping duplicate call.');
       return;
     }
 
@@ -29,7 +28,10 @@ class _AppointmentState extends State<Appointment> {
       if (userState is CurrentUser) {
         final userId = userState.user.userId; // Access userId from CurrentUser
         context.read<AppointmentBloc>().add(AppointmentsFetch(userId!));
-        Navigator.of(context).pop();
+      } else if (userState is UserLoaded) {
+        final userId = userState.user.userId; // Access userId from UserLoaded
+
+        context.read<AppointmentBloc>().add(AppointmentsFetch(userId!));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -38,7 +40,11 @@ class _AppointmentState extends State<Appointment> {
         );
       }
     } catch (e) {
-      print('Error fetching appointments: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching appointments: $e'),
+        ),
+      );
     } finally {
       _isFetching = false; // Reset fetching flag
     }

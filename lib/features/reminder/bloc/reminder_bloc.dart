@@ -56,7 +56,6 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
       AddReminder event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
     try {
-      print(event.reminder.toJson());
       final newReminder = await addReminder.call(event.reminder);
       reminders.add(newReminder);
       emit(ReminderLoaded(reminders));

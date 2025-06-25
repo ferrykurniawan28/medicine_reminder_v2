@@ -1,9 +1,11 @@
 part of '../widgets.dart';
 
 class RoutineSelectionScreen extends StatelessWidget {
+  final User assignedUser;
   final DeviceContainer container;
 
-  const RoutineSelectionScreen({super.key, required this.container});
+  const RoutineSelectionScreen(
+      {super.key, required this.container, required this.assignedUser});
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,7 @@ class RoutineSelectionScreen extends StatelessWidget {
                 arguments: {
                   'container': container,
                   'isOnce': true,
+                  'assignedUser': assignedUser,
                 },
               ),
             ),
@@ -47,6 +50,7 @@ class RoutineSelectionScreen extends StatelessWidget {
                     builder: (context) => OnceTwiceDailyPage(
                       container: container,
                       isOnce: false,
+                      assignedUser: assignedUser,
                     ),
                   ),
                 );
@@ -57,7 +61,10 @@ class RoutineSelectionScreen extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => MoreOptionsPage(container: container),
+                  builder: (context) => MoreOptionsPage(
+                    container: container,
+                    assignedUser: assignedUser,
+                  ),
                 ),
               ),
             ),

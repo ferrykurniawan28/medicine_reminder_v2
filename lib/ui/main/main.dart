@@ -11,6 +11,7 @@ import 'package:medicine_reminder/features/device/domain/entities/device_control
 import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/features/reminder/presentation/reminder_list_body.dart';
 import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
+import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 import 'package:medicine_reminder/models/models.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:shimmer/shimmer.dart';

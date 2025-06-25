@@ -3,23 +3,29 @@ part of 'routes.dart';
 class AddReminderModule extends Module {
   @override
   void routes(r) {
-    r.child('/', child: (_) => const AddReminderScreen());
+    r.child('/',
+        child: (_) => AddReminderScreen(
+              assignedUser: r.args.data['assignedUser'],
+            ));
     r.child('/routine-select',
         child: (_) => RoutineSelectionScreen(
-              container: r.args.data['container'],
-            ));
+            container: r.args.data['container'],
+            assignedUser: r.args.data['assignedUser']));
     r.child('/once-twice',
         child: (_) => OnceTwiceDailyPage(
+              assignedUser: r.args.data['assignedUser'],
               container: r.args.data['container'],
               isOnce: r.args.data['isOnce'],
             ));
     r.child('/multiple-times',
         child: (_) => MultipleTimesDaily(
+              assignedUser: r.args.data['assignedUser'],
               container: r.args.data['container'],
               howManyTimes: r.args.data['howManyTimes'],
             ));
     r.child('/specific-days',
         child: (_) => SpecificDays(
+              assignedUser: r.args.data['assignedUser'],
               container: r.args.data['container'],
               days: r.args.data['days'],
             ));

@@ -3,10 +3,12 @@ part of '../widgets.dart';
 class SpecificDays extends StatefulWidget {
   final ContainerModel container;
   final List<Days> days;
+  final User assignedUser;
   const SpecificDays({
     super.key,
     required this.container,
     required this.days,
+    required this.assignedUser,
   });
 
   @override
@@ -25,6 +27,30 @@ class _SpecificDaysState extends State<SpecificDays> {
       return;
     }
 
+    // final userState = context.read<UserBloc>().state;
+    // if (userState is CurrentUser) {
+    //   if (userState.user.userId == null) {
+    //     _showErrorDialog('User ID is not available.');
+    //     return;
+    //   }
+    // } else if (userState is UserLoaded) {
+    //   if (userState.user.userId == null) {
+    //     _showErrorDialog('User ID is not available.');
+    //     return;
+    //   }
+    // } else {
+    //   _showErrorDialog('No user is currently logged in.');
+    //   return;
+    // }
+
+    User? createdBy;
+    final userState = context.read<UserBloc>().state;
+    if (userState is CurrentUser) {
+      createdBy = userState.user;
+    } else if (userState is UserLoaded) {
+      createdBy = userState.user;
+    }
+
     Reminder newReminder = Reminder(
       type: ReminderType.specificDays,
       times: [
@@ -36,6 +62,8 @@ class _SpecificDaysState extends State<SpecificDays> {
       dosage: [dosage],
       isAlert: isCriticalAlert,
       daysofWeek: widget.days,
+      assignedTo: widget.assignedUser,
+      createdBy: createdBy,
     );
 
     context.read<ReminderBloc>().add(

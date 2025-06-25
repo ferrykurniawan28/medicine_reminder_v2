@@ -62,6 +62,7 @@ class _CardReminderState extends State<CardReminder> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [defaultShadow],
+          border: Border.all(color: kPrimaryColor, width: 1),
         ),
         child: Row(
           children: [

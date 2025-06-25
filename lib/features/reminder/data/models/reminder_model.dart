@@ -45,9 +45,11 @@ class ReminderModel extends Reminder {
               orElse: () => ReminderType.onceDaily,
             )
           : ReminderType.onceDaily,
-      times: (json['times'] as List<dynamic>)
-          .map((e) => Time.fromDateTime(DateTime.parse(e)))
-          .toList(),
+      times: json['times'] != null
+          ? (json['times'] as List<dynamic>)
+              .map((e) => Time.fromDateTime(DateTime.parse(e)))
+              .toList()
+          : [],
       daysofWeek: (json['daysofWeek'] as List<dynamic>?)
           ?.map((e) => Days.values[e])
           .toList(),

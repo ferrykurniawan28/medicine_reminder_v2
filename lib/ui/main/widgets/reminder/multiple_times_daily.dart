@@ -3,10 +3,12 @@ part of '../widgets.dart';
 class MultipleTimesDaily extends StatefulWidget {
   final ContainerModel container;
   final int howManyTimes;
+  final User assignedUser;
   const MultipleTimesDaily({
     super.key,
     required this.container,
     required this.howManyTimes,
+    required this.assignedUser,
   });
 
   @override
@@ -46,6 +48,16 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
             Time.fromDateTime(DateTime(0, 0, 0, time.hour, time.minute)))
         .toList();
 
+    final assignedUser = widget.assignedUser;
+
+    User? createdBy;
+    final userState = context.read<UserBloc>().state;
+    if (userState is CurrentUser) {
+      createdBy = userState.user;
+    } else if (userState is UserLoaded) {
+      createdBy = userState.user;
+    }
+
     ReminderModel newReminder = ReminderModel(
       type: ReminderType.multipleTimesDaily,
       times: times,
@@ -53,6 +65,8 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
       medicineLeft: widget.container.quantity,
       dosage: dosage,
       isAlert: isCriticalAlert,
+      assignedTo: assignedUser,
+      createdBy: createdBy,
     );
 
     context.read<ReminderBloc>().add(

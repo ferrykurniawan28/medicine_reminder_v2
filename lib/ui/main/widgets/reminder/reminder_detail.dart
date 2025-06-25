@@ -4,14 +4,20 @@ void showReminderDetail(BuildContext context, Reminder reminder) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    useSafeArea: true,
+    // useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
     backgroundColor: Colors.grey[100],
     builder: (context) {
-      return ReminderDetail(reminder: reminder);
+      return FractionallySizedBox(
+        heightFactor: 0.8,
+        child: ReminderDetail(reminder: reminder),
+      );
     },
+    // builder: (context) {
+    //   return ReminderDetail(reminder: reminder);
+    // },
   );
 }
 
@@ -26,82 +32,118 @@ class ReminderDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Stack(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-                boxShadow: [defaultShadow],
-              ),
-              child: Center(
-                child: Text(
-                  'Reminder Details',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: CupertinoButton(
-                child: const Text('Close'),
+        // iOS-style header
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            boxShadow: [defaultShadow],
+          ),
+          child: Row(
+            children: [
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child:
+                    const Text('Close', style: TextStyle(color: Colors.blue)),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: CupertinoButton(
-                child: const Icon(Icons.more_horiz, size: 25),
+              const Spacer(),
+              Center(
+                child: Text(
+                  'Reminder Details',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
+              const Spacer(),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child:
+                    const Icon(Icons.more_horiz, size: 25, color: Colors.blue),
                 onPressed: () => _showActionSheet(context, reminder),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        // Content with improved layout
         Expanded(
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _buildDetailItem(
+              // Medicine Section
+              _buildSection(
                 icon: Image.asset(
                   'assets/icons/pill.png',
                   width: 24,
                   height: 24,
+                  color: kPrimaryColor,
                 ),
-                title: 'Medicine Name',
-                // value: reminder.medicineName,
+                title: 'Medicine',
+                items: [
+                  if (reminder.medicineName.isNotEmpty)
+                    _buildDetailItem('Name', reminder.medicineName),
+                  if (reminder.dosage.isNotEmpty)
+                    _buildDetailItem('Dosage', reminder.dosage.join(', ')),
+                  if (reminder.medicineLeft != null)
+                    _buildDetailItem(
+                        'Quantity Left', reminder.medicineLeft!.toString()),
+                ],
               ),
-              spacerHeight(16),
-              _buildDetailItem(
-                title: 'Dosage',
-                value: reminder.dosage.join(', '),
-              ),
-              spacerHeight(16),
-              _buildDetailItem(
+              const SizedBox(height: 20),
+              // Schedule Section
+              _buildSection(
                 icon: Image.asset(
                   'assets/icons/calendar.png',
                   width: 24,
                   height: 24,
+                  color: kPrimaryColor,
                 ),
-                title: 'Medication Schedule',
-                value: _getReminderTypeName(reminder.type),
+                title: 'Schedule',
+                items: [
+                  _buildDetailItem('Type', _getReminderTypeName(reminder.type)),
+                  _buildDetailItem(
+                    'Times',
+                    reminder.times
+                        .map((t) => DateFormat.Hm()
+                            .format(DateTime(2023, 1, 1, t.hour, t.minute)))
+                        .join(', '),
+                  ),
+                  if (reminder.daysofWeek != null &&
+                      reminder.daysofWeek!.isNotEmpty)
+                    _buildDetailItem(
+                      'Days',
+                      reminder.daysofWeek!
+                          .map((d) => _getDayName(d))
+                          .join(', '),
+                    ),
+                  if (reminder.endDate != null)
+                    _buildDetailItem(
+                      'End Date',
+                      DateFormat.yMMMd().format(reminder.endDate!),
+                    ),
+                ],
               ),
-              spacerHeight(16),
-              _buildDetailItem(
+              const SizedBox(height: 20),
+              // Status Section
+              _buildSection(
+                icon: const Icon(Icons.info_outline,
+                    size: 24, color: kPrimaryColor),
                 title: 'Status',
-                value: reminder.isActive ? 'Active' : 'Inactive',
-              ),
-              spacerHeight(16),
-              _buildDetailItem(
-                title: 'Medicine Left',
-                value: reminder.medicineLeft != null
-                    ? reminder.medicineLeft.toString()
-                    : 'Not specified',
+                items: [
+                  _buildDetailItem(
+                    'Status',
+                    reminder.isActive ? 'Active' : 'Inactive',
+                    valueColor: reminder.isActive ? Colors.green : Colors.grey,
+                  ),
+                  if (reminder.assignedTo != null)
+                    _buildDetailItem(
+                        'Assigned To', reminder.assignedTo!.userName ?? 'N/A'),
+                  if (reminder.note != null && reminder.note!.isNotEmpty)
+                    _buildDetailItem('Notes', reminder.note!),
+                ],
               ),
             ],
           ),
@@ -110,33 +152,100 @@ class ReminderDetail extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailItem({
-    String? title,
-    String? value,
-    Widget? icon,
+  Widget _buildSection({
+    required Widget icon,
+    required String title,
+    required List<Widget> items,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [defaultShadow],
-      ),
-      child: Row(
-        children: [
-          icon ?? const SizedBox.shrink(),
-          if (icon != null) spacerWidth(8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (title != null) Text(title, style: subtitleTextStyle),
-              spacerHeight(4),
-              if (value != null) Text(value, style: bodyTextStyle),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            icon,
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 3,
+                offset: const Offset(0, 1),
+              ),
             ],
+          ),
+          child: Column(
+            children: items,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailItem(String label, String value, {Color? valueColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: valueColor ?? Colors.black87,
+              ),
+              textAlign: TextAlign.end,
+            ),
           ),
         ],
       ),
     );
+  }
+
+  String _getDayName(Days day) {
+    switch (day) {
+      case Days.monday:
+        return 'Monday';
+      case Days.tuesday:
+        return 'Tuesday';
+      case Days.wednesday:
+        return 'Wednesday';
+      case Days.thursday:
+        return 'Thursday';
+      case Days.friday:
+        return 'Friday';
+      case Days.saturday:
+        return 'Saturday';
+      case Days.sunday:
+        return 'Sunday';
+    }
   }
 
   String _getReminderTypeName(ReminderType type) {
@@ -148,9 +257,9 @@ class ReminderDetail extends StatelessWidget {
       case ReminderType.multipleTimesDaily:
         return 'Multiple Times Daily';
       case ReminderType.intervalhours:
-        return 'Interval Hours';
+        return 'Every ${reminder.times.first.hour} Hours';
       case ReminderType.intervaldays:
-        return 'Interval Days';
+        return 'Every ${reminder.daysofWeek} Days';
       case ReminderType.specificDays:
         return 'Specific Days';
       case ReminderType.cyclic:
@@ -159,27 +268,32 @@ class ReminderDetail extends StatelessWidget {
   }
 
   void _showActionSheet(BuildContext context, Reminder reminder) {
-    // Store the bottom sheet context before showing the action sheet
     final bottomSheetContext = context;
-
     showCupertinoModalPopup<void>(
       context: context,
-      builder: (BuildContext actionSheetContext) => CupertinoActionSheet(
+      builder: (BuildContext context) => CupertinoActionSheet(
         actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              // Add edit functionality here
+            },
+            child: const Text('Edit Reminder'),
+          ),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
             onPressed: () {
-              Navigator.pop(actionSheetContext);
+              Navigator.pop(context);
               Navigator.pop(bottomSheetContext);
               context.read<ReminderBloc>().add(DeleteReminder(reminder));
             },
             child: const Text('Delete Reminder'),
           ),
-          CupertinoActionSheetAction(
-            onPressed: () => Navigator.pop(actionSheetContext),
-            child: const Text('Cancel'),
-          ),
         ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
       ),
     );
   }

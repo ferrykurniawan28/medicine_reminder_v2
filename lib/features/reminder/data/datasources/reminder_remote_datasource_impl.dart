@@ -29,9 +29,26 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
 
   @override
   Future<void> addReminder(Reminder reminder) async {
+    final body = {
+      "deviceId": reminder.deviceId,
+      "containerId": reminder.containerId,
+      "medicineName": reminder.medicineName,
+      "dosage": reminder.dosage.map((d) => d).toList(),
+      "isActive": reminder.isActive,
+      "isAlert": reminder.isAlert,
+      "note": reminder.note,
+      "type": ReminderTypeHelper.getName(reminder.type),
+      "times": reminder.times
+          .map((time) => '${time.toDateTime().toIso8601String()}Z')
+          .toList(),
+      "daysofWeek": reminder.daysofWeek?.map((day) => day.index).toList(),
+      "endDate": reminder.endDate?.toIso8601String(),
+      "assignedTo": reminder.assignedTo?.userId,
+      "createdBy": reminder.createdBy?.userId,
+    };
     final response = await networkService.post(
       reminderUrl,
-      body: reminder.toJson(),
+      body: body,
     );
     if (response.statusCode != 201) {
       throw Exception('Failed to add reminder');

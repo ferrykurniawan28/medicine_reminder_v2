@@ -3,11 +3,13 @@ part of '../widgets.dart';
 class OnceTwiceDailyPage extends StatefulWidget {
   final DeviceContainer container;
   final bool isOnce;
+  final User assignedUser;
 
   const OnceTwiceDailyPage({
     super.key,
     required this.container,
     required this.isOnce,
+    required this.assignedUser,
   });
 
   @override
@@ -70,6 +72,16 @@ class _OnceTwiceDailyPageState extends State<OnceTwiceDailyPage> {
           )
         : null;
 
+    final assignedUser = widget.assignedUser;
+
+    User? createdBy;
+    final userState = context.read<UserBloc>().state;
+    if (userState is CurrentUser) {
+      createdBy = userState.user;
+    } else if (userState is UserLoaded) {
+      createdBy = userState.user;
+    }
+
     final reminder = Reminder(
       containerId: widget.container.id,
       times: [
@@ -82,6 +94,8 @@ class _OnceTwiceDailyPageState extends State<OnceTwiceDailyPage> {
       medicineName: widget.container.medicineName!,
       deviceId: widget.container.deviceId,
       medicineLeft: widget.container.quantity,
+      assignedTo: assignedUser,
+      createdBy: createdBy,
     );
 
     context.read<ReminderBloc>().add(

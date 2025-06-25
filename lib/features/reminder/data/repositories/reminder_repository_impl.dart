@@ -16,9 +16,12 @@ class ReminderRepositoryImpl implements ReminderRepository {
 
   @override
   Future<List<Reminder>> getReminders(int userId) async {
+    print('Fetching reminders for userId: $userId');
     if (isOnline != null && isOnline!() && remoteDataSource != null) {
       try {
+        print('Fetching reminders from remote data source');
         final remoteReminders = await remoteDataSource!.fetchReminders(userId);
+        print('Remote reminders fetched: ${remoteReminders.length}');
         for (final reminder in remoteReminders) {
           await localDataSource.addReminder(reminder, isSynced: true);
         }

@@ -1,7 +1,8 @@
 part of '../widgets.dart';
 
 class AddReminderScreen extends StatelessWidget {
-  const AddReminderScreen({super.key});
+  final User assignedUser;
+  const AddReminderScreen({super.key, required this.assignedUser});
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +35,8 @@ class AddReminderScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   CupertinoPageRoute(
-                    builder: (context) =>
-                        RoutineSelectionScreen(container: container),
+                    builder: (context) => RoutineSelectionScreen(
+                        container: container, assignedUser: assignedUser),
                   ),
                 );
               },

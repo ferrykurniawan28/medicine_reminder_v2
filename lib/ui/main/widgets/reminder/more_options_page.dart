@@ -2,7 +2,9 @@ part of '../widgets.dart';
 
 class MoreOptionsPage extends StatefulWidget {
   final DeviceContainer container;
-  const MoreOptionsPage({super.key, required this.container});
+  final User assignedUser;
+  const MoreOptionsPage(
+      {super.key, required this.container, required this.assignedUser});
 
   @override
   State<MoreOptionsPage> createState() => _MoreOptionsPageState();
@@ -584,7 +586,8 @@ class _MoreOptionsPageState extends State<MoreOptionsPage> {
                               Modular.to.pushNamed('/reminder/multiple-times',
                                   arguments: {
                                     'container': widget.container,
-                                    'howManyTimes': multipleTimesDaily
+                                    'howManyTimes': multipleTimesDaily,
+                                    'assignedUser': widget.assignedUser,
                                   });
                               break;
                             case 1:
@@ -599,6 +602,7 @@ class _MoreOptionsPageState extends State<MoreOptionsPage> {
                                   arguments: {
                                     'container': widget.container,
                                     'days': selectedDays,
+                                    'assignedUser': widget.assignedUser,
                                   });
                             default:
                           }
