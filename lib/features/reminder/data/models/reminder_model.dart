@@ -60,13 +60,34 @@ class ReminderModel extends Reminder {
     );
   }
 
+  factory ReminderModel.fromEntity(Reminder reminder) {
+    return ReminderModel(
+      id: reminder.id,
+      deviceId: reminder.deviceId,
+      createdBy: reminder.createdBy,
+      assignedTo: reminder.assignedTo,
+      containerId: reminder.containerId,
+      medicineName: reminder.medicineName,
+      dosage: reminder.dosage,
+      medicineLeft: reminder.medicineLeft,
+      isActive: reminder.isActive,
+      isAlert: reminder.isAlert,
+      note: reminder.note,
+      type: reminder.type,
+      times: reminder.times,
+      daysofWeek: reminder.daysofWeek,
+      endDate: reminder.endDate,
+      isSynced: 0, // Default value for isSynced
+    );
+  }
+
   @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'deviceId': deviceId,
-      'createdBy': createdBy,
-      'assignedTo': assignedTo,
+      'createdBy': createdBy!.toJson(),
+      'assignedTo': assignedTo!.toJson(),
       'containerId': containerId,
       'medicineName': medicineName,
       'dosage': dosage,

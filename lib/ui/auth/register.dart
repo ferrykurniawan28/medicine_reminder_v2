@@ -41,7 +41,10 @@ class _RegisterState extends State<Register> {
             );
           } else if (state is AuthAuthenticated) {
             CustomOverlay.hide();
-            // Navigate to home page on successful registration
+            ReadContext(context).read<UserBloc>().add(CreateUser(state.user));
+            ReadContext(context).read<UserBloc>().add(
+                  LoadUser(state.user.userId!),
+                );
             Modular.to.pushReplacementNamed('/home');
           } else if (state is AuthError) {
             CustomOverlay.hide();

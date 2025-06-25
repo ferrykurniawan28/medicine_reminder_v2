@@ -30,7 +30,7 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
   @override
   Future<void> addReminder(Reminder reminder) async {
     final response = await networkService.post(
-      '/reminders',
+      reminderUrl,
       body: reminder.toJson(),
     );
     if (response.statusCode != 201) {
@@ -40,9 +40,24 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
 
   @override
   Future<void> updateReminder(Reminder reminder) async {
+    final body = {
+      "deviceId": reminder.deviceId,
+      "containerId": reminder.containerId,
+      "medicineName": reminder.medicineName,
+      "dosage": reminder.dosage,
+      "isActive": reminder.isActive,
+      "isAlert": reminder.isActive,
+      "note": reminder.note,
+      "type": ReminderTypeHelper.getName(reminder.type),
+      "times": reminder.times.map((time) => time.toString()).join(';'),
+      "daysofWeek": reminder.daysofWeek?.map((day) => day.index).join(','),
+      "endDate": reminder.endDate?.toIso8601String(),
+      "assignedTo": reminder.assignedTo?.userId,
+      "createdBy": reminder.createdBy?.userId,
+    };
     final response = await networkService.put(
-      '/reminders/${reminder.id}',
-      body: reminder.toJson(),
+      '$reminderUrl/${reminder.id}',
+      body: body,
     );
     if (response.statusCode != 200) {
       throw Exception('Failed to update reminder');
@@ -50,8 +65,24 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
   }
 
   @override
+  Future<void> updateReminderStatus(Reminder reminder) async {
+    final body = {
+      "isActive": reminder.isActive,
+    };
+    final response = await networkService.put(
+      '$reminderUrl/${reminder.id}',
+      body: body,
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update reminder status');
+    }
+  }
+
+  @override
   Future<void> deleteReminder(int reminderId) async {
-    final response = await networkService.delete('/reminders/$reminderId');
+    final response = await networkService.delete(
+      '$reminderUrl/$reminderId',
+    );
     if (response.statusCode != 200) {
       throw Exception('Failed to delete reminder');
     }

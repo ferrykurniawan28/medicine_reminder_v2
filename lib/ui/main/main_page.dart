@@ -135,7 +135,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       drawer: _buildDrawer(),
       appBar: _appBarMap[_selectedIndex],
-      body: _bodyMap[_selectedIndex] ?? const Home(),
+      body: const RouterOutlet(),
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }

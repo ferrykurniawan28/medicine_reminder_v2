@@ -3,14 +3,13 @@ import 'package:equatable/equatable.dart';
 import 'package:medicine_reminder/core/network/network_service.dart';
 import 'package:medicine_reminder/core/services/services.dart';
 import 'package:medicine_reminder/features/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
 import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc({this.userBloc}) : super(AuthInitial()) {
+  AuthBloc() : super(AuthInitial()) {
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
@@ -20,7 +19,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final networkService = NetworkService();
   final authRemoteDataSource =
       AuthRemoteDataSource(networkService: NetworkService());
-  final UserBloc? userBloc;
+  // final UserBloc? userBloc;
 
   Future<void> _onLoginRequested(
       AuthLoginRequested event, Emitter<AuthState> emit) async {
@@ -34,7 +33,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (response.isSuccess) {
         final user = response.data!;
         // Add user to local user table via UserBloc
-        userBloc?.add(CreateUser(user));
+        // userBloc?.add(CreateUser(user));
         SharedPreference.setInt('userId', user.userId!);
         emit(AuthAuthenticated(user: user));
       } else {
@@ -65,7 +64,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (response.isSuccess) {
         final user = response.data!;
         // Add user to local user table via UserBloc
-        userBloc?.add(CreateUser(user));
+        // userBloc?.add(CreateUser(user));
         SharedPreference.setInt('userId', user.userId!);
         emit(AuthAuthenticated(user: user));
       } else {

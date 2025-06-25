@@ -32,6 +32,8 @@ class _DeviceState extends State<DeviceView> {
       if (userState is CurrentUser) {
         userId = userState.user.userId;
         context.read<DeviceBloc>().add(DeviceFetch(userId!));
+      } else if (userState is UserLoaded) {
+        userId = userState.user.userId!;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -118,14 +120,14 @@ class _DeviceState extends State<DeviceView> {
                       style: captionTextStyle,
                     ),
                     onTap: () {
-                      poopUpMenuContainer(context, container, key, 0);
+                      poopUpMenuContainer(context, container, key, 80);
                     },
                   );
                 },
               );
             } else if (state is DeviceLoading) {
               return ListView.builder(
-                // shrinkWrap: true,
+                shrinkWrap: true,
                 // physics: const NeverScrollableScrollPhysics(),
                 itemCount: 5,
                 itemBuilder: (context, index) {
@@ -163,85 +165,87 @@ class _DeviceState extends State<DeviceView> {
             } else if (state is DeviceError) {
               if (state.message == 'Exception: Device not found' ||
                   state.message == 'No device found') {
-                return Column(
-                  children: [
-                    // Text(
-                    // state.message,
-                    //   style: bodyTextStyle,
-                    // ),
-                    // spacerHeight(20),
-                    // add a button to add device
-                    ElevatedButton(
-                      onPressed: () {
-                        // open a dialog to add device
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            String deviceUid = '';
-                            return AlertDialog(
-                              title: const Text('Add Device'),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  TextField(
-                                    onChanged: (value) {
-                                      deviceUid = value;
-                                    },
-                                    decoration: const InputDecoration(
-                                      labelText: 'Device UID',
-                                      hintText: 'Enter device UID',
+                return Center(
+                  child: Column(
+                    children: [
+                      // Text(
+                      // state.message,
+                      //   style: bodyTextStyle,
+                      // ),
+                      // spacerHeight(20),
+                      // add a button to add device
+                      ElevatedButton(
+                        onPressed: () {
+                          // open a dialog to add device
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              String deviceUid = '';
+                              return AlertDialog(
+                                title: const Text('Add Device'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TextField(
+                                      onChanged: (value) {
+                                        deviceUid = value;
+                                      },
+                                      decoration: const InputDecoration(
+                                        labelText: 'Device UID',
+                                        hintText: 'Enter device UID',
+                                      ),
                                     ),
-                                  ),
-                                  // Add more fields if necessary
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Cancel'),
+                                    // Add more fields if necessary
+                                  ],
                                 ),
-                                TextButton(
-                                  onPressed: () async {
-                                    if (deviceUid.isEmpty) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Device UID cannot be empty'),
-                                        ),
-                                      );
-                                      return;
-                                    }
-                                    if (userId == null) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                              Text('User ID is not available'),
-                                        ),
-                                      );
-                                      return;
-                                    }
-                                    context.read<DeviceBloc>().add(
-                                          DeviceAdd(
-                                            userId!,
-                                            deviceUid,
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      if (deviceUid.isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Device UID cannot be empty'),
                                           ),
                                         );
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Add Device'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: const Text('Add Device'),
-                    ),
-                  ],
+                                        return;
+                                      }
+                                      if (userId == null) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'User ID is not available'),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      context.read<DeviceBloc>().add(
+                                            DeviceAdd(
+                                              userId!,
+                                              deviceUid,
+                                            ),
+                                          );
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Add Device'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: const Text('Add Device'),
+                      ),
+                    ],
+                  ),
                 );
               }
               return Center(
@@ -251,7 +255,26 @@ class _DeviceState extends State<DeviceView> {
                 ),
               );
             } else {
-              return const Text('No data available');
+              return Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'An unexpected error occurred',
+                      style: bodyTextStyle,
+                    ),
+                    spacerHeight(20),
+                    ElevatedButton(
+                      onPressed: () {
+                        _fetchDevice();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kPrimaryColor,
+                      ),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
             }
           }),
         ]),

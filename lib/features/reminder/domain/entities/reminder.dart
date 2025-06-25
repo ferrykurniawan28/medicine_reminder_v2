@@ -107,8 +107,8 @@ class Reminder {
     return {
       'id': id,
       'deviceId': deviceId,
-      'createdBy': createdBy,
-      'assignedTo': assignedTo,
+      'createdBy': createdBy?.toJson(), // Serialize createdBy
+      'assignedTo': assignedTo?.toJson(), // Serialize assignedTo
       'containerId': containerId,
       'medicineName': medicineName,
       'dosage': dosage.join(','),

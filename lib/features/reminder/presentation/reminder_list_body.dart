@@ -2,28 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medicine_reminder/features/reminder/bloc/reminder_bloc.dart';
 import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
+import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:medicine_reminder/ui/main/widgets/widgets.dart';
 import 'package:shimmer/shimmer.dart';
 
-class ReminderListBody extends StatelessWidget {
+class ReminderListBody extends StatefulWidget {
   const ReminderListBody({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    late final int userId;
+  State<ReminderListBody> createState() => _ReminderListBodyState();
+}
+
+class _ReminderListBodyState extends State<ReminderListBody> {
+  late final int userId;
+
+  @override
+  void initState() {
     final userState = context.read<UserBloc>().state;
     if (userState is CurrentUser) {
       userId = userState.user.userId!;
+    } else if (userState is UserLoaded) {
+      userId = userState.user.userId!;
     } else {
+      userId = 0; // Default to 0 or handle accordingly
       // Handle the case where the user is not logged in or userId is not available
-      return const Center(child: Text('No user is currently logged in.'));
+      // return const Center(child: Text('No user is currently logged in.'));
     }
+    print('User ID in ReminderListBody: $userId');
     // Trigger the initial load of reminders
     BlocProvider.of<ReminderBloc>(context).add(LoadReminders(userId));
+    super.initState();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
-        BlocProvider.of<ReminderBloc>(context).add(LoadReminders(userId));
+        context.read<ReminderBloc>().add(LoadReminders(userId));
       },
       child: BlocConsumer<ReminderBloc, ReminderState>(
         listener: (context, state) {
@@ -102,7 +117,25 @@ class ReminderListBody extends StatelessWidget {
           } else if (state is ReminderError) {
             return Center(child: Text(state.message));
           } else {
-            return const Center(child: Text('No reminders found'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  const Text('Failed to load reminders'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<ReminderBloc>().add(LoadReminders(userId));
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: kPrimaryColor),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
           }
         },
       ),

@@ -98,7 +98,7 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => userBloc),
         BlocProvider(
             create: (context) => AuthBloc(
-                  userBloc: ReadContext(context).read<UserBloc>(),
+                // userBloc: ReadContext(context).read<UserBloc>(),
                 )),
       ],
       child: MaterialApp.router(

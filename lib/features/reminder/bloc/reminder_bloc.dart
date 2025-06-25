@@ -9,22 +9,28 @@ import 'package:medicine_reminder/features/reminder/domain/usecases/delete_remin
 import 'package:medicine_reminder/features/reminder/domain/usecases/update_reminder.dart'
     as usecase_update;
 import 'package:medicine_reminder/features/reminder/data/repositories/reminder_repository_impl.dart';
+import 'package:medicine_reminder/features/reminder/domain/usecases/update_reminder_status.dart'
+    as usecase_status;
 
 part 'reminder_event.dart';
 part 'reminder_state.dart';
 
 class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
+  List<Reminder> reminders = [];
   final GetReminders getReminders;
   final usecase_add.AddReminder addReminder;
   final usecase_delete.DeleteReminder deleteReminder;
   final usecase_update.UpdateReminder updateReminder;
   final ReminderRepositoryImpl reminderRepository;
+  final usecase_status.UpdateReminderStatus updateReminderStatus;
 
   ReminderBloc({required this.reminderRepository})
       : getReminders = GetReminders(reminderRepository),
         addReminder = usecase_add.AddReminder(reminderRepository),
         deleteReminder = usecase_delete.DeleteReminder(reminderRepository),
         updateReminder = usecase_update.UpdateReminder(reminderRepository),
+        updateReminderStatus =
+            usecase_status.UpdateReminderStatus(reminderRepository),
         super(ReminderInitial()) {
     on<LoadReminders>(_onFetchReminders);
     on<AddReminder>(_addReminder);
@@ -37,7 +43,7 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
       LoadReminders event, Emitter<ReminderState> emit) async {
     emit(ReminderLoading());
     try {
-      final reminders = await getReminders(event.userId);
+      reminders = await getReminders(event.userId);
       print(reminders.map((r) => r.toJson()).toList());
       emit(ReminderLoaded(reminders));
     } catch (e) {
@@ -52,8 +58,10 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
     try {
       print(event.reminder.toJson());
       final newReminder = await addReminder.call(event.reminder);
-      emit(ReminderAdded(newReminder));
-      add(LoadReminders(event.reminder.assignedTo!.userId!));
+      reminders.add(newReminder);
+      emit(ReminderLoaded(reminders));
+      // emit(ReminderAdded(newReminder));
+      // add(LoadReminders(event.reminder.assignedTo!.userId!));
     } catch (e) {
       emit(ReminderError(e.toString()));
     }
@@ -64,8 +72,10 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
     emit(ReminderLoading());
     try {
       await deleteReminder.call(event.reminder.id!);
-      emit(ReminderDeleted(event.reminder.id!));
-      add(LoadReminders(event.reminder.assignedTo!.userId!));
+      reminders.removeWhere((reminder) => reminder.id == event.reminder.id);
+      emit(ReminderLoaded(reminders));
+      // emit(ReminderDeleted(event.reminderId));
+      // add(LoadReminders(event.userId));
     } catch (e) {
       emit(ReminderError(e.toString()));
     }
@@ -85,15 +95,30 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
   Future<void> _updateReminderStatus(
       UpdateReminderStatus event, Emitter<ReminderState> emit) async {
     try {
-      await updateReminder.call(event.reminder);
-      if (state is ReminderLoaded) {
-        final currentReminders = (state as ReminderLoaded).reminders;
-        final updatedReminders = currentReminders
-            .map((r) => r.id == event.reminder.id ? event.reminder : r)
-            .toList();
-        emit(ReminderLoaded(updatedReminders));
+      // Find the index of the reminder to update
+      final index =
+          reminders.indexWhere((reminder) => reminder.id == event.reminder.id);
+      if (index == -1) {
+        throw Exception('Reminder not found');
       }
+
+      // Update the isActive status directly in the reminders list
+      // reminders[index] =
+      //     reminders[index].copyWith(isActive: event.reminder.isActive);
+
+      // Directly update the reminder in the repository
+      final updatedReminder = reminders[index].copyWith(
+        isActive: event.reminder.isActive,
+      );
+      await updateReminderStatus.call(updatedReminder);
+
+      // Update the reminders list with the modified reminder
+      // reminders[index] = updatedReminder;
+
+      // // Emit the updated reminders list
+      // emit(ReminderLoaded(reminders));
     } catch (e) {
+      print('Error updating reminder status: $e');
       emit(ReminderError(e.toString()));
     }
   }

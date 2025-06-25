@@ -1,4 +1,4 @@
-import '../../domain/entities/reminder.dart' as domain;
+import '../../domain/entities/reminder.dart';
 import '../../domain/repositories/reminder_repository.dart';
 import '../datasources/reminder_local_datasource_interface.dart';
 import '../datasources/reminder_remote_datasource.dart';
@@ -15,7 +15,7 @@ class ReminderRepositoryImpl implements ReminderRepository {
   });
 
   @override
-  Future<List<domain.Reminder>> getReminders(int userId) async {
+  Future<List<Reminder>> getReminders(int userId) async {
     if (isOnline != null && isOnline!() && remoteDataSource != null) {
       try {
         final remoteReminders = await remoteDataSource!.fetchReminders(userId);
@@ -32,7 +32,7 @@ class ReminderRepositoryImpl implements ReminderRepository {
   }
 
   @override
-  Future<domain.Reminder> addReminder(domain.Reminder reminder) async {
+  Future<Reminder> addReminder(Reminder reminder) async {
     if (isOnline != null && isOnline!() && remoteDataSource != null) {
       try {
         await remoteDataSource!.addReminder(reminder);
@@ -59,16 +59,37 @@ class ReminderRepositoryImpl implements ReminderRepository {
   }
 
   @override
-  Future<void> updateReminder(domain.Reminder reminder) async {
+  Future<void> updateReminder(Reminder reminder) async {
+    print('Updating reminder: ${reminder.toJson()}');
     if (isOnline != null && isOnline!() && remoteDataSource != null) {
       try {
+        print('Updating reminder remotely: ${reminder.toJson()}');
         await remoteDataSource!.updateReminder(reminder);
-        await localDataSource.updateReminder(reminder);
+        print('Reminder updated remotely successfully');
+        await localDataSource.updateReminder(reminder, isSynced: true);
         return;
       } catch (e) {
         // Log error and fallback to local data
+        print('Error updating reminder: $e');
+        throw Exception('Failed to update reminder - $e');
       }
     }
     await localDataSource.updateReminder(reminder, isSynced: false);
+  }
+
+  @override
+  Future<void> updateReminderStatus(Reminder reminder) async {
+    if (isOnline != null && isOnline!() && remoteDataSource != null) {
+      try {
+        await remoteDataSource!.updateReminderStatus(reminder);
+        await localDataSource.updateReminderStatus(reminder, isSynced: true);
+        return;
+      } catch (e) {
+        // Log error and fallback to local data
+        print('Error updating reminder status: $e');
+        throw Exception('Failed to update reminder status - $e');
+      }
+    }
+    await localDataSource.updateReminderStatus(reminder, isSynced: false);
   }
 }

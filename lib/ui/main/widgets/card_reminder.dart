@@ -12,38 +12,48 @@ class CardReminder extends StatefulWidget {
 }
 
 class _CardReminderState extends State<CardReminder> {
+  // Local state to handle immediate UI feedback
+  late bool _isActive;
+
   @override
-  Widget build(BuildContext context) {
-    String reminderType;
+  void initState() {
+    super.initState();
+    _isActive = widget.reminder.isActive;
+  }
+
+  @override
+  void didUpdateWidget(CardReminder oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.reminder.isActive != oldWidget.reminder.isActive) {
+      setState(() {
+        _isActive = widget.reminder.isActive;
+      });
+    }
+  }
+
+  String get reminderType {
     switch (widget.reminder.type) {
       case ReminderType.onceDaily:
-        reminderType = 'Once Daily';
-        break;
+        return 'Once Daily';
       case ReminderType.twiceDaily:
-        reminderType = 'Twice Daily';
-        break;
+        return 'Twice Daily';
       case ReminderType.multipleTimesDaily:
-        reminderType = 'Multiple Times Daily';
-        break;
+        return 'Multiple Times Daily';
       case ReminderType.intervalhours:
-        reminderType = 'Interval Hours';
-        break;
+        return 'Interval Hours';
       case ReminderType.intervaldays:
-        reminderType = 'Interval Days';
-        break;
+        return 'Interval Days';
       case ReminderType.specificDays:
-        reminderType = 'Specific Days';
-        break;
+        return 'Specific Days';
       case ReminderType.cyclic:
-        reminderType = 'Cyclic';
-        break;
+        return 'Cyclic';
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => showReminderDetail(
-        context,
-        widget.reminder,
-      ),
+      onTap: () => showReminderDetail(context, widget.reminder),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
@@ -133,9 +143,15 @@ class _CardReminderState extends State<CardReminder> {
             Expanded(
               flex: 2,
               child: Switch(
-                value: widget.reminder.isActive,
+                value: _isActive,
                 activeTrackColor: kPrimaryColor,
-                onChanged: (bool value) {
+                onChanged: (bool value) async {
+                  // Immediate UI feedback
+                  setState(() {
+                    _isActive = value;
+                  });
+
+                  // Send update to BLoC
                   context.read<ReminderBloc>().add(
                         UpdateReminderStatus(
                           widget.reminder.copyWith(isActive: value),

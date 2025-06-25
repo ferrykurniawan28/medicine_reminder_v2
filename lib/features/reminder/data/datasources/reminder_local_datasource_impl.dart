@@ -223,7 +223,7 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
             'email': reminder.createdBy!.email,
           },
           conflictAlgorithm:
-              ConflictAlgorithm.ignore, // Ignore if user already exists
+              ConflictAlgorithm.replace, // Ignore if user already exists
         );
       } catch (e) {
         print(
@@ -252,6 +252,7 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
 
     // Insert the reminder into the `reminders` table
     final data = {
+      'id': reminder.id ?? null, // Use null for auto-increment
       'deviceId': reminder.deviceId,
       'createdBy': reminder.createdBy?.userId,
       'assignedTo': reminder.assignedTo?.userId,
@@ -283,6 +284,21 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
     await db.update(
       'reminders',
       reminder.toJson()..['is_synced'] = isSynced ? 1 : 0,
+      where: 'id = ?',
+      whereArgs: [reminder.id],
+    );
+  }
+
+  @override
+  Future<void> updateReminderStatus(Reminder reminder,
+      {bool isSynced = false}) async {
+    final db = await database;
+    await db.update(
+      'reminders',
+      {
+        'isActive': reminder.isActive ? 1 : 0,
+        'is_synced': isSynced ? 1 : 0, // Update sync status
+      },
       where: 'id = ?',
       whereArgs: [reminder.id],
     );
