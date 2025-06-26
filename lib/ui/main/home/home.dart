@@ -28,7 +28,12 @@ class Home extends StatelessWidget {
           });
         },
         backgroundColor: kPrimaryColor,
-        shape: const CircleBorder(),
+        shape: const CircleBorder(
+          side: BorderSide(
+            color: Colors.white,
+            width: 2.0,
+          ),
+        ),
         tooltip: 'Add Reminder',
         child: const Icon(
           Icons.add,

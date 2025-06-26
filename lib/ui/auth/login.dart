@@ -13,35 +13,74 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
+  final ValueNotifier<bool> _obscurePasswordNotifier =
+      ValueNotifier<bool>(true);
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _obscurePasswordNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthLoading) {
-            // Show loading indicator
-            CustomOverlay.showLoading(
-              context,
-              message: 'Logging in...',
-            );
-          } else if (state is AuthAuthenticated) {
-            CustomOverlay.hide();
-            // Navigate to home page on successful registration
-            ReadContext(context).read<UserBloc>().add(CreateUser(state.user));
-            ReadContext(context).read<UserBloc>().add(
-                  LoadUser(state.user.userId!),
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthLoading) {
+                // Show loading indicator
+                CustomOverlay.showLoading(
+                  context,
+                  message: 'Logging in...',
                 );
-            Modular.to.pushReplacementNamed('/home');
-          } else if (state is AuthError) {
-            CustomOverlay.hide();
-            // Show error message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
-          }
-        },
+              } else if (state is AuthAuthenticated) {
+                // CustomOverlay.hide();
+                // Navigate to home page on successful registration
+                ReadContext(context)
+                    .read<UserBloc>()
+                    .add(CreateUser(state.user));
+                // ReadContext(context).read<UserBloc>().add(
+                //       LoadUser(state.user.userId!),
+                //     );
+                // Modular.to.pushReplacementNamed('/home');
+              } else if (state is AuthError) {
+                CustomOverlay.hide();
+                // Show error message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+            },
+          ),
+          BlocListener<UserBloc, UserState>(
+            listener: (context, state) {
+              if (state is UserLoaded) {
+                CustomOverlay.hide();
+                // Navigate to home page after user is loaded
+                Modular.to.pushReplacementNamed('/home');
+              } else if (state is CurrentUser) {
+                CustomOverlay.hide();
+                // User is already authenticated, navigate to home
+                Modular.to.pushReplacementNamed('/home');
+              } else if (state is UserLoading) {
+                // Show loading indicator while user is being loaded
+                CustomOverlay.showLoading(
+                  context,
+                  message: 'Loading user data...',
+                );
+              } else if (state is UserError) {
+                // Handle user loading error
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+            },
+          )
+        ],
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -120,49 +159,54 @@ class _LoginState extends State<Login> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _passwordController,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            hintText: 'Enter your password',
-                            prefixIcon: const Icon(Icons.lock_outline,
-                                color: kSecondaryColor),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: kSecondaryColor,
+                        ValueListenableBuilder<bool>(
+                          valueListenable: _obscurePasswordNotifier,
+                          builder: (context, obscurePassword, child) {
+                            return TextFormField(
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                hintText: 'Enter your password',
+                                prefixIcon: const Icon(Icons.lock_outline,
+                                    color: kSecondaryColor),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: kSecondaryColor,
+                                  ),
+                                  onPressed: () {
+                                    _obscurePasswordNotifier.value =
+                                        !obscurePassword;
+                                  },
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: kSecondaryColor),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                      color: kPrimaryColor, width: 2),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelStyle:
+                                    const TextStyle(color: kSecondaryColor),
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
+                              obscureText: obscurePassword,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your password';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                return null;
                               },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  const BorderSide(color: kSecondaryColor),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                  color: kPrimaryColor, width: 2),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            labelStyle: const TextStyle(color: kSecondaryColor),
-                          ),
-                          obscureText: _obscurePassword,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
-                            }
-                            if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
-                            }
-                            return null;
+                            );
                           },
                         ),
                         const SizedBox(height: 8),

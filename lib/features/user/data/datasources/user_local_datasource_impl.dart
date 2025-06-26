@@ -61,8 +61,9 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
         : UserModel(
             userId: user.userId, userName: user.userName, email: user.email);
     final data = userModel.toJson();
-    data['is_synced'] = 0; // Always mark as not synced on local add
-    await db.insert('users', data);
+    data['is_synced'] = 1; // Always mark as not synced on local add
+    await db.insert('users', data,
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   @override

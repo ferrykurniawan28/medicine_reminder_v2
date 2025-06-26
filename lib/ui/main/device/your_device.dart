@@ -60,10 +60,9 @@ class YourDevice extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Image.asset(
-                    'assets/icons/pils.png',
-                    width: 60,
-                    height: 60,
+                  OptimizedIcon(
+                    assetPath: 'assets/icons/pils.png',
+                    size: 60,
                   ),
                   spacerWidth(10),
                   Column(
@@ -123,10 +122,9 @@ class YourDevice extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Image.asset(
-                    'assets/icons/celsius.png',
-                    width: 60,
-                    height: 60,
+                  OptimizedIcon(
+                    assetPath: 'assets/icons/celsius.png',
+                    size: 60,
                   ),
                   spacerWidth(10),
                   Expanded(

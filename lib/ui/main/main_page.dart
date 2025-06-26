@@ -132,11 +132,24 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: _buildDrawer(),
-      appBar: _appBarMap[_selectedIndex],
-      body: const RouterOutlet(),
-      bottomNavigationBar: _buildBottomNavBar(),
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthUnauthenticated) {
+          Modular.to.navigate('/auth');
+        } else if (state is AuthAuthenticated) {
+          // Optionally handle authenticated state
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
+        }
+      },
+      child: Scaffold(
+        drawer: _buildDrawer(),
+        appBar: _appBarMap[_selectedIndex],
+        body: const RouterOutlet(),
+        bottomNavigationBar: _buildBottomNavBar(),
+      ),
     );
   }
 
@@ -160,6 +173,13 @@ class _MainPageState extends State<MainPage> {
                   Navigator.pop(context);
                 },
               )),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Logout'),
+            onTap: () {
+              context.read<AuthBloc>().add(AuthLogoutRequested());
+            },
+          )
         ],
       ),
     );
@@ -182,11 +202,11 @@ class _MainPageState extends State<MainPage> {
         children: _navItems
             .map((item) => CustomIconButton(
                   onPressed: () => _onItemTapped(item.index),
-                  icon: Image.asset(
-                    _selectedIndex == item.index
+                  icon: OptimizedIcon(
+                    assetPath: _selectedIndex == item.index
                         ? item.selectedIconPath
                         : item.iconPath,
-                    width: 24,
+                    size: 24,
                     color: _selectedIndex == item.index
                         ? kPrimaryColor
                         : Colors.black,

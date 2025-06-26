@@ -5,6 +5,7 @@ import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter_modular/flutter_modular.dart'
     show Modular, RouterOutlet;
 import 'package:medicine_reminder/core/services/services.dart';
+import 'package:medicine_reminder/features/auth/bloc/auth_bloc.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device_control.dart';
@@ -13,6 +14,7 @@ import 'package:medicine_reminder/features/reminder/presentation/reminder_list_b
 import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
 import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 import 'package:medicine_reminder/models/models.dart';
+import 'package:medicine_reminder/ui/common/optimized_image.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:shimmer/shimmer.dart';
 

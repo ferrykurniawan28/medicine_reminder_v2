@@ -26,38 +26,52 @@ import 'core/services/services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize the database asynchronously
-  final localDataSource = AppointmentLocalDataSourceImpl();
-  final database = await localDataSource.database; // Use asynchronous getter
-
-  // Create SyncManager after database initialization
-  final syncManager = SyncManager(
-    db: database,
-    connectivity: Connectivity(),
-    appointmentLocalDataSource: localDataSource,
-    appointmentRemoteDataSource:
-        AppointmentRemoteDataSourceImpl(NetworkService()),
-  );
-
-  final userId = await SharedPreference.getInt('userId');
-  print('User ID from SharedPreferences: $userId');
+  // Start the app immediately with minimal setup
   final userBloc = UserBloc();
 
-  if (userId != null) {
-    // Load the user if userId is available
-    userBloc.add(LoadUser(userId));
-  }
-
   runApp(ModularApp(
-      module: AppRoute(),
-      child: MainApp(syncManager: syncManager, userBloc: userBloc)));
+    module: AppRoute(),
+    child: MainApp(userBloc: userBloc),
+  ));
+
+  // Initialize background services after app start
+  _initializeBackgroundServices(userBloc);
+}
+
+Future<void> _initializeBackgroundServices(UserBloc userBloc) async {
+  try {
+    // Initialize the database asynchronously
+    final localDataSource = AppointmentLocalDataSourceImpl();
+    final database = await localDataSource.database; // Use asynchronous getter
+
+    // Create SyncManager after database initialization
+    final syncManager = SyncManager(
+      db: database,
+      connectivity: Connectivity(),
+      appointmentLocalDataSource: localDataSource,
+      appointmentRemoteDataSource:
+          AppointmentRemoteDataSourceImpl(NetworkService()),
+    );
+
+    // Start sync manager
+    await syncManager.start();
+
+    // Load user data in background
+    final userId = await SharedPreference.getInt('userId');
+    print('User ID from SharedPreferences: $userId');
+
+    userBloc.add(LoadUser(userId));
+
+    print('Background services initialized successfully');
+  } catch (e) {
+    print('Background initialization error: $e');
+  }
 }
 
 class MainApp extends StatelessWidget {
-  final SyncManager syncManager;
   final UserBloc userBloc;
 
-  const MainApp({required this.syncManager, required this.userBloc, super.key});
+  const MainApp({required this.userBloc, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -77,12 +91,23 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => ParentalBloc()),
         BlocProvider(
           create: (context) {
+            // Create a temporary SyncManager for immediate use
+            // The proper one will be initialized in background
+            final tempLocalDataSource = AppointmentLocalDataSourceImpl();
+            final tempSyncManager = SyncManager(
+              db: tempLocalDataSource.databaseSync,
+              connectivity: Connectivity(),
+              appointmentLocalDataSource: tempLocalDataSource,
+              appointmentRemoteDataSource:
+                  AppointmentRemoteDataSourceImpl(NetworkService()),
+            );
+
             final repo = AppointmentRepositoryImpl(
-              AppointmentLocalDataSourceImpl(),
+              tempLocalDataSource,
               remoteDataSource:
                   AppointmentRemoteDataSourceImpl(NetworkService()),
               isOnline: () => true,
-              syncManager: syncManager,
+              syncManager: tempSyncManager,
             );
             return AppointmentBloc(repo);
           },

@@ -20,10 +20,9 @@ GestureDetector appointmentCard(BuildContext ctx,
       ),
       child: Row(
         children: [
-          Image.asset(
-            'assets/icons/medical.png',
-            width: 60,
-            height: 60,
+          OptimizedIcon(
+            assetPath: 'assets/icons/medical.png',
+            size: 60,
           ),
           spacerWidth(10),
           Expanded(

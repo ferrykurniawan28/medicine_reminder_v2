@@ -75,10 +75,9 @@ class ReminderDetail extends StatelessWidget {
             children: [
               // Medicine Section
               _buildSection(
-                icon: Image.asset(
-                  'assets/icons/pill.png',
-                  width: 24,
-                  height: 24,
+                icon: OptimizedIcon(
+                  assetPath: 'assets/icons/pill.png',
+                  size: 24,
                   color: kPrimaryColor,
                 ),
                 title: 'Medicine',
@@ -95,10 +94,9 @@ class ReminderDetail extends StatelessWidget {
               const SizedBox(height: 20),
               // Schedule Section
               _buildSection(
-                icon: Image.asset(
-                  'assets/icons/calendar.png',
-                  width: 24,
-                  height: 24,
+                icon: OptimizedIcon(
+                  assetPath: 'assets/icons/calendar.png',
+                  size: 24,
                   color: kPrimaryColor,
                 ),
                 title: 'Schedule',

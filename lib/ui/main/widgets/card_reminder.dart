@@ -12,23 +12,43 @@ class CardReminder extends StatefulWidget {
 }
 
 class _CardReminderState extends State<CardReminder> {
-  // Local state to handle immediate UI feedback
-  late bool _isActive;
+  // Use ValueNotifier for state management
+  late final ValueNotifier<bool> _isActiveNotifier;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
     super.initState();
-    _isActive = widget.reminder.isActive;
+    _isActiveNotifier = ValueNotifier(widget.reminder.isActive);
   }
 
   @override
   void didUpdateWidget(CardReminder oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.reminder.isActive != oldWidget.reminder.isActive) {
-      setState(() {
-        _isActive = widget.reminder.isActive;
-      });
+      _isActiveNotifier.value = widget.reminder.isActive;
     }
+  }
+
+  @override
+  void dispose() {
+    _isActiveNotifier.dispose();
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onSwitchChanged(bool value) {
+    _isActiveNotifier.value = value;
+
+    // Debounce the update to the BLoC
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      context.read<ReminderBloc>().add(
+            UpdateReminderStatus(
+              widget.reminder.copyWith(isActive: value),
+            ),
+          );
+    });
   }
 
   String get reminderType {
@@ -143,21 +163,14 @@ class _CardReminderState extends State<CardReminder> {
             ),
             Expanded(
               flex: 2,
-              child: Switch(
-                value: _isActive,
-                activeTrackColor: kPrimaryColor,
-                onChanged: (bool value) async {
-                  // Immediate UI feedback
-                  setState(() {
-                    _isActive = value;
-                  });
-
-                  // Send update to BLoC
-                  context.read<ReminderBloc>().add(
-                        UpdateReminderStatus(
-                          widget.reminder.copyWith(isActive: value),
-                        ),
-                      );
+              child: ValueListenableBuilder<bool>(
+                valueListenable: _isActiveNotifier,
+                builder: (context, isActive, child) {
+                  return Switch(
+                    value: isActive,
+                    activeTrackColor: kPrimaryColor,
+                    onChanged: _onSwitchChanged,
+                  );
                 },
               ),
             ),

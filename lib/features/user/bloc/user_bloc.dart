@@ -56,8 +56,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     try {
       await addUser(event.user);
       emit(CurrentUser(event.user));
-      add(LoadUsers());
+      // add(LoadUsers());
     } catch (e) {
+      print('Error creating user: $e');
       emit(UserError(e.toString()));
     }
   }

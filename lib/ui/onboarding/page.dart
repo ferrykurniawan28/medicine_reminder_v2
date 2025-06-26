@@ -20,7 +20,15 @@ class OnboardingPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(image, height: 300),
+            OptimizedImage(
+              assetPath: image,
+              height: 300,
+              fit: BoxFit.contain,
+              placeholder: const SizedBox(
+                height: 300,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
             spacerHeight(20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

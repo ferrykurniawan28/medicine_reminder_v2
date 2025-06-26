@@ -47,7 +47,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLogoutRequested(
       AuthLogoutRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // Perform logout logic here, e.g., clear user session
+      SharedPreference.setInt('userId', 0);
+      // Optionally notify UserBloc to remove user data
+      // userBloc?.add(RemoveUser());
+      emit(AuthUnauthenticated());
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
     emit(AuthUnauthenticated());
   }
 

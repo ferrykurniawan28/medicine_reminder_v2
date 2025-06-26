@@ -18,7 +18,8 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> addUser(User user, {int isSynced = 0}) async {
+  Future<void> addUser(User user, {int isSynced = 1}) async {
+    print('Adding user: ${user.userName}, isSynced: $isSynced');
     final userModel = user is UserModel
         ? user
         : UserModel(

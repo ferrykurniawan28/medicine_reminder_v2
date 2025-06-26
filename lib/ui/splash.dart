@@ -7,20 +7,67 @@ class Splash extends StatefulWidget {
   State<Splash> createState() => _SplashState();
 }
 
-class _SplashState extends State<Splash> {
+class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
+  bool _navigationTriggered = false;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () async {
-      if (!mounted) return;
-      final userBloc = BlocProvider.of<UserBloc>(context);
-      final userState = userBloc.state;
-      if (userState is CurrentUser) {
-        Modular.to.pushReplacementNamed('/home');
-      } else {
-        Modular.to.pushReplacementNamed('/boarding');
-      }
+
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 600), // Reduced duration
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut, // More efficient curve
+    ));
+
+    // Start fade animation immediately
+    _fadeController.forward();
+
+    // Use microtask to avoid blocking the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigateAfterDelay();
     });
+  }
+
+  Future<void> _navigateAfterDelay() async {
+    if (_navigationTriggered) return;
+    _navigationTriggered = true;
+
+    // Reduced splash duration
+    await Future.delayed(const Duration(milliseconds: 1200));
+
+    if (!mounted) return;
+
+    // Stop animation before navigation to free resources
+    _fadeController.stop();
+
+    // Check user state asynchronously
+    final userBloc = BlocProvider.of<UserBloc>(context);
+    final userState = userBloc.state;
+
+    // Navigate based on user state
+    if (userState is CurrentUser) {
+      await Modular.to.pushReplacementNamed('/home');
+    } else if (userState is UserLoaded) {
+      await Modular.to.pushReplacementNamed('/home');
+    } else {
+      await Modular.to.pushReplacementNamed('/boarding');
+    }
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
   }
 
   @override
@@ -28,8 +75,16 @@ class _SplashState extends State<Splash> {
     return Scaffold(
       backgroundColor: kPrimaryColor,
       body: Center(
-        child: Text('Minder',
-            style: titleTextStyle.copyWith(color: Colors.white, fontSize: 30)),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Text(
+            'Minder',
+            style: titleTextStyle.copyWith(
+              color: Colors.white,
+              fontSize: 30,
+            ),
+          ),
+        ),
       ),
     );
   }

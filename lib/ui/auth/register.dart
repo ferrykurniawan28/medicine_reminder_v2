@@ -15,8 +15,10 @@ class _RegisterState extends State<Register> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+  final ValueNotifier<bool> _obscurePasswordNotifier =
+      ValueNotifier<bool>(true);
+  final ValueNotifier<bool> _obscureConfirmPasswordNotifier =
+      ValueNotifier<bool>(true);
 
   @override
   void dispose() {
@@ -24,36 +26,66 @@ class _RegisterState extends State<Register> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _formKey.currentState?.dispose();
+    _obscurePasswordNotifier.dispose();
+    _obscureConfirmPasswordNotifier.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthLoading) {
-            // Show loading indicator
-            CustomOverlay.showLoading(
-              context,
-              message: 'Creating your account...',
-            );
-          } else if (state is AuthAuthenticated) {
-            CustomOverlay.hide();
-            ReadContext(context).read<UserBloc>().add(CreateUser(state.user));
-            ReadContext(context).read<UserBloc>().add(
-                  LoadUser(state.user.userId!),
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthLoading) {
+                // Show loading indicator
+                CustomOverlay.showLoading(
+                  context,
+                  message: 'Creating your account...',
                 );
-            Modular.to.pushReplacementNamed('/home');
-          } else if (state is AuthError) {
-            CustomOverlay.hide();
-            // Show error message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
-          }
-        },
+              } else if (state is AuthAuthenticated) {
+                // CustomOverlay.hide();
+                ReadContext(context)
+                    .read<UserBloc>()
+                    .add(CreateUser(state.user));
+                // ReadContext(context).read<UserBloc>().add(
+                //       LoadUser(state.user.userId!),
+                //     );
+                // Modular.to.pushReplacementNamed('/home');
+              } else if (state is AuthError) {
+                CustomOverlay.hide();
+                // Show error message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+            },
+          ),
+          BlocListener<UserBloc, UserState>(
+            listener: (context, state) {
+              if (state is UserLoading) {
+                // Show loading indicator
+                CustomOverlay.showLoading(
+                  context,
+                  message: 'Loading user data...',
+                );
+              } else if (state is UserLoaded) {
+                CustomOverlay.hide();
+                // User data loaded successfully
+                Modular.to.pushReplacementNamed('/home');
+              } else if (state is CurrentUser) {
+                CustomOverlay.hide();
+                Modular.to.pushReplacementNamed('/home');
+              } else if (state is UserError) {
+                CustomOverlay.hide();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+            },
+          ),
+        ],
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -154,7 +186,7 @@ class _RegisterState extends State<Register> {
                             if (value == null || value.isEmpty) {
                               return 'Please enter an email';
                             }
-                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}//$')
                                 .hasMatch(value)) {
                               return 'Please enter a valid email';
                             }
@@ -162,95 +194,104 @@ class _RegisterState extends State<Register> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _passwordController,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            hintText: 'Enter your password',
-                            prefixIcon: const Icon(Icons.lock_outline,
-                                color: kSecondaryColor),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: kSecondaryColor,
+                        ValueListenableBuilder<bool>(
+                          valueListenable: _obscurePasswordNotifier,
+                          builder: (context, obscurePassword, child) {
+                            return TextFormField(
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                hintText: 'Enter your password',
+                                prefixIcon: const Icon(Icons.lock_outline,
+                                    color: kSecondaryColor),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: kSecondaryColor,
+                                  ),
+                                  onPressed: () {
+                                    _obscurePasswordNotifier.value =
+                                        !obscurePassword;
+                                  },
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: kSecondaryColor),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                      color: kPrimaryColor, width: 2),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelStyle:
+                                    const TextStyle(color: kSecondaryColor),
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
+                              obscureText: obscurePassword,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                return null;
                               },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  const BorderSide(color: kSecondaryColor),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                  color: kPrimaryColor, width: 2),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            labelStyle: const TextStyle(color: kSecondaryColor),
-                          ),
-                          obscureText: _obscurePassword,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a password';
-                            }
-                            if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
-                            }
-                            return null;
+                            );
                           },
                         ),
                         const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _confirmPasswordController,
-                          decoration: InputDecoration(
-                            labelText: 'Confirm Password',
-                            hintText: 'Re-enter your password',
-                            prefixIcon: const Icon(Icons.lock_outline,
-                                color: kSecondaryColor),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureConfirmPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: kSecondaryColor,
+                        ValueListenableBuilder<bool>(
+                          valueListenable: _obscureConfirmPasswordNotifier,
+                          builder: (context, obscureConfirmPassword, child) {
+                            return TextFormField(
+                              controller: _confirmPasswordController,
+                              decoration: InputDecoration(
+                                labelText: 'Confirm Password',
+                                hintText: 'Re-enter your password',
+                                prefixIcon: const Icon(Icons.lock_outline,
+                                    color: kSecondaryColor),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    obscureConfirmPassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: kSecondaryColor,
+                                  ),
+                                  onPressed: () {
+                                    _obscureConfirmPasswordNotifier.value =
+                                        !obscureConfirmPassword;
+                                  },
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: kSecondaryColor),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                      color: kPrimaryColor, width: 2),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelStyle:
+                                    const TextStyle(color: kSecondaryColor),
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureConfirmPassword =
-                                      !_obscureConfirmPassword;
-                                });
+                              obscureText: obscureConfirmPassword,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please confirm your password';
+                                } else if (value != _passwordController.text) {
+                                  return 'Passwords do not match';
+                                }
+                                return null;
                               },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  const BorderSide(color: kSecondaryColor),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                  color: kPrimaryColor, width: 2),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            labelStyle: const TextStyle(color: kSecondaryColor),
-                          ),
-                          obscureText: _obscureConfirmPassword,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please confirm your password';
-                            } else if (value != _passwordController.text) {
-                              return 'Passwords do not match';
-                            }
-                            return null;
+                            );
                           },
                         ),
                         const SizedBox(height: 24),
