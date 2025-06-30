@@ -32,6 +32,7 @@ part 'reminder/more_options_page.dart';
 part 'reminder/multiple_times_daily.dart';
 part 'reminder/specific_days.dart';
 part 'reminder/reminder_detail.dart';
+part 'reminder/reminder_edit.dart';
 part 'card_reminder.dart';
 part 'appointment/appointment.dart';
 part 'appointment/select_date_time.dart';

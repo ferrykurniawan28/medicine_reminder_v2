@@ -271,13 +271,12 @@ class ReminderDetail extends StatelessWidget {
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
         actions: <CupertinoActionSheetAction>[
-          CupertinoActionSheetAction(
-            onPressed: () {
-              Navigator.pop(context);
-              // Add edit functionality here
-            },
-            child: const Text('Edit Reminder'),
-          ),
+          // CupertinoActionSheetAction(
+          //   onPressed: () {
+          //     showReminderEdit(context, reminder);
+          //   },
+          //   child: const Text('Edit Reminder'),
+          // ),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
             onPressed: () {

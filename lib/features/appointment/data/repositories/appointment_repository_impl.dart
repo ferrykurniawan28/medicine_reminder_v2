@@ -20,9 +20,6 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
 
   @override
   Future<List<Appointment>> getAppointments(int userId) async {
-    await syncManager.syncDeletedAppointments();
-    await syncManager.syncUnsyncedAppointments();
-
     // Always read from local for offline-first
     final local = await localDataSource.getAppointments(userId);
 
@@ -40,6 +37,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
 
     if (isOnline != null && isOnline!() && remoteDataSource != null) {
       try {
+        await syncManager.syncDeletedAppointments();
+        await syncManager.syncUnsyncedAppointments();
+
         final remote = await remoteDataSource!.fetchAppointments(userId);
 
         // Map remote data to domain objects

@@ -165,14 +165,34 @@ class _MainPageState extends State<MainPage> {
               style: TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
-          ..._navItems.map((item) => ListTile(
-                leading: _getDrawerIcon(item.index),
-                title: Text(item.label),
-                onTap: () {
-                  _onItemTapped(item.index);
-                  Navigator.pop(context);
-                },
-              )),
+          ListTile(
+            leading: const Icon(Icons.notifications),
+            title: const Text('Notifications'),
+            onTap: () {
+              // Modular.to.navigate('/notifications');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.medical_information),
+            title: const Text('Medical Records'),
+            onTap: () {
+              // Modular.to.navigate('/medical-records');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.qr_code),
+            title: const Text('Parental Code'),
+            onTap: () {
+              // Modular.to.navigate('/settings');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () {
+              Modular.to.navigate('/settings');
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),

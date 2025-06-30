@@ -15,6 +15,11 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
     return _database!;
   }
 
+  Database get databaseSync {
+    if (_database != null) return _database!;
+    throw Exception('Database is not initialized yet.');
+  }
+
   Future<Database> _initDB() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'reminders.db');
@@ -22,7 +27,7 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
 
     final db = await openDatabase(
       path,
-      version: 6, // Bump version for migration
+      version: 7, // Bump version for migration
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE reminders(
@@ -41,7 +46,9 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
             times TEXT,
             daysofWeek TEXT,
             endDate TEXT,
-            is_synced INTEGER DEFAULT 0
+            is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER DEFAULT 0,
+            is_updated INTEGER DEFAULT 0
           )
         ''');
       },
@@ -55,6 +62,12 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
         if (oldVersion < 5) {
           await db.execute(
               'ALTER TABLE reminders ADD COLUMN is_synced INTEGER DEFAULT 0');
+        }
+        if (oldVersion < 7) {
+          await db.execute(
+              'ALTER TABLE reminders ADD COLUMN is_deleted INTEGER DEFAULT 0');
+          await db.execute(
+              'ALTER TABLE reminders ADD COLUMN is_updated INTEGER DEFAULT 0');
         }
       },
     );
@@ -268,6 +281,8 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
       'daysofWeek': reminder.daysofWeek?.map((d) => d.index).join(','),
       'endDate': reminder.endDate?.toIso8601String(),
       'is_synced': synced,
+      'is_deleted': 0,
+      'is_updated': 0,
     };
     final id = await db.insert(
       'reminders',
@@ -281,9 +296,12 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
   Future<void> updateReminder(Reminder reminder,
       {bool isSynced = false}) async {
     final db = await database;
+    final data = reminder.toJson();
+    data['is_synced'] = isSynced ? 1 : 0;
+    data['is_updated'] = isSynced ? 0 : 1; // Mark as updated if not synced
     await db.update(
       'reminders',
-      reminder.toJson()..['is_synced'] = isSynced ? 1 : 0,
+      data,
       where: 'id = ?',
       whereArgs: [reminder.id],
     );
@@ -321,30 +339,28 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
   }
 
   @override
-  Future<List<Reminder>?> getUnsyncedReminders(int userId) async {
+  Future<List<Reminder>?> getUnsyncedReminders() async {
     final db = await database;
     List<Map<String, Object?>> result = [];
     try {
       result = await db.rawQuery('''
-            SELECT r.*, 
-                   u1.username as createdByName, u1.email as createdByEmail,
-                   u2.username as assignedToName, u2.email as assignedToEmail
-            FROM reminders r
-            LEFT JOIN users_db.users u1
-              ON r.createdBy = u1.id
-            LEFT JOIN users_db.users u2
-              ON r.assignedTo = u2.id
-            WHERE r.is_synced = 0 AND r.assignedTo = ?
-            ORDER BY r.id DESC
-        ''', [userId]);
+        SELECT r.*, 
+               u1.username as createdByName, u1.email as createdByEmail,
+               u2.username as assignedToName, u2.email as assignedToEmail
+        FROM reminders r
+        LEFT JOIN users_db.users u1
+          ON r.createdBy = u1.id
+        LEFT JOIN users_db.users u2
+          ON r.assignedTo = u2.id
+        WHERE r.is_synced = 0 AND r.is_deleted = 0
+        ORDER BY r.id DESC
+      ''');
     } catch (e) {
       print(
           '[ReminderLocalDataSourceImpl] Error fetching unsynced reminders: $e');
       result = await db.query(
         'reminders',
-        where: 'is_synced = 0 AND assignedTo = ?',
-        whereArgs: [userId],
-        orderBy: 'id DESC',
+        where: 'is_synced = 0 AND is_deleted = 0',
       );
     }
 
@@ -413,6 +429,136 @@ class ReminderLocalDataSourceImpl implements ReminderLocalDataSource {
       {'is_deleted': 1}, // Mark as deleted
       where: 'id = ?',
       whereArgs: [reminderId],
+    );
+  }
+
+  @override
+  Future<List<Reminder>> getDeletedReminders() async {
+    final db = await database;
+
+    // Ensure device_db and users_db are attached
+    final dbPath = await getDatabasesPath();
+    final deviceDbPath = join(dbPath, 'device.db');
+    final usersDbPath = join(dbPath, 'users.db');
+
+    // Check if device_db is already attached
+    final attachedDbs = await db.rawQuery("PRAGMA database_list;");
+    final isDeviceDbAttached =
+        attachedDbs.any((row) => row['name'] == 'device_db');
+    final isUsersDbAttached =
+        attachedDbs.any((row) => row['name'] == 'users_db');
+
+    if (!isDeviceDbAttached) {
+      try {
+        await db.execute("ATTACH DATABASE '$deviceDbPath' AS device_db");
+      } catch (e) {
+        print('[ReminderLocalDataSourceImpl] Error attaching device_db: $e');
+      }
+    }
+
+    if (!isUsersDbAttached) {
+      try {
+        await db.execute("ATTACH DATABASE '$usersDbPath' AS users_db");
+      } catch (e) {
+        print('[ReminderLocalDataSourceImpl] Error attaching users_db: $e');
+      }
+    }
+
+    List<Map<String, Object?>> result = [];
+    try {
+      result = await db.rawQuery('''
+        SELECT r.*, 
+               u1.username as createdByName, u1.email as createdByEmail,
+               u2.username as assignedToName, u2.email as assignedToEmail
+        FROM reminders r
+        LEFT JOIN users_db.users u1
+          ON r.createdBy = u1.id
+        LEFT JOIN users_db.users u2
+          ON r.assignedTo = u2.id
+        WHERE r.is_deleted = 1
+        ORDER BY r.id DESC
+      ''');
+    } catch (e) {
+      print(
+          '[ReminderLocalDataSourceImpl] Error fetching deleted reminders: $e');
+      result = await db.query(
+        'reminders',
+        where: 'is_deleted = 1',
+      );
+    }
+
+    return result
+        .map((e) => Reminder(
+              id: e['id'] as int?,
+              deviceId: e['deviceId'] as int?,
+              createdBy: e['createdBy'] != null
+                  ? User(
+                      userId: e['createdBy'] as int,
+                      userName: e['createdByName'] as String?,
+                      email: e['createdByEmail'] as String?,
+                    )
+                  : null,
+              assignedTo: e['assignedTo'] != null
+                  ? User(
+                      userId: e['assignedTo'] as int,
+                      userName: e['assignedToName'] as String?,
+                      email: e['assignedToEmail'] as String?,
+                    )
+                  : null,
+              containerId: e['containerId'] as int?,
+              medicineName: e['medicineName'] as String,
+              dosage:
+                  (e['dosage'] as String).split(',').map(int.parse).toList(),
+              medicineLeft: e['medicineLeft'] as int?,
+              isActive: (e['isActive'] as int) == 1,
+              isAlert: (e['isAlert'] as int) == 1,
+              note: e['note'] as String?,
+              type: ReminderType.values[e['type'] as int],
+              times: (e['times'] as String)
+                  .split(';')
+                  .map((t) => Time.fromString(t))
+                  .toList(),
+              daysofWeek: (e['daysofWeek'] as String?)
+                  ?.split(',')
+                  .map((v) => Days.values[int.parse(v)])
+                  .toList(),
+              endDate: e['endDate'] != null && e['endDate'] is String
+                  ? DateTime.tryParse(e['endDate'] as String)
+                  : null,
+            ))
+        .toList();
+  }
+
+  @override
+  Future<void> markReminderNotSynced(int id) async {
+    final db = await database;
+    await db.update(
+      'reminders',
+      {'is_synced': 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<void> markReminderAsNotUpdated(int id) async {
+    final db = await database;
+    await db.update(
+      'reminders',
+      {'is_updated': 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  @override
+  Future<void> markReminderAsUpdated(int id) async {
+    final db = await database;
+    await db.update(
+      'reminders',
+      {'is_updated': 1},
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 }

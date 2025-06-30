@@ -44,6 +44,11 @@ Future<void> _initializeBackgroundServices(UserBloc userBloc) async {
     final localDataSource = AppointmentLocalDataSourceImpl();
     final database = await localDataSource.database; // Use asynchronous getter
 
+    // Initialize reminder datasources for sync
+    final reminderLocalDataSource = ReminderLocalDataSourceImpl();
+    final reminderRemoteDataSource =
+        ReminderRemoteDataSourceImpl(NetworkService());
+
     // Create SyncManager after database initialization
     final syncManager = SyncManager(
       db: database,
@@ -51,6 +56,8 @@ Future<void> _initializeBackgroundServices(UserBloc userBloc) async {
       appointmentLocalDataSource: localDataSource,
       appointmentRemoteDataSource:
           AppointmentRemoteDataSourceImpl(NetworkService()),
+      reminderLocalDataSource: reminderLocalDataSource,
+      reminderRemoteDataSource: reminderRemoteDataSource,
     );
 
     // Start sync manager
@@ -113,11 +120,22 @@ class MainApp extends StatelessWidget {
           },
         ),
         BlocProvider(create: (context) {
-          final reminderRepository = ReminderRepositoryImpl(
-            ReminderLocalDataSourceImpl(),
-            remoteDataSource: ReminderRemoteDataSourceImpl(NetworkService()),
-            isOnline: () => true,
+          final tempLocalDataSource = ReminderLocalDataSourceImpl();
+          // Create a temporary SyncManager for immediate use
+          final tempS = SyncManager(
+            db: tempLocalDataSource.databaseSync,
+            connectivity: Connectivity(),
+            appointmentLocalDataSource: AppointmentLocalDataSourceImpl(),
+            appointmentRemoteDataSource:
+                AppointmentRemoteDataSourceImpl(NetworkService()),
+            reminderLocalDataSource: tempLocalDataSource,
+            reminderRemoteDataSource:
+                ReminderRemoteDataSourceImpl(NetworkService()),
           );
+          final reminderRepository = ReminderRepositoryImpl(tempLocalDataSource,
+              remoteDataSource: ReminderRemoteDataSourceImpl(NetworkService()),
+              isOnline: () => true,
+              syncManager: tempS);
           return ReminderBloc(reminderRepository: reminderRepository);
         }),
         BlocProvider(create: (context) => userBloc),

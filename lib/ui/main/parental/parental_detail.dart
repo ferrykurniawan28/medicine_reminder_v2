@@ -13,9 +13,9 @@ class _ParentalDetailState extends State<ParentalDetail> {
   @override
   void initState() {
     super.initState();
-    Modular.to.navigate('/home/parental/detail/reminder', arguments: {
-      'parental': widget.parental,
-    });
+    // Modular.to.navigate('/home/parental/detail/reminder', arguments: {
+    //   'parental': widget.parental,
+    // });
   }
 
   @override

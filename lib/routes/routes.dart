@@ -63,6 +63,30 @@ class AppRoute extends Module {
     //           parental: r.args.data['parental'],
     //         ));
     r.child('/device-control-list', child: (_) => const DeviceControlList());
+    r.child('/parental/detail',
+        child: (child) => ParentalDetail(
+              parental: r.args.data['parental'],
+            ),
+        children: [
+          ChildRoute(
+            '/',
+            child: (_) => ReminderList(
+              parental: r.args.data['parental'],
+            ),
+          ),
+          ChildRoute(
+            '/appointment',
+            child: (_) => AppointmentList(
+              parental: r.args.data['parental'],
+            ),
+          ),
+          ChildRoute(
+            '/device',
+            child: (_) => DeviceParental(
+              parental: r.args.data['parental'],
+            ),
+          ),
+        ]);
     // r.child(
     //   '/device/:deviceId',
     //   child: (_) => const DeviceView(),

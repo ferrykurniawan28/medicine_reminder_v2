@@ -37,6 +37,16 @@ class ReminderBloc extends Bloc<ReminderEvent, ReminderState> {
     on<UpdateReminder>(_updateReminder);
     on<DeleteReminder>(_deleteReminder);
     on<UpdateReminderStatus>(_updateReminderStatus);
+    on<SyncRemindersEvent>((event, emit) async {
+      try {
+        emit(ReminderSyncing());
+        await reminderRepository.syncUnsyncedReminders();
+        await reminderRepository.syncDeletedReminders();
+        emit(ReminderSynced());
+      } catch (e) {
+        emit(ReminderSyncError(e.toString()));
+      }
+    });
   }
 
   Future<void> _onFetchReminders(

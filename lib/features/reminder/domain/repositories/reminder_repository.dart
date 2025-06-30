@@ -6,4 +6,6 @@ abstract class ReminderRepository {
   Future<void> deleteReminder(int id);
   Future<void> updateReminder(Reminder reminder);
   Future<void> updateReminderStatus(Reminder reminder);
+  Future<void> syncUnsyncedReminders();
+  Future<void> syncDeletedReminders();
 }

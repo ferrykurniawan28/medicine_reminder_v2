@@ -68,7 +68,7 @@ class _ListParentalState extends State<ListParental> {
                     leading: const Icon(CupertinoIcons.person),
                     onTap: () {
                       Modular.to.pushNamed(
-                        '/home/parental/detail',
+                        '/parental/detail',
                         arguments: {
                           'parental': parental,
                         },

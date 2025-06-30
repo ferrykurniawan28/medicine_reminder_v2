@@ -65,3 +65,16 @@ final class ReminderUpdatedStatus extends ReminderState {
   @override
   List<Object> get props => [reminderId, isActive];
 }
+
+final class ReminderSyncing extends ReminderState {}
+
+final class ReminderSynced extends ReminderState {}
+
+final class ReminderSyncError extends ReminderState {
+  final String message;
+
+  const ReminderSyncError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

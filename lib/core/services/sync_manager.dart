@@ -4,6 +4,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:medicine_reminder/features/appointment/data/datasources/appointment_local_datasource.dart';
 import 'package:medicine_reminder/features/appointment/data/datasources/appointment_remote_datasource.dart';
 import 'package:medicine_reminder/features/appointment/data/models/appointment_model.dart';
+import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource_interface.dart';
+import 'package:medicine_reminder/features/reminder/data/datasources/reminder_remote_datasource.dart';
+import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 
 /// A simple sync manager for offline-first apps.
 class SyncManager {
@@ -16,11 +19,17 @@ class SyncManager {
   final AppointmentLocalDataSource appointmentLocalDataSource;
   final AppointmentRemoteDataSource appointmentRemoteDataSource;
 
+  // Optional reminder sync components
+  final ReminderLocalDataSource? reminderLocalDataSource;
+  final ReminderRemoteDataSource? reminderRemoteDataSource;
+
   SyncManager({
     required this.db,
     required this.connectivity,
     required this.appointmentLocalDataSource,
     required this.appointmentRemoteDataSource,
+    this.reminderLocalDataSource,
+    this.reminderRemoteDataSource,
   });
 
   Stream<bool> get syncing => _syncingController.stream;
@@ -39,7 +48,7 @@ class SyncManager {
     _syncingController.add(true);
     try {
       await _syncAppointments();
-      // Add other feature sync methods here
+      await _syncReminders();
     } finally {
       _isSyncing = false;
       _syncingController.add(false);
@@ -49,6 +58,13 @@ class SyncManager {
   Future<void> _syncAppointments() async {
     await syncUnsyncedAppointments();
     await syncDeletedAppointments();
+  }
+
+  Future<void> _syncReminders() async {
+    if (reminderLocalDataSource != null && reminderRemoteDataSource != null) {
+      await syncUnsyncedReminders();
+      await syncDeletedReminders();
+    }
   }
 
   Future<void> syncUnsyncedAppointments() async {
@@ -100,6 +116,63 @@ class SyncManager {
     if (appointment.id != null) {
       await appointmentRemoteDataSource.addAppointment(appointment);
       await appointmentLocalDataSource.markAppointmentAsSynced(appointment.id!);
+    }
+  }
+
+  Future<void> syncUnsyncedReminders() async {
+    if (reminderLocalDataSource == null || reminderRemoteDataSource == null) {
+      return;
+    }
+
+    try {
+      final unsyncedReminders =
+          await reminderLocalDataSource!.getUnsyncedReminders();
+
+      for (var reminder in unsyncedReminders ?? []) {
+        if (reminder.isDeleted == 1) {
+          await _syncDeletedReminder(reminder);
+        } else if (reminder.isUpdated == 1) {
+          await reminderRemoteDataSource!.updateReminder(reminder);
+          await reminderLocalDataSource!.markReminderAsSynced(reminder.id!);
+        } else if (reminder.isSynced == 0) {
+          await reminderRemoteDataSource!.addReminder(reminder);
+          await reminderLocalDataSource!.markReminderAsSynced(reminder.id!);
+        }
+      }
+
+      // Note: We'll need to implement getUnsyncedReminders without userId for sync manager
+      // or modify the approach
+      print('Syncing unsynced reminders...');
+      // For now, we'll skip this since we need userId
+      // In a real implementation, you might store the current user ID in the sync manager
+    } catch (e) {
+      print('Failed to sync unsynced reminders: $e');
+    }
+  }
+
+  Future<void> syncDeletedReminders() async {
+    if (reminderLocalDataSource == null || reminderRemoteDataSource == null) {
+      return;
+    }
+
+    try {
+      final deletedReminders =
+          await reminderLocalDataSource!.getDeletedReminders();
+      for (var reminder in deletedReminders) {
+        print('Syncing deleted reminder: ${reminder.id}');
+        await _syncDeletedReminder(reminder);
+      }
+    } catch (e) {
+      print('Failed to sync deleted reminders: $e');
+    }
+  }
+
+  Future<void> _syncDeletedReminder(Reminder reminder) async {
+    if (reminder.id != null &&
+        reminderLocalDataSource != null &&
+        reminderRemoteDataSource != null) {
+      await reminderLocalDataSource!.deleteReminder(reminder.id!);
+      await reminderRemoteDataSource!.deleteReminder(reminder.id!);
     }
   }
 

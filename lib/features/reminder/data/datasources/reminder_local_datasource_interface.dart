@@ -7,7 +7,11 @@ abstract class ReminderLocalDataSource {
   Future<void> updateReminderStatus(Reminder reminder, {bool isSynced = false});
   Future<void> deleteReminder(int id);
   Future<void> clearReminders();
-  Future<List<Reminder>?> getUnsyncedReminders(int userId);
+  Future<List<Reminder>?> getUnsyncedReminders();
   Future<void> markReminderAsSynced(int reminderIds);
   Future<void> markReminderAsDeleted(int reminderId);
+  Future<List<Reminder>> getDeletedReminders();
+  Future<void> markReminderNotSynced(int id);
+  Future<void> markReminderAsNotUpdated(int id);
+  Future<void> markReminderAsUpdated(int id);
 }

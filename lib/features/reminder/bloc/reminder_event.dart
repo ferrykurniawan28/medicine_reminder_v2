@@ -51,3 +51,7 @@ final class UpdateReminderStatus extends ReminderEvent {
   @override
   List<Object> get props => [reminder];
 }
+
+final class SyncRemindersEvent extends ReminderEvent {
+  const SyncRemindersEvent();
+}
