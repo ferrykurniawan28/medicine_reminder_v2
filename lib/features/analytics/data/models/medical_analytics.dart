@@ -36,39 +36,37 @@ class MedicalAnalytics {
   });
 
   factory MedicalAnalytics.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>;
-
     return MedicalAnalytics(
-      totalEntries: data['total_entries'] ?? 0,
-      reminderEntries: data['reminder_entries'] ?? 0,
-      appointmentEntries: data['appointment_entries'] ?? 0,
-      completedReminders: data['completed_reminders'] ?? 0,
-      missedReminders: data['missed_reminders'] ?? 0,
-      attendedAppointments: data['attended_appointments'] ?? 0,
-      missedAppointments: data['missed_appointments'] ?? 0,
-      medicineAnalysis: (data['medicine_analysis'] as List<dynamic>? ?? [])
+      totalEntries: json['total_entries'] ?? 0,
+      reminderEntries: json['reminder_entries'] ?? 0,
+      appointmentEntries: json['appointment_entries'] ?? 0,
+      completedReminders: json['completed_reminders'] ?? 0,
+      missedReminders: json['missed_reminders'] ?? 0,
+      attendedAppointments: json['attended_appointments'] ?? 0,
+      missedAppointments: json['missed_appointments'] ?? 0,
+      medicineAnalysis: (json['medicine_analysis'] as List<dynamic>? ?? [])
           .map((item) => MedicineAnalysis.fromJson(item))
           .toList(),
       reminderStatusBreakdown:
-          Map<String, int>.from(data['reminder_status_breakdown'] ?? {}),
+          Map<String, int>.from(json['reminder_status_breakdown'] ?? {}),
       appointmentStatusBreakdown:
-          Map<String, int>.from(data['appointment_status_breakdown'] ?? {}),
+          Map<String, int>.from(json['appointment_status_breakdown'] ?? {}),
       mostActiveTimeSlots:
-          (data['most_active_time_slots'] as List<dynamic>? ?? [])
+          (json['most_active_time_slots'] as List<dynamic>? ?? [])
               .map((item) => TimeSlotActivity.fromJson(item))
               .toList(),
-      weeklyTrends: (data['weekly_trends'] as List<dynamic>? ?? [])
+      weeklyTrends: (json['weekly_trends'] as List<dynamic>? ?? [])
           .map((item) => WeeklyTrend.fromJson(item))
           .toList(),
-      overallComplianceRate: (data['overall_compliance_rate'] ?? 0).toDouble(),
+      overallComplianceRate: (json['overall_compliance_rate'] ?? 0).toDouble(),
       medicineComplianceRates:
-          (data['medicine_compliance_rates'] as List<dynamic>? ?? [])
+          (json['medicine_compliance_rates'] as List<dynamic>? ?? [])
               .map((item) => MedicineCompliance.fromJson(item))
               .toList(),
       lastWeekActivity:
-          ActivitySummary.fromJson(data['last_week_activity'] ?? {}),
+          ActivitySummary.fromJson(json['last_week_activity'] ?? {}),
       lastMonthActivity:
-          ActivitySummary.fromJson(data['last_month_activity'] ?? {}),
+          ActivitySummary.fromJson(json['last_month_activity'] ?? {}),
     );
   }
 }

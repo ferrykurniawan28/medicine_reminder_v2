@@ -23,3 +23,4 @@ const parentalQRUrl = '$parentalUrl/qr';
 const parentalUserUrl = '$parentalUrl/user';
 
 const medicalRecordURL = '$baseUrl/medical-record';
+const medicalAnalyticsUrl = '$medicalRecordURL/summary';

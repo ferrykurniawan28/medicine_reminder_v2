@@ -1,26 +1,44 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:medicine_reminder/core/constant/url.dart';
+import 'package:medicine_reminder/core/network/network_service.dart';
+
 import '../models/medical_analytics.dart';
 
 class AnalyticsService {
-  static const String baseUrl =
-      'YOUR_API_BASE_URL'; // Replace with your actual API URL
+  final NetworkService _networkServices = NetworkService();
 
   Future<MedicalAnalytics> getMedicalAnalytics(int userId) async {
     try {
-      // Simulate API call - replace with your actual endpoint
-      final response = await http.get(
-        Uri.parse('$baseUrl/medical-analytics/$userId'),
-        headers: {'Content-Type': 'application/json'},
+      final response = await _networkServices.get(
+        '$medicalAnalyticsUrl/$userId',
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
       if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
+        // Handle different response formats
+        Map<String, dynamic> jsonData;
+
+        if (response.data is String) {
+          // If response is a string, decode it
+          jsonData = json.decode(response.data);
+        } else if (response.data is Map<String, dynamic>) {
+          // If response is already a Map, use it directly
+          jsonData = response.data;
+        } else {
+          throw Exception('Unexpected response format');
+        }
+
+        print('Parsed JSON data: $jsonData');
+
+        // Feed data directly to the model
         return MedicalAnalytics.fromJson(jsonData);
       } else {
         throw Exception('Failed to load analytics data');
       }
     } catch (e) {
+      print('Error fetching analytics data: $e');
       // For demo purposes, return mock data
       // Remove this in production and handle the actual API call
       return _getMockAnalytics();
