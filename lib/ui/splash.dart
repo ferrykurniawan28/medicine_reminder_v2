@@ -50,17 +50,26 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     // Stop animation before navigation to free resources
     _fadeController.stop();
 
-    // Check user state asynchronously
-    final userBloc = BlocProvider.of<UserBloc>(context);
-    final userState = userBloc.state;
+    // Check if user has completed onboarding
+    final isFirst = await SharedPreference.getBool('isFirst');
 
-    // Navigate based on user state
-    if (userState is CurrentUser) {
-      await Modular.to.pushReplacementNamed('/home');
-    } else if (userState is UserLoaded) {
+    if (!isFirst) {
+      // User hasn't completed onboarding, show onboarding
+      await Modular.to.pushReplacementNamed('/boarding');
+      return;
+    }
+
+    // User has completed onboarding, check user credentials
+    final userId = await SharedPreference.getInt('userId');
+
+    if (userId > 0) {
+      // User has saved credentials, wait a bit for UserBloc to load and then go to home
+      await Future.delayed(const Duration(milliseconds: 500));
+
       await Modular.to.pushReplacementNamed('/home');
     } else {
-      await Modular.to.pushReplacementNamed('/boarding');
+      // No saved user credentials, go to authentication
+      await Modular.to.pushReplacementNamed('/auth');
     }
   }
 

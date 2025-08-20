@@ -19,6 +19,8 @@ import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 import 'package:medicine_reminder/models/models.dart';
 import 'package:medicine_reminder/ui/common/optimized_image.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
+import 'package:medicine_reminder/core/connectivity/connectivity.dart';
+import 'package:medicine_reminder/ui/connectivity_test_page.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'widgets/widgets.dart';

@@ -60,6 +60,8 @@ class _MainPageState extends State<MainPage> {
     0: defaultAppBar(
       'Reminders',
       actions: [
+        const ConnectivityIndicator(size: 20, showText: false),
+        const SizedBox(width: 8),
         IconButton(
           onPressed: () {},
           icon: const Icon(Icons.notifications),
@@ -69,13 +71,21 @@ class _MainPageState extends State<MainPage> {
     1: defaultAppBar(
       'Appointment',
       actions: [
+        const ConnectivityIndicator(size: 20, showText: false),
+        const SizedBox(width: 8),
         IconButton(
           onPressed: () {},
           icon: const Icon(Icons.notifications),
         ),
       ],
     ),
-    2: defaultAppBar('Parental'),
+    2: defaultAppBar(
+      'Parental',
+      actions: [
+        const ConnectivityIndicator(size: 20, showText: false),
+        const SizedBox(width: 8),
+      ],
+    ),
     3: defaultAppBar(
       'Device',
       actions: [

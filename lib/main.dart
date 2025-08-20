@@ -24,66 +24,68 @@ import 'package:flutter/services.dart';
 import 'package:medicine_reminder/core/services/sync_manager.dart';
 import 'package:medicine_reminder/features/device/data/datasources/device_local_datasource_impl.dart';
 import 'package:medicine_reminder/features/device/data/datasources/device_remote_datasource_impl.dart';
-
-import 'core/services/services.dart';
+import 'package:medicine_reminder/core/connectivity/connectivity.dart';
+import 'package:medicine_reminder/core/services/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Start the app immediately with minimal setup
-  final userBloc = UserBloc();
+  // Initialize critical services first
+  await _initializeCoreServices();
+
+  // Initialize UserBloc with saved credentials
+  final userBloc = await _initializeUserBloc();
 
   runApp(ModularApp(
     module: AppRoute(),
     child: MainApp(userBloc: userBloc),
   ));
-
-  // Initialize background services after app start
-  _initializeBackgroundServices(userBloc);
 }
 
-Future<void> _initializeBackgroundServices(UserBloc userBloc) async {
+Future<void> _initializeCoreServices() async {
   try {
-    // Initialize the database asynchronously
-    final localDataSource = AppointmentLocalDataSourceImpl();
-    final database = await localDataSource.database; // Use asynchronous getter
+    // Initialize connectivity service first
+    final connectivityService = ConnectivityService();
+    await connectivityService.initialize();
 
-    // Initialize reminder datasources for sync
+    // Initialize database by creating and accessing it once
+    final appointmentLocalDataSource = AppointmentLocalDataSourceImpl();
+    await appointmentLocalDataSource.database; // This initializes the database
+
+    // Initialize reminder database
     final reminderLocalDataSource = ReminderLocalDataSourceImpl();
-    final reminderRemoteDataSource =
-        ReminderRemoteDataSourceImpl(NetworkService());
+    await reminderLocalDataSource
+        .database; // This initializes the reminder database
 
-    // Create SyncManager after database initialization
-    final syncManager = SyncManager(
-      db: database,
-      connectivity: Connectivity(),
-      appointmentLocalDataSource: localDataSource,
-      appointmentRemoteDataSource:
-          AppointmentRemoteDataSourceImpl(NetworkService()),
-      reminderLocalDataSource: reminderLocalDataSource,
-      reminderRemoteDataSource: reminderRemoteDataSource,
-    );
-
-    // Start sync manager
-    await syncManager.start();
-
-    // Load user data in background
-    final userId = await SharedPreference.getInt('userId');
-    print('User ID from SharedPreferences: $userId');
-
-    userBloc.add(LoadUser(userId));
-
-    print('Background services initialized successfully');
+    debugPrint('✅ Core services initialized successfully');
   } catch (e) {
-    print('Background initialization error: $e');
+    debugPrint('❌ Failed to initialize core services: $e');
   }
+}
+
+Future<UserBloc> _initializeUserBloc() async {
+  final userBloc = UserBloc();
+
+  // Load saved user ID and initialize user state
+  try {
+    final userId = await SharedPreference.getInt('userId');
+    if (userId > 0) {
+      userBloc.add(LoadUser(userId));
+      debugPrint('✅ User loaded with ID: $userId');
+    } else {
+      debugPrint('ℹ️ No saved user found');
+    }
+  } catch (e) {
+    debugPrint('❌ Failed to load user: $e');
+  }
+
+  return userBloc;
 }
 
 // Helper function to check connectivity
 bool _isOnline() {
-  // For initial setup, assume online to maintain functionality
-  // The actual connectivity will be checked by SyncManager
-  return true;
+  // Use the connectivity service for more accurate status
+  return ConnectivityService().isConnected;
 }
 
 class MainApp extends StatelessWidget {
@@ -109,44 +111,43 @@ class MainApp extends StatelessWidget {
         BlocProvider(create: (context) => ParentalBloc()),
         BlocProvider(
           create: (context) {
-            // Create a temporary SyncManager for immediate use
-            // The proper one will be initialized in background
-            final tempLocalDataSource = AppointmentLocalDataSourceImpl();
-            final tempSyncManager = SyncManager(
-              db: tempLocalDataSource.databaseSync,
+            // Use properly initialized data sources
+            final localDataSource = AppointmentLocalDataSourceImpl();
+            final syncManager = SyncManager(
+              db: localDataSource.databaseSync,
               connectivity: Connectivity(),
-              appointmentLocalDataSource: tempLocalDataSource,
+              appointmentLocalDataSource: localDataSource,
               appointmentRemoteDataSource:
                   AppointmentRemoteDataSourceImpl(NetworkService()),
             );
 
             final repo = AppointmentRepositoryImpl(
-              tempLocalDataSource,
+              localDataSource,
               remoteDataSource:
                   AppointmentRemoteDataSourceImpl(NetworkService()),
               isOnline: () => true,
-              syncManager: tempSyncManager,
+              syncManager: syncManager,
             );
             return AppointmentBloc(repo);
           },
         ),
         BlocProvider(create: (context) {
-          final tempLocalDataSource = ReminderLocalDataSourceImpl();
-          // Create a temporary SyncManager for immediate use
-          final tempS = SyncManager(
-            db: tempLocalDataSource.databaseSync,
+          final localDataSource = ReminderLocalDataSourceImpl();
+          // Create SyncManager with properly initialized data sources
+          final syncManager = SyncManager(
+            db: localDataSource.databaseSync,
             connectivity: Connectivity(),
             appointmentLocalDataSource: AppointmentLocalDataSourceImpl(),
             appointmentRemoteDataSource:
                 AppointmentRemoteDataSourceImpl(NetworkService()),
-            reminderLocalDataSource: tempLocalDataSource,
+            reminderLocalDataSource: localDataSource,
             reminderRemoteDataSource:
                 ReminderRemoteDataSourceImpl(NetworkService()),
           );
-          final reminderRepository = ReminderRepositoryImpl(tempLocalDataSource,
+          final reminderRepository = ReminderRepositoryImpl(localDataSource,
               remoteDataSource: ReminderRemoteDataSourceImpl(NetworkService()),
               isOnline: () => true,
-              syncManager: tempS);
+              syncManager: syncManager);
           return ReminderBloc(reminderRepository: reminderRepository);
         }),
         BlocProvider(create: (context) => userBloc),
@@ -165,51 +166,63 @@ class MainApp extends StatelessWidget {
                 // userBloc: ReadContext(context).read<UserBloc>(),
                 )),
       ],
-      child: MaterialApp.router(
-        routeInformationParser: Modular.routeInformationParser,
-        routerDelegate: Modular.routerDelegate,
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primaryColor: kPrimaryColor,
-          fontFamily: 'Montserrat ',
-          appBarTheme: const AppBarTheme(
-            backgroundColor: kPrimaryColor,
-            actionsIconTheme: IconThemeData(color: Colors.white),
-            iconTheme: IconThemeData(color: Colors.white),
-            titleTextStyle: TextStyle(
-                fontFamily: 'Montserrat ',
-                fontSize: 20,
-                fontWeight: FontWeight.bold),
-          ),
-          buttonTheme: const ButtonThemeData(
-            buttonColor: kPrimaryColor,
-            textTheme: ButtonTextTheme.primary,
-          ),
-          toggleButtonsTheme: const ToggleButtonsThemeData(
-            selectedColor: kPrimaryColor,
-            color: Colors.white,
-            fillColor: kPrimaryColor,
-          ),
-          switchTheme: const SwitchThemeData(
-            thumbColor: WidgetStatePropertyAll(Colors.white),
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+      child: ConnectivityListener(
+        onConnected: () {
+          // Trigger sync when connection is restored
+          debugPrint('🔄 Connection restored - triggering sync');
+        },
+        onDisconnected: () {
+          // Handle offline mode
+          debugPrint('⚠️ Connection lost - entering offline mode');
+        },
+        child: ConnectivityBanner(
+          child: MaterialApp.router(
+            routeInformationParser: Modular.routeInformationParser,
+            routerDelegate: Modular.routerDelegate,
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primaryColor: kPrimaryColor,
+              fontFamily: 'Montserrat ',
+              appBarTheme: const AppBarTheme(
+                backgroundColor: kPrimaryColor,
+                actionsIconTheme: IconThemeData(color: Colors.white),
+                iconTheme: IconThemeData(color: Colors.white),
+                titleTextStyle: TextStyle(
+                    fontFamily: 'Montserrat ',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+              buttonTheme: const ButtonThemeData(
+                buttonColor: kPrimaryColor,
+                textTheme: ButtonTextTheme.primary,
+              ),
+              toggleButtonsTheme: const ToggleButtonsThemeData(
+                selectedColor: kPrimaryColor,
+                color: Colors.white,
+                fillColor: kPrimaryColor,
+              ),
+              switchTheme: const SwitchThemeData(
+                thumbColor: WidgetStatePropertyAll(Colors.white),
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              scaffoldBackgroundColor: Colors.white,
+              textTheme: const TextTheme(
+                titleLarge: TextStyle(
+                    fontFamily: 'Montserrat ',
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold),
+                bodyLarge: TextStyle(fontFamily: 'Roboto', fontSize: 14),
+                bodyMedium: TextStyle(fontFamily: 'Roboto', fontSize: 12),
               ),
             ),
-          ),
-          scaffoldBackgroundColor: Colors.white,
-          textTheme: const TextTheme(
-            titleLarge: TextStyle(
-                fontFamily: 'Montserrat ',
-                fontSize: 24,
-                fontWeight: FontWeight.bold),
-            bodyLarge: TextStyle(fontFamily: 'Roboto', fontSize: 14),
-            bodyMedium: TextStyle(fontFamily: 'Roboto', fontSize: 12),
           ),
         ),
       ),
