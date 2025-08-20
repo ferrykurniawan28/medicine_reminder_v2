@@ -35,7 +35,7 @@ class _MainPageState extends State<MainPage> {
         ),
         BottomNavItem(
           index: 2,
-          route: '/home/parental/list',
+          route: '/home/parental',
           label: 'Parental',
           iconPath: 'assets/icons/family.png',
           selectedIconPath: 'assets/icons/family-selected.png',
@@ -165,26 +165,33 @@ class _MainPageState extends State<MainPage> {
               style: TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
+          // ListTile(
+          //   leading: const Icon(Icons.notifications),
+          //   title: const Text('Notifications'),
+          //   onTap: () {
+          //     // Modular.to.navigate('/notifications');
+          //   },
+          // ),
           ListTile(
-            leading: const Icon(Icons.notifications),
-            title: const Text('Notifications'),
+            leading: const Icon(Icons.analytics_outlined),
+            title: const Text('Analytics'),
             onTap: () {
-              // Modular.to.navigate('/notifications');
+              Modular.to.pushNamed('/analytics');
+              // Modular.to.navigate('/medical-records');
             },
           ),
           ListTile(
-            leading: const Icon(Icons.medical_information),
-            title: const Text('Medical Records'),
+            leading: const Icon(Icons.medical_services_outlined),
+            title: const Text('History'),
             onTap: () {
+              Modular.to.pushNamed('/records');
               // Modular.to.navigate('/medical-records');
             },
           ),
           ListTile(
             leading: const Icon(Icons.qr_code),
             title: const Text('Parental Code'),
-            onTap: () {
-              // Modular.to.navigate('/settings');
-            },
+            onTap: parentalQR,
           ),
           ListTile(
             leading: const Icon(Icons.settings),
@@ -252,6 +259,37 @@ class _MainPageState extends State<MainPage> {
       default:
         return const Icon(Icons.home);
     }
+  }
+
+  void parentalQR() async {
+    final userState = context.read<UserBloc>().state;
+    User? user;
+    if (userState is CurrentUser) {
+      user = userState.user;
+    } else if (userState is UserLoaded) {
+      user = userState.user;
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No user is currently logged in.'),
+        ),
+      );
+      return;
+    }
+    final imgUrl = '$parentalQRUrl/${user.userId}';
+    print(imgUrl);
+
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.info,
+      title: 'Parental Code',
+      body: CachedNetworkImage(
+        imageUrl: imgUrl,
+        placeholder: (context, url) => const CircularProgressIndicator(),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
+      ),
+      btnOkOnPress: () {},
+    ).show();
   }
 }
 

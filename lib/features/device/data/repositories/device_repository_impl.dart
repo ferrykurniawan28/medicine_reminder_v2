@@ -192,15 +192,20 @@ class DeviceRepositoryImpl implements DeviceRepository {
   Future<List<DeviceControl>?> getDeviceControl(int deviceId) async {
     if (isOnline != null && isOnline!()) {
       try {
-        final remoteControls = await remoteDataSource.fetchDeviceControl(deviceId);
-        return remoteControls.map((control) => DeviceControl.fromModel(control)).toList();
+        final remoteControls =
+            await remoteDataSource.fetchDeviceControl(deviceId);
+        return remoteControls
+            .map((control) => DeviceControl.fromModel(control))
+            .toList();
       } catch (e) {
         print('Error fetching device controls: $e');
         rethrow;
       }
     } else {
       final localControls = await localDataSource.getDeviceControls(deviceId);
-      return localControls?.map((control) => DeviceControl.fromModel(control)).toList();
+      return localControls
+          ?.map((control) => DeviceControl.fromModel(control))
+          .toList();
     }
   }
 }

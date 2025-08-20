@@ -13,9 +13,9 @@ class _ParentalDetailState extends State<ParentalDetail> {
   @override
   void initState() {
     super.initState();
-    // Modular.to.navigate('/home/parental/detail/reminder', arguments: {
-    //   'parental': widget.parental,
-    // });
+    Modular.to.navigate('/parental/detail/', arguments: {
+      'parental': widget.parental,
+    });
   }
 
   @override
@@ -49,19 +49,18 @@ class _ParentalDetailState extends State<ParentalDetail> {
                 switch (value) {
                   case 0:
                     Modular.to
-                        .navigate('/home/parental/detail/reminder', arguments: {
+                        .navigate('/parental/detail/reminder', arguments: {
                       'parental': widget.parental,
                     });
                     break;
                   case 1:
-                    Modular.to.navigate('/home/parental/detail/appointment',
-                        arguments: {
-                          'parental': widget.parental,
-                        });
+                    Modular.to
+                        .navigate('/parental/detail/appointment', arguments: {
+                      'parental': widget.parental,
+                    });
                     break;
                   case 2:
-                    Modular.to
-                        .navigate('/home/parental/detail/device', arguments: {
+                    Modular.to.navigate('/parental/detail/device', arguments: {
                       'parental': widget.parental,
                     });
                     break;

@@ -36,7 +36,7 @@ class SyncManager {
 
   Future<void> start() async {
     connectivity.onConnectivityChanged.listen((status) async {
-      if (status != ConnectivityResult.none) {
+      if (status.isNotEmpty && !status.contains(ConnectivityResult.none)) {
         await syncAll();
       }
     });

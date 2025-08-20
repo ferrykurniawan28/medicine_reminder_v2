@@ -1,9 +1,12 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter_modular/flutter_modular.dart'
     show Modular, RouterOutlet;
+import 'package:medicine_reminder/core/constant/url.dart';
 import 'package:medicine_reminder/core/services/services.dart';
 import 'package:medicine_reminder/features/auth/bloc/auth_bloc.dart';
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';

@@ -7,12 +7,16 @@ import 'package:medicine_reminder/features/appointment/data/datasources/appointm
 import 'package:medicine_reminder/features/appointment/data/repositories/appointment_repository_impl.dart';
 import 'package:medicine_reminder/core/network/network_service.dart';
 import 'package:medicine_reminder/features/auth/bloc/auth_bloc.dart';
-import 'package:medicine_reminder/features/device/data/repositories/device_repository_impl.dart';
+import 'package:medicine_reminder/features/device/data/repositories/device_repository_impl_new.dart'
+    as device_repo_offline;
 import 'package:medicine_reminder/features/features.dart';
 import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource_impl.dart';
 import 'package:medicine_reminder/features/reminder/data/datasources/reminder_remote_datasource_impl.dart';
 import 'package:medicine_reminder/features/reminder/data/repositories/reminder_repository_impl.dart';
 import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
+import 'package:medicine_reminder/features/record/data/datasources/medical_record_local_datasource_impl.dart';
+import 'package:medicine_reminder/features/record/data/datasources/medical_record_remote_datasource_impl.dart';
+import 'package:medicine_reminder/features/record/data/repositories/medical_record_repository_impl.dart';
 // import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
 import 'package:medicine_reminder/routes/routes.dart';
@@ -75,6 +79,13 @@ Future<void> _initializeBackgroundServices(UserBloc userBloc) async {
   }
 }
 
+// Helper function to check connectivity
+bool _isOnline() {
+  // For initial setup, assume online to maintain functionality
+  // The actual connectivity will be checked by SyncManager
+  return true;
+}
+
 class MainApp extends StatelessWidget {
   final UserBloc userBloc;
 
@@ -87,7 +98,7 @@ class MainApp extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) {
-            final deviceRepo = DeviceRepositoryImpl(
+            final deviceRepo = device_repo_offline.DeviceRepositoryImpl(
               localDataSource: DeviceLocalDataSourceImpl(),
               remoteDataSource: DeviceRemoteDataSourceImpl(NetworkService()),
               isOnline: () => true,
@@ -139,6 +150,16 @@ class MainApp extends StatelessWidget {
           return ReminderBloc(reminderRepository: reminderRepository);
         }),
         BlocProvider(create: (context) => userBloc),
+        BlocProvider(create: (context) {
+          final medicalRecordRepository = MedicalRecordRepositoryImpl(
+            MedicalRecordLocalDataSourceImpl(),
+            remoteDataSource:
+                MedicalRecordRemoteDataSourceImpl(NetworkService()),
+            isOnline: _isOnline,
+          );
+          return MedicalRecordBloc(
+              medicalRecordRepository: medicalRecordRepository);
+        }),
         BlocProvider(
             create: (context) => AuthBloc(
                 // userBloc: ReadContext(context).read<UserBloc>(),

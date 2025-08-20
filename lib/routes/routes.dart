@@ -1,4 +1,7 @@
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:medicine_reminder/features/analytics/presentation/pages/analytics_dashboard_page.dart';
+// import 'package:medicine_reminder/features/analytics/presentation/pages/analytics_page.dart';
+import 'package:medicine_reminder/features/record/presentation/pages/medical_records_page.dart';
 import 'package:medicine_reminder/ui/main/widgets/widgets.dart';
 import 'package:medicine_reminder/ui/ui.dart';
 
@@ -22,32 +25,32 @@ class AppRoute extends Module {
         child: (_) => const ParentalMainPage(),
         children: [
           ChildRoute('/list', child: (_) => const ListParental()),
-          ChildRoute(
-            '/detail',
-            child: (_) => ParentalDetail(
-              parental: r.args.data['parental'],
-            ),
-            children: [
-              ChildRoute(
-                '/reminder',
-                child: (_) => ReminderList(
-                  parental: r.args.data['parental'],
-                ),
-              ),
-              ChildRoute(
-                '/appointment',
-                child: (_) => AppointmentList(
-                  parental: r.args.data['parental'],
-                ),
-              ),
-              ChildRoute(
-                '/device',
-                child: (_) => DeviceParental(
-                  parental: r.args.data['parental'],
-                ),
-              ),
-            ],
-          ),
+          // ChildRoute(
+          //   '/detail',
+          //   child: (_) => ParentalDetail(
+          //     parental: r.args.data['parental'],
+          //   ),
+          //   children: [
+          //     ChildRoute(
+          //       '/reminder',
+          //       child: (_) => ReminderList(
+          //         parental: r.args.data['parental'],
+          //       ),
+          //     ),
+          //     ChildRoute(
+          //       '/appointment',
+          //       child: (_) => AppointmentList(
+          //         parental: r.args.data['parental'],
+          //       ),
+          //     ),
+          //     ChildRoute(
+          //       '/device',
+          //       child: (_) => DeviceParental(
+          //         parental: r.args.data['parental'],
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
       ChildRoute('/device', child: (_) => const DeviceView(), children: [
@@ -87,10 +90,8 @@ class AppRoute extends Module {
             ),
           ),
         ]);
-    // r.child(
-    //   '/device/:deviceId',
-    //   child: (_) => const DeviceView(),
-    // );
+    r.child('/records', child: (_) => const MedicalRecordsPage());
+    r.child('/analytics', child: (_) => const AnalyticsPage());
     r.module('/auth', module: AuthRoutes());
     r.module('/reminder', module: AddReminderModule());
   }
