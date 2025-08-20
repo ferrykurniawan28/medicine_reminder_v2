@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
 import '../../data/models/medical_analytics.dart';
 import '../../data/services/analytics_service.dart';
@@ -12,6 +14,7 @@ class AnalyticsPage extends StatefulWidget {
 }
 
 class _AnalyticsPageState extends State<AnalyticsPage> {
+  late final int userId;
   late final AnalyticsService _analyticsService;
   late Future<MedicalAnalytics> _analyticsFuture;
 
@@ -20,7 +23,18 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     super.initState();
     _analyticsService = AnalyticsService();
     // Replace with actual user ID - you might get this from auth service or global state
-    _analyticsFuture = _analyticsService.getMedicalAnalytics(1);
+    final userState = context.read<UserBloc>().state;
+    userId = (userState is CurrentUser || userState is UserLoaded)
+        ? (userState as dynamic).user.userId!
+        : 0;
+
+    if (userId == 0) {
+      debugPrint('No user logged in. Defaulting userId to 0.');
+    } else {
+      debugPrint('User ID in ReminderListBody: $userId');
+    }
+
+    _analyticsFuture = _analyticsService.getMedicalAnalytics(userId);
   }
 
   @override
