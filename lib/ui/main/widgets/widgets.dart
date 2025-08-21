@@ -11,6 +11,7 @@ import 'package:medicine_reminder/features/appointment/domain/entities/appointme
 import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/container.dart';
 import 'package:medicine_reminder/features/features.dart';
+import 'package:medicine_reminder/features/parental/domain/entities/parental.dart';
 import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 import 'package:medicine_reminder/ui/common/optimized_image.dart';

@@ -9,6 +9,8 @@ class ReminderList extends StatefulWidget {
 }
 
 class _ReminderListState extends State<ReminderList> {
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -16,8 +18,15 @@ class _ReminderListState extends State<ReminderList> {
   }
 
   Future<void> _loadReminders() async {
-    context.read<ParentalBloc>().add(
-        const LoadReminderParental(1)); //Todo: get the id from the parental
+    setState(() {
+      _isLoading = true;
+    });
+    context
+        .read<ParentalBloc>()
+        .add(LoadReminderParental(widget.parental.user.userId!));
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -27,16 +36,16 @@ class _ReminderListState extends State<ReminderList> {
       child: BlocBuilder<ParentalBloc, ParentalState>(
         builder: (context, state) {
           if (state is ReminderParentalLoaded) {
-            if (state.reminders.isEmpty) {
+            if (state.reminders == null || state.reminders!.isEmpty) {
               return const Center(
                 child: Text('No reminders found add one!'),
               );
             }
             return ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: state.reminders.length,
+              padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 8),
+              itemCount: state.reminders?.length ?? 0,
               itemBuilder: (context, index) {
-                final reminder = state.reminders[index];
+                final reminder = state.reminders![index];
                 return CardReminder(reminder: reminder);
               },
             );

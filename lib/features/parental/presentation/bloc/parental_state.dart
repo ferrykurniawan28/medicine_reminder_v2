@@ -41,12 +41,12 @@ final class ParentalError extends ParentalState {
 }
 
 final class ReminderParentalLoaded extends ParentalState {
-  final List<ReminderModel> reminders;
+  final List<Reminder>? reminders;
 
   const ReminderParentalLoaded(this.reminders);
 
   @override
-  List<Object> get props => [reminders];
+  List<Object> get props => [reminders ?? []];
 }
 
 final class AppointmentParentalLoaded extends ParentalState {

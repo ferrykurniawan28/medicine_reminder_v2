@@ -16,37 +16,29 @@ final class LoadParentals extends ParentalEvent {
   List<Object> get props => [userId];
 }
 
-final class LoadParental extends ParentalEvent {
+final class ParentalAdd extends ParentalEvent {
+  final Parental parental;
   final int userId;
 
-  const LoadParental(this.userId);
+  const ParentalAdd(this.parental, this.userId);
 
   @override
-  List<Object> get props => [userId];
+  List<Object> get props => [parental, userId];
 }
 
-final class AddParental extends ParentalEvent {
+final class ParentalUpdate extends ParentalEvent {
   final Parental parental;
 
-  const AddParental(this.parental);
+  const ParentalUpdate(this.parental);
 
   @override
   List<Object> get props => [parental];
 }
 
-final class UpdateParental extends ParentalEvent {
-  final Parental parental;
-
-  const UpdateParental(this.parental);
-
-  @override
-  List<Object> get props => [parental];
-}
-
-final class DeleteParental extends ParentalEvent {
+final class ParentalDelete extends ParentalEvent {
   final int id;
 
-  const DeleteParental(this.id);
+  const ParentalDelete(this.id);
 
   @override
   List<Object> get props => [id];

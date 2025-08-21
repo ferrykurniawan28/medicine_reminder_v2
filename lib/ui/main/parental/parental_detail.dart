@@ -32,43 +32,49 @@ class _ParentalDetailState extends State<ParentalDetail> {
         ),
       ),
       backgroundColor: Colors.white,
-      body: Column(
+      body: Stack(
         children: [
-          Center(
-            child: CupertinoSlidingSegmentedControl<int>(
-              groupValue: _selectedSegment,
-              children: const {
-                0: Text('Reminder'),
-                1: Text('Appointment'),
-                2: Text('Device'),
-              },
-              onValueChanged: (int? value) {
-                setState(() {
-                  _selectedSegment = value!;
-                });
-                switch (value) {
-                  case 0:
-                    Modular.to
-                        .navigate('/parental/detail/reminder', arguments: {
-                      'parental': widget.parental,
-                    });
-                    break;
-                  case 1:
-                    Modular.to
-                        .navigate('/parental/detail/appointment', arguments: {
-                      'parental': widget.parental,
-                    });
-                    break;
-                  case 2:
-                    Modular.to.navigate('/parental/detail/device', arguments: {
-                      'parental': widget.parental,
-                    });
-                    break;
-                }
-              },
+          const RouterOutlet(),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: CupertinoSlidingSegmentedControl<int>(
+                groupValue: _selectedSegment,
+                children: const {
+                  0: Text('Reminder'),
+                  1: Text('Appointment'),
+                  2: Text('Device'),
+                },
+                onValueChanged: (int? value) {
+                  setState(() {
+                    _selectedSegment = value!;
+                  });
+                  switch (value) {
+                    case 0:
+                      Modular.to.navigate('/parental/detail/', arguments: {
+                        'parental': widget.parental,
+                      });
+                      break;
+                    case 1:
+                      Modular.to
+                          .navigate('/parental/detail/appointment', arguments: {
+                        'parental': widget.parental,
+                      });
+                      break;
+                    case 2:
+                      Modular.to
+                          .navigate('/parental/detail/device', arguments: {
+                        'parental': widget.parental,
+                      });
+                      break;
+                  }
+                },
+              ),
             ),
           ),
-          const Expanded(child: RouterOutlet()),
+
+          // const Expanded(child: RouterOutlet()),
         ],
       ),
       floatingActionButton: _selectedSegment <= 1

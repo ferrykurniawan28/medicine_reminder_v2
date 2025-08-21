@@ -10,6 +10,7 @@ import 'package:medicine_reminder/features/auth/bloc/auth_bloc.dart';
 import 'package:medicine_reminder/features/device/data/repositories/device_repository_impl_new.dart'
     as device_repo_offline;
 import 'package:medicine_reminder/features/features.dart';
+import 'package:medicine_reminder/features/parental/data/datasources/parental_remote_datasource_impl.dart';
 import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource_impl.dart';
 import 'package:medicine_reminder/features/reminder/data/datasources/reminder_remote_datasource_impl.dart';
 import 'package:medicine_reminder/features/reminder/data/repositories/reminder_repository_impl.dart';
@@ -23,6 +24,9 @@ import 'package:medicine_reminder/routes/routes.dart';
 import 'package:flutter/services.dart';
 import 'package:medicine_reminder/core/services/sync_manager.dart';
 import 'package:medicine_reminder/features/device/data/datasources/device_local_datasource_impl.dart';
+import 'package:medicine_reminder/features/parental/data/database/parental_database.dart';
+import 'package:medicine_reminder/features/parental/data/datasources/parental_local_datasource_impl.dart';
+import 'package:medicine_reminder/features/parental/data/repositories/parental_repository_impl.dart';
 import 'package:medicine_reminder/features/device/data/datasources/device_remote_datasource_impl.dart';
 import 'package:medicine_reminder/core/connectivity/connectivity.dart';
 import 'package:medicine_reminder/core/services/services.dart';
@@ -56,6 +60,10 @@ Future<void> _initializeCoreServices() async {
     final reminderLocalDataSource = ReminderLocalDataSourceImpl();
     await reminderLocalDataSource
         .database; // This initializes the reminder database
+
+    // Initialize parental database
+    final parentalDatabase = ParentalDatabase();
+    await parentalDatabase.database; // This initializes the parental database
 
     debugPrint('✅ Core services initialized successfully');
   } catch (e) {
@@ -103,12 +111,22 @@ class MainApp extends StatelessWidget {
             final deviceRepo = device_repo_offline.DeviceRepositoryImpl(
               localDataSource: DeviceLocalDataSourceImpl(),
               remoteDataSource: DeviceRemoteDataSourceImpl(NetworkService()),
-              isOnline: () => true,
+              isOnline: _isOnline,
             );
             return DeviceBloc(deviceRepo);
           },
         ),
-        BlocProvider(create: (context) => ParentalBloc()),
+        BlocProvider(
+          create: (context) {
+            final parentalLocalDataSource = ParentalLocalDataSourceImpl();
+            final parentalRepository = ParentalRepositoryImpl(
+              localDataSource: parentalLocalDataSource,
+              remoteDataSource: ParentalRemoteDataSourceImpl(NetworkService()),
+              isOnline: _isOnline,
+            );
+            return ParentalBloc(parentalRepository);
+          },
+        ),
         BlocProvider(
           create: (context) {
             // Use properly initialized data sources
@@ -125,7 +143,7 @@ class MainApp extends StatelessWidget {
               localDataSource,
               remoteDataSource:
                   AppointmentRemoteDataSourceImpl(NetworkService()),
-              isOnline: () => true,
+              isOnline: _isOnline,
               syncManager: syncManager,
             );
             return AppointmentBloc(repo);
@@ -146,7 +164,7 @@ class MainApp extends StatelessWidget {
           );
           final reminderRepository = ReminderRepositoryImpl(localDataSource,
               remoteDataSource: ReminderRemoteDataSourceImpl(NetworkService()),
-              isOnline: () => true,
+              isOnline: _isOnline,
               syncManager: syncManager);
           return ReminderBloc(reminderRepository: reminderRepository);
         }),

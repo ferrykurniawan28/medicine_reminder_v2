@@ -1,0 +1,103 @@
+import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
+
+import '../../domain/entities/parental.dart';
+import '../../domain/repositories/parental_repository.dart';
+import '../datasources/parental_local_datasource.dart';
+import '../datasources/parental_remote_datasource.dart';
+
+class ParentalRepositoryImpl implements ParentalRepository {
+  final ParentalLocalDataSource localDataSource;
+  final ParentalRemoteDataSource remoteDataSource;
+  final bool Function()? isOnline;
+
+  ParentalRepositoryImpl({
+    required this.localDataSource,
+    required this.remoteDataSource,
+    required this.isOnline,
+  });
+
+  // Local operations
+  @override
+  Future<List<Parental>> getParentals(int userId) async {
+    if (isOnline == null || !isOnline!()) {
+      // If offline, return local data
+      return await localDataSource.getParentals(userId);
+    } else {
+      try {
+        final remoteParentals = await remoteDataSource.fetchParentals(userId);
+
+        // Sync to local database - only insert if server ID doesn't exist
+        for (final parental in remoteParentals) {
+          if (parental.id != null) {
+            // Check if record with this server ID already exists
+            final exists =
+                await localDataSource.parentalExistsById(parental.id!);
+            print('Parental record ${parental.id} exists: $exists');
+            if (!exists) {
+              // Insert new relationship with server ID
+              await localDataSource.addParental(parental, userId);
+            }
+            // If exists, skip insertion (don't insert duplicates)
+          }
+        }
+        print('Fetched parentals from remote: $remoteParentals');
+
+        return remoteParentals;
+      } catch (e) {
+        print('Error fetching parentals from remote: $e');
+        // Fallback to local data if remote fails
+        return await localDataSource.getParentals(userId);
+      }
+    }
+  }
+
+  @override
+  Future<List<Reminder>> getParentalReminders(int parentalId) async {
+    try {
+      return await remoteDataSource.fetchParentalReminders(parentalId);
+    } catch (e) {
+      print('Error fetching parental reminders: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<List<Parental>> getParentalsByParentalId(int parentalId) async {
+    return await localDataSource.getParentalsByParentalId(parentalId);
+  }
+
+  @override
+  Future<Parental?> getParental(int id) async {
+    return await localDataSource.getParental(id);
+  }
+
+  @override
+  Future<void> addParental(Parental parental, int userId) async {
+    await localDataSource.addParental(parental, userId);
+  }
+
+  @override
+  Future<void> updateParental(Parental parental) async {
+    await localDataSource.updateParental(parental);
+  }
+
+  @override
+  Future<void> deleteParental(int id) async {
+    await localDataSource.deleteParental(id);
+  }
+
+  @override
+  Future<bool> parentalExists(int userId, int parentalId) async {
+    return await localDataSource.parentalExists(parentalId);
+  }
+
+  @override
+  Future<Parental?> getParentalByIds(int userId, int parentalId) async {
+    return await localDataSource.getParentalByIds(userId, parentalId);
+  }
+
+  @override
+  Future<void> syncParentalToServer(Parental parental) async {
+    await remoteDataSource.addParental(parental);
+  }
+}

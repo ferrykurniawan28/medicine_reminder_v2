@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 export 'user_helper.dart';
+export 'parental_helper.dart';
 
 part 'style.dart';
 part 'theme.dart';
