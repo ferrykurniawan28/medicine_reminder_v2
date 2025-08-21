@@ -64,3 +64,13 @@ class GetParentalDevice {
     return await repository.getParentalDevice(parentalId);
   }
 }
+
+class AddParentalAppointment {
+  final ParentalRepository repository;
+
+  AddParentalAppointment(this.repository);
+
+  Future<void> call(Appointment appointment, int parentalId) async {
+    await repository.createParentalAppointment(appointment, parentalId);
+  }
+}

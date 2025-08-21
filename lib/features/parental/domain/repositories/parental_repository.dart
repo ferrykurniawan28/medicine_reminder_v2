@@ -1,3 +1,4 @@
+import 'package:medicine_reminder/features/appointment/data/models/appointment_model.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/parental/domain/entities/parental.dart';
@@ -19,6 +20,9 @@ abstract class ParentalRepository {
   Future<List<Reminder>> getParentalReminders(int parentalId);
   Future<List<Appointment>> getParentalAppointments(int parentalId);
   Future<Device> getParentalDevice(int parentalId);
+  Future<void> createParentalAppointment(
+      Appointment appointment, int parentalId);
+
   Future<void> syncParentalToServer(Parental parental);
   // Future<void> updateParentalOnServer(Parental parental);
   // Future<void> deleteParentalOnServer(int parentalId);

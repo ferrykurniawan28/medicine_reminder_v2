@@ -12,8 +12,9 @@ Future<void> editAppointment(BuildContext ctx, Appointment appointment) async {
 
   showModalBottomSheet(
     context: ctx,
-    isScrollControlled: true,
-    useSafeArea: true,
+    // isScrollControlled: true,
+    scrollControlDisabledMaxHeightRatio: 0.93,
+    // useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(
         top: Radius.circular(20),

@@ -33,28 +33,46 @@ class _ReminderListState extends State<ReminderList> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: _loadReminders,
-      child: BlocBuilder<ParentalBloc, ParentalState>(
-        builder: (context, state) {
-          if (state is ReminderParentalLoaded) {
-            if (state.reminders == null || state.reminders!.isEmpty) {
-              return const Center(
-                child: Text('No reminders found add one!'),
-              );
-            }
-            return ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 8),
-              itemCount: state.reminders?.length ?? 0,
-              itemBuilder: (context, index) {
-                final reminder = state.reminders![index];
-                return CardReminder(reminder: reminder);
+      child: Stack(
+        children: [
+          BlocBuilder<ParentalBloc, ParentalState>(
+            builder: (context, state) {
+              if (state is ReminderParentalLoaded) {
+                if (state.reminders == null || state.reminders!.isEmpty) {
+                  return const Center(
+                    child: Text('No reminders found add one!'),
+                  );
+                }
+                return ListView.builder(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 50, horizontal: 8),
+                  itemCount: state.reminders?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    final reminder = state.reminders![index];
+                    return CardReminder(reminder: reminder);
+                  },
+                );
+              } else if (state is ParentalLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else {
+                return const Center(child: Text('No reminders found'));
+              }
+            },
+          ),
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              shape: const CircleBorder(),
+              backgroundColor: kPrimaryColor,
+              foregroundColor: Colors.white,
+              onPressed: () {
+                // Handle add reminder action
               },
-            );
-          } else if (state is ParentalLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            return const Center(child: Text('No reminders found'));
-          }
-        },
+              child: const Icon(Icons.add),
+            ),
+          ),
+        ],
       ),
     );
   }

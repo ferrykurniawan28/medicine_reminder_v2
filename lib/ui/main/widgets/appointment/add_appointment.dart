@@ -1,6 +1,10 @@
 part of '../widgets.dart';
 
-void addAppointment(BuildContext ctx) {
+void addAppointment(
+  BuildContext ctx,
+  int toUserId, {
+  required Function(Appointment appointment) onSave,
+}) {
   DateTime selectedDate = DateTime.now().add(const Duration(days: 1));
   TimeOfDay selectedTime = const TimeOfDay(hour: 9, minute: 0);
   String name = '';
@@ -8,8 +12,9 @@ void addAppointment(BuildContext ctx) {
 
   showModalBottomSheet(
     context: ctx,
-    isScrollControlled: true,
-    useSafeArea: true,
+    // isScrollControlled: true,
+    scrollControlDisabledMaxHeightRatio: 0.9,
+    // useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(
         top: Radius.circular(20),
@@ -105,31 +110,23 @@ void addAppointment(BuildContext ctx) {
                                 final userId =
                                     await SharedPreference.getInt('userId');
                                 if (!context.mounted) return;
-                                context.read<AppointmentBloc>().add(
-                                      AppointmentAdd(
-                                        Appointment(
-                                          userAssigned: User(
-                                            userId: userId,
-                                            // userName: "test",
-                                            // email: "email@email.com",
-                                          ),
-                                          userCreated: User(
-                                            userId: userId,
-                                            // userName: "test",
-                                            // email: "email@email.com",
-                                          ),
-                                          doctor: name,
-                                          note: note,
-                                          time: DateTime(
-                                            selectedDate.year,
-                                            selectedDate.month,
-                                            selectedDate.day,
-                                            selectedTime.hour,
-                                            selectedTime.minute,
-                                          ),
-                                        ),
-                                      ),
-                                    );
+
+                                final appointment = Appointment(
+                                  userAssigned: User(userId: toUserId),
+                                  userCreated: User(userId: userId),
+                                  doctor: name,
+                                  note: note,
+                                  time: DateTime(
+                                    selectedDate.year,
+                                    selectedDate.month,
+                                    selectedDate.day,
+                                    selectedTime.hour,
+                                    selectedTime.minute,
+                                  ),
+                                );
+
+                                // Use the callback instead of hardcoded bloc
+                                onSave(appointment);
                                 Navigator.of(context).pop();
                               }
                             : null,

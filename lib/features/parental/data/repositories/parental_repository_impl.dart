@@ -1,3 +1,4 @@
+import 'package:medicine_reminder/features/appointment/data/models/appointment_model.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
@@ -80,6 +81,19 @@ class ParentalRepositoryImpl implements ParentalRepository {
     } catch (e) {
       print('Error fetching parental device: $e');
       throw Exception('Failed to fetch parental device: $e');
+    }
+  }
+
+  @override
+  Future<void> createParentalAppointment(
+      Appointment appointment, int parentalId) async {
+    try {
+      final appointmentModel = AppointmentModel.fromDomain(appointment);
+      await remoteDataSource.createParentalAppointment(
+          appointmentModel, parentalId);
+    } catch (e) {
+      print('Error creating parental appointment: $e');
+      throw Exception('Failed to create parental appointment: $e');
     }
   }
 

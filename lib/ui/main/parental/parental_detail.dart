@@ -98,15 +98,35 @@ class _ParentalDetailState extends State<ParentalDetail> {
           // const Expanded(child: RouterOutlet()),
         ],
       ),
-      floatingActionButton: _selectedSegment <= 1
-          ? FloatingActionButton(
-              onPressed: () {},
-              shape: const CircleBorder(),
-              backgroundColor: kPrimaryColor,
-              foregroundColor: Colors.white,
-              child: const Icon(Icons.add),
-            )
-          : null,
+      // floatingActionButton: _selectedSegment <= 1
+      //     ? FloatingActionButton(
+      //         onPressed: () {
+      //           switch (_selectedSegment) {
+      //             case 0:
+      //               // _addReminder(context, widget.parental.id);
+      //               break;
+      //             case 1:
+      //               _addAppointment(context, widget.parental.id!);
+      //               break;
+      //             default:
+      //               break;
+      //           }
+      //         },
+      //         shape: const CircleBorder(),
+      //         backgroundColor: kPrimaryColor,
+      //         foregroundColor: Colors.white,
+      //         child: const Icon(Icons.add),
+      //       )
+      //     : null,
     );
   }
+}
+
+void _addAppointment(BuildContext ctx, int parentalId) async {
+  addAppointment(ctx, parentalId, onSave: (appointment) {
+    // Dispatch the add appointment event
+    ctx
+        .read<ParentalBloc>()
+        .add(CreateParentalAppointment(appointment, parentalId));
+  });
 }

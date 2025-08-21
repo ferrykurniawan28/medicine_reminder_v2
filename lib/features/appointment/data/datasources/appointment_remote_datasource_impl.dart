@@ -58,7 +58,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
     late AppointmentModel addedAppointment;
     final response = await networkService.post<AppointmentModel>(
       appointmentUrl,
-      body: body,
+      body: appointment.toJson(),
       fromData: (data) => addedAppointment = AppointmentModel.fromJson(data),
     );
 

@@ -155,6 +155,29 @@ class ParentalRemoteDataSourceImpl implements ParentalRemoteDataSource {
   }
 
   @override
+  Future<void> createParentalAppointment(
+      AppointmentModel appointment, int parentalId) async {
+    try {
+      final response = await networkService.post(
+        '$parentalUrl/$parentalId/appointment',
+        body: appointment.toJson(),
+      );
+
+      if (response.statusCode == 201) {
+        print('Successfully created parental appointment');
+      } else {
+        print(
+            'Failed to create parental appointment - Status: ${response.statusCode}, Message: ${response.message}');
+        throw Exception(
+            'Failed to create parental appointment: Status ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error in createParentalAppointment: $e');
+      throw Exception('Failed to create parental appointment: $e');
+    }
+  }
+
+  @override
   Future<void> addParental(Parental parental) async {
     //TODO: add parental
   }

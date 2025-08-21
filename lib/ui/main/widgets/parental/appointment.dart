@@ -25,28 +25,51 @@ class _AppointmentListState extends State<AppointmentList> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: _loadAppointments,
-      child: BlocBuilder<ParentalBloc, ParentalState>(
-        builder: (context, state) {
-          if (state is AppointmentParentalLoaded) {
-            if (state.appointments == null || state.appointments!.isEmpty) {
-              return const Center(
-                child: Text('No appointments found add one!'),
-              );
-            }
-            return ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 8),
-              itemCount: state.appointments!.length,
-              itemBuilder: (context, index) {
-                final appointment = state.appointments![index];
-                return appointmentCard(context, appointment: appointment);
+      child: Stack(
+        children: [
+          BlocBuilder<ParentalBloc, ParentalState>(
+            builder: (context, state) {
+              if (state is AppointmentParentalLoaded) {
+                if (state.appointments == null || state.appointments!.isEmpty) {
+                  return const Center(
+                    child: Text('No appointments found add one!'),
+                  );
+                }
+                return ListView.builder(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 50, horizontal: 8),
+                  itemCount: state.appointments!.length,
+                  itemBuilder: (context, index) {
+                    final appointment = state.appointments![index];
+                    return appointmentCard(context, appointment: appointment);
+                  },
+                );
+              } else if (state is ParentalLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else {
+                return const Center(child: Text('No appointments found'));
+              }
+            },
+          ),
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              shape: const CircleBorder(),
+              backgroundColor: kPrimaryColor,
+              foregroundColor: Colors.white,
+              onPressed: () {
+                addAppointment(context, widget.parental.id!,
+                    onSave: (appointment) {
+                  // Dispatch the add appointment event
+                  context.read<ParentalBloc>().add(CreateParentalAppointment(
+                      appointment, widget.parental.id!));
+                });
               },
-            );
-          } else if (state is ParentalLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            return const Center(child: Text('No appointments found'));
-          }
-        },
+              child: const Icon(Icons.add),
+            ),
+          ),
+        ],
       ),
     );
   }

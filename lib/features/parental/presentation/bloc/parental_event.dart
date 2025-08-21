@@ -70,3 +70,13 @@ final class LoadDeviceParental extends ParentalEvent {
   @override
   List<Object> get props => [parentalId];
 }
+
+final class CreateParentalAppointment extends ParentalEvent {
+  final Appointment appointment;
+  final int parentalId;
+
+  const CreateParentalAppointment(this.appointment, this.parentalId);
+
+  @override
+  List<Object> get props => [appointment, parentalId];
+}

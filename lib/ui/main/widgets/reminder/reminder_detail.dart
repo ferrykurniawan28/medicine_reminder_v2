@@ -3,17 +3,15 @@ part of '../widgets.dart';
 void showReminderDetail(BuildContext context, Reminder reminder) {
   showModalBottomSheet(
     context: context,
-    isScrollControlled: true,
+    // isScrollControlled: false,
+    scrollControlDisabledMaxHeightRatio: 0.92,
     // useSafeArea: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
     backgroundColor: Colors.grey[100],
     builder: (context) {
-      return FractionallySizedBox(
-        heightFactor: 0.8,
-        child: ReminderDetail(reminder: reminder),
-      );
+      return ReminderDetail(reminder: reminder);
     },
     // builder: (context) {
     //   return ReminderDetail(reminder: reminder);

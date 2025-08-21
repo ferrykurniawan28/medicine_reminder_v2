@@ -19,6 +19,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
   final GetParentalReminder getParentalReminder;
   final GetParentalAppointment getParentalAppointment;
   final GetParentalDevice getParentalDevice;
+  final AddParentalAppointment addParentalAppointment;
   final ParentalRepository repository;
 
   List<Parental> _parentals = [];
@@ -33,6 +34,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
         getParentalReminder = GetParentalReminder(repository),
         getParentalAppointment = GetParentalAppointment(repository),
         getParentalDevice = GetParentalDevice(repository),
+        addParentalAppointment = AddParentalAppointment(repository),
         super(ParentalInitial()) {
     on<LoadParentals>(_onFetchParentals);
     // on<LoadParental>(_onFetchParental);
@@ -42,6 +44,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
     on<LoadReminderParental>(_onFetchReminderParental);
     on<LoadAppointmentParental>(_onFetchAppointmentParental);
     on<LoadDeviceParental>(_onFetchDeviceParental);
+    on<CreateParentalAppointment>(_onCreateParentalAppointment);
   }
 
   Future<void> _onFetchParentals(
@@ -121,6 +124,23 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
     try {
       _deviceModel = await getParentalDevice(event.parentalId);
       emit(DeviceParentalLoaded(_deviceModel));
+    } catch (e) {
+      emit(ParentalError(e.toString()));
+    }
+  }
+
+  Future<void> _onCreateParentalAppointment(
+      CreateParentalAppointment event, Emitter<ParentalState> emit) async {
+    emit(ParentalLoading());
+    try {
+      // Add the appointment (this is void)
+      await addParentalAppointment(event.appointment, event.parentalId);
+
+      // Update the internal appointments list with the new appointment
+      _appointments = [..._appointments ?? [], event.appointment];
+
+      // Emit the updated appointments state
+      emit(AppointmentParentalLoaded(_appointments));
     } catch (e) {
       emit(ParentalError(e.toString()));
     }

@@ -10,6 +10,7 @@ class Appointment extends StatefulWidget {
 class _AppointmentState extends State<Appointment> {
   bool _isFetching = false; // Add a flag to prevent duplicate fetches
   bool _hasInitialized = false; // Track if we've already initialized
+  int? _userId;
 
   @override
   void initState() {
@@ -38,7 +39,8 @@ class _AppointmentState extends State<Appointment> {
 
     try {
       UserHelper.executeWithUserId(context, (int userId) {
-        context.read<AppointmentBloc>().add(AppointmentsFetch(userId));
+        _userId = userId; // Store userId for later use
+        context.read<AppointmentBloc>().add(AppointmentsFetch(_userId!));
       });
     } catch (e) {
       if (mounted) {
@@ -75,7 +77,11 @@ class _AppointmentState extends State<Appointment> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => addAppointment(context),
+        onPressed: () =>
+            addAppointment(context, _userId!, onSave: (appointment) {
+          // Dispatch the add appointment event
+          context.read<AppointmentBloc>().add(AppointmentAdd(appointment));
+        }),
         backgroundColor: kPrimaryColor,
         shape: const CircleBorder(),
         tooltip: 'Add Appointment',
