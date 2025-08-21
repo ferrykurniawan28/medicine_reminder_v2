@@ -8,12 +8,34 @@ class ListParental extends StatefulWidget {
 }
 
 class _ListParentalState extends State<ListParental> {
+  bool _isFetching = false;
+
   @override
   initState() {
     super.initState();
-    context
-        .read<ParentalBloc>()
-        .add(const LoadParentals(1)); //TODO: Change userId
+    _fetchParentals();
+  }
+
+  void _fetchParentals() {
+    if (_isFetching || !mounted) return;
+
+    _isFetching = true; // Set fetching flag to true
+
+    try {
+      UserHelper.executeWithUserId(context, (int userId) {
+        context.read<ParentalBloc>().add(LoadParentals(userId));
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error fetching parentals: $e'),
+          ),
+        );
+      }
+    } finally {
+      _isFetching = false; // Reset fetching flag
+    }
   }
 
   @override

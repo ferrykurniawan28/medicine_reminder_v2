@@ -37,22 +37,9 @@ class _AppointmentState extends State<Appointment> {
     _isFetching = true; // Set fetching flag to true
 
     try {
-      final userState = context.read<UserBloc>().state;
-      if (userState is CurrentUser) {
-        final userId = userState.user.userId; // Access userId from CurrentUser
-        context.read<AppointmentBloc>().add(AppointmentsFetch(userId!));
-      } else if (userState is UserLoaded) {
-        final userId = userState.user.userId; // Access userId from UserLoaded
-        context.read<AppointmentBloc>().add(AppointmentsFetch(userId!));
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('No user is currently logged in.'),
-            ),
-          );
-        }
-      }
+      UserHelper.executeWithUserId(context, (int userId) {
+        context.read<AppointmentBloc>().add(AppointmentsFetch(userId));
+      });
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

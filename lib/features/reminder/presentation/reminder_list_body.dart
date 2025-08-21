@@ -20,21 +20,29 @@ class _ReminderListBodyState extends State<ReminderListBody> {
   @override
   void initState() {
     super.initState();
-    final userState = context.read<UserBloc>().state;
-    userId = (userState is CurrentUser || userState is UserLoaded)
-        ? (userState as dynamic).user.userId!
-        : 0;
+    _fetchReminders();
+  }
 
-    if (userId == 0) {
-      debugPrint('No user logged in. Defaulting userId to 0.');
-    } else {
-      debugPrint('User ID in ReminderListBody: $userId');
+  void _fetchReminders() {
+    if (_isLoading || !mounted) return;
+
+    _isLoading = true; // Set loading flag to true
+
+    try {
+      UserHelper.executeWithUserId(context, (int userId) {
+        context.read<ReminderBloc>().add(LoadReminders(userId));
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error fetching reminders: $e'),
+          ),
+        );
+      }
+    } finally {
+      _isLoading = false; // Reset loading flag
     }
-
-    // Use addPostFrameCallback to avoid blocking the UI
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadReminders();
-    });
   }
 
   void _loadReminders() {

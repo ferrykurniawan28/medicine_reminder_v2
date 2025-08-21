@@ -28,19 +28,10 @@ class _DeviceState extends State<DeviceView> {
     _isFetching = true; // Set fetching flag to true
 
     try {
-      final userState = context.read<UserBloc>().state;
-      if (userState is CurrentUser) {
-        userId = userState.user.userId;
-        context.read<DeviceBloc>().add(DeviceFetch(userId!));
-      } else if (userState is UserLoaded) {
-        userId = userState.user.userId!;
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No user is currently logged in.'),
-          ),
-        );
-      }
+      UserHelper.executeWithUserId(context, (int id) {
+        userId = id;
+        context.read<DeviceBloc>().add(DeviceFetch(id));
+      });
     } catch (e) {
       if (!mounted) return;
 
@@ -220,23 +211,22 @@ class _DeviceState extends State<DeviceView> {
                                           );
                                           return;
                                         }
-                                        if (userId == null) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                  'User ID is not available'),
-                                            ),
-                                          );
-                                          return;
+
+                                        final success =
+                                            UserHelper.executeWithUserId(
+                                          context,
+                                          (int id) {
+                                            context.read<DeviceBloc>().add(
+                                                  DeviceAdd(id, deviceUid),
+                                                );
+                                          },
+                                          errorMessage:
+                                              'User ID is not available',
+                                        );
+
+                                        if (success) {
+                                          Navigator.of(context).pop();
                                         }
-                                        context.read<DeviceBloc>().add(
-                                              DeviceAdd(
-                                                userId!,
-                                                deviceUid,
-                                              ),
-                                            );
-                                        Navigator.of(context).pop();
                                       },
                                       child: const Text('Add Device'),
                                     ),
