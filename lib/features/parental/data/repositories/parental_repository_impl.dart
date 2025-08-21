@@ -1,3 +1,4 @@
+import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 
 import '../../domain/entities/parental.dart';
@@ -57,6 +58,16 @@ class ParentalRepositoryImpl implements ParentalRepository {
       return await remoteDataSource.fetchParentalReminders(parentalId);
     } catch (e) {
       print('Error fetching parental reminders: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<List<Appointment>> getParentalAppointments(int parentalId) async {
+    try {
+      return await remoteDataSource.fetchParentalAppointments(parentalId);
+    } catch (e) {
+      print('Error fetching parental appointments: $e');
       return [];
     }
   }

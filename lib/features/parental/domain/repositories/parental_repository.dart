@@ -1,3 +1,4 @@
+import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/parental/domain/entities/parental.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 
@@ -15,6 +16,7 @@ abstract class ParentalRepository {
   // Remote operations
   // Future<List<Parental>> fetchParentalsFromServer(int userId);
   Future<List<Reminder>> getParentalReminders(int parentalId);
+  Future<List<Appointment>> getParentalAppointments(int parentalId);
   Future<void> syncParentalToServer(Parental parental);
   // Future<void> updateParentalOnServer(Parental parental);
   // Future<void> deleteParentalOnServer(int parentalId);

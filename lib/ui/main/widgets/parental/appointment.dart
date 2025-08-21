@@ -16,8 +16,9 @@ class _AppointmentListState extends State<AppointmentList> {
   }
 
   Future<void> _loadAppointments() async {
-    context.read<ParentalBloc>().add(
-        const LoadAppointmentParental(1)); //Todo: get the id from the parental
+    context
+        .read<ParentalBloc>()
+        .add(LoadAppointmentParental(widget.parental.user.userId!));
   }
 
   @override
@@ -27,16 +28,16 @@ class _AppointmentListState extends State<AppointmentList> {
       child: BlocBuilder<ParentalBloc, ParentalState>(
         builder: (context, state) {
           if (state is AppointmentParentalLoaded) {
-            if (state.appointments.isEmpty) {
+            if (state.appointments == null || state.appointments!.isEmpty) {
               return const Center(
                 child: Text('No appointments found add one!'),
               );
             }
             return ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: state.appointments.length,
+              padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 8),
+              itemCount: state.appointments!.length,
               itemBuilder: (context, index) {
-                final appointment = state.appointments[index];
+                final appointment = state.appointments![index];
                 return appointmentCard(context, appointment: appointment);
               },
             );

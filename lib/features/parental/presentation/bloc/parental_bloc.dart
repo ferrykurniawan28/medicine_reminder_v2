@@ -17,6 +17,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
   final AddParental addParental;
   final DeleteParental deleteParental;
   final GetParentalReminder getParentalReminder;
+  final GetParentalAppointment getParentalAppointment;
   final ParentalRepository repository;
 
   List<Parental> _parentals = [];
@@ -29,6 +30,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
         addParental = AddParental(repository),
         deleteParental = DeleteParental(repository),
         getParentalReminder = GetParentalReminder(repository),
+        getParentalAppointment = GetParentalAppointment(repository),
         super(ParentalInitial()) {
     on<LoadParentals>(_onFetchParentals);
     // on<LoadParental>(_onFetchParental);
@@ -104,10 +106,8 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
       LoadAppointmentParental event, Emitter<ParentalState> emit) async {
     emit(ParentalLoading());
     try {
-      _appointments = [];
-      // final appointments =
-      //     await _appointmentRepository.getAppointment(event.parentalId);
-      emit(AppointmentParentalLoaded(_appointments!));
+      _appointments = await getParentalAppointment(event.parentalId);
+      emit(AppointmentParentalLoaded(_appointments));
     } catch (e) {
       emit(ParentalError(e.toString()));
     }

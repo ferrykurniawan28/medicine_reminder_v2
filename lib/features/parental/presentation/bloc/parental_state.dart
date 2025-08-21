@@ -50,12 +50,12 @@ final class ReminderParentalLoaded extends ParentalState {
 }
 
 final class AppointmentParentalLoaded extends ParentalState {
-  final List<Appointment> appointments;
+  final List<Appointment>? appointments;
 
   const AppointmentParentalLoaded(this.appointments);
 
   @override
-  List<Object> get props => [appointments];
+  List<Object> get props => [appointments ?? []];
 }
 
 final class DeviceParentalLoaded extends ParentalState {

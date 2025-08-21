@@ -1,5 +1,7 @@
 import 'package:medicine_reminder/core/constant/url.dart';
 import 'package:medicine_reminder/core/network/network_service.dart';
+import 'package:medicine_reminder/features/appointment/data/models/appointment_model.dart';
+import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/parental/data/models/parental_model.dart';
 import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
@@ -67,6 +69,50 @@ class ParentalRemoteDataSourceImpl implements ParentalRemoteDataSource {
     } catch (e) {
       print('Error in fetchParentalReminders: $e');
       throw Exception('Failed to fetch parental reminders: $e');
+    }
+  }
+
+  @override
+  Future<List<Appointment>> fetchParentalAppointments(int parentalId) async {
+    try {
+      final response = await networkService.get<List<AppointmentModel>>(
+        '$parentalUrl/$parentalId/appointment',
+        fromData: (data) {
+          print('Parental appointments data received: $data');
+          return (data as List).map((item) {
+            // Handle the field name mismatch between API and model
+            final appointmentJson = Map<String, dynamic>.from(item);
+
+            // Map API field names to model field names
+            if (appointmentJson.containsKey('createdBy')) {
+              appointmentJson['created_by'] = appointmentJson['createdBy'];
+              appointmentJson.remove('createdBy');
+            }
+
+            // If assignedTo is missing, use the same as createdBy or set a default
+            if (!appointmentJson.containsKey('assigned_to')) {
+              appointmentJson['assigned_to'] =
+                  appointmentJson['created_by'] ?? parentalId;
+            }
+
+            return AppointmentModel.fromJson(appointmentJson);
+          }).toList();
+        },
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        print(
+            'Successfully fetched ${response.data!.length} parental appointments');
+        return response.data!;
+      } else {
+        print(
+            'Failed to fetch parental appointments - Status: ${response.statusCode}, Message: ${response.message}');
+        throw Exception(
+            'Failed to fetch parental appointments: Status ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error in fetchParentalAppointments: $e');
+      throw Exception('Failed to fetch parental appointments: $e');
     }
   }
 
