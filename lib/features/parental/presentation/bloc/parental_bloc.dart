@@ -18,12 +18,13 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
   final DeleteParental deleteParental;
   final GetParentalReminder getParentalReminder;
   final GetParentalAppointment getParentalAppointment;
+  final GetParentalDevice getParentalDevice;
   final ParentalRepository repository;
 
   List<Parental> _parentals = [];
   List<Reminder>? _reminders = [];
   List<Appointment>? _appointments = [];
-  DeviceModel? _deviceModel;
+  Device? _deviceModel;
 
   ParentalBloc(this.repository)
       : getParentals = GetParentals(repository),
@@ -31,6 +32,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
         deleteParental = DeleteParental(repository),
         getParentalReminder = GetParentalReminder(repository),
         getParentalAppointment = GetParentalAppointment(repository),
+        getParentalDevice = GetParentalDevice(repository),
         super(ParentalInitial()) {
     on<LoadParentals>(_onFetchParentals);
     // on<LoadParental>(_onFetchParental);
@@ -117,10 +119,8 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
       LoadDeviceParental event, Emitter<ParentalState> emit) async {
     emit(ParentalLoading());
     try {
-      _deviceModel = null;
-      // final deviceModel =
-      //     await _deviceRepository.getDevice(event.parentalId);
-      emit(DeviceParentalLoaded(_deviceModel!));
+      _deviceModel = await getParentalDevice(event.parentalId);
+      emit(DeviceParentalLoaded(_deviceModel));
     } catch (e) {
       emit(ParentalError(e.toString()));
     }

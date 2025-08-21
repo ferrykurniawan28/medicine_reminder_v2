@@ -16,9 +16,7 @@ class _DeviceParentalState extends State<DeviceParental> {
   }
 
   Future<void> _loadDevices() async {
-    context
-        .read<ParentalBloc>()
-        .add(const LoadDeviceParental(1)); //Todo: get the id from the parental
+    context.read<ParentalBloc>().add(LoadDeviceParental(widget.parental.id!));
   }
 
   @override
@@ -34,12 +32,12 @@ class _DeviceParentalState extends State<DeviceParental> {
               );
             }
             return ListView(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 50),
               children: [
                 BlocBuilder<ParentalBloc, ParentalState>(
                   builder: (context, state) {
                     if (state is DeviceParentalLoaded) {
-                      return YourDevice(device: state.devices);
+                      return YourDevice(device: state.devices!);
                     } else if (state is ParentalLoading) {
                       return Shimmer.fromColors(
                         baseColor: Colors.grey[300]!,
@@ -70,9 +68,9 @@ class _DeviceParentalState extends State<DeviceParental> {
                       return ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: state.devices.containers.length,
+                        itemCount: state.devices!.containers.length,
                         itemBuilder: (context, index) {
-                          final container = state.devices.containers[index];
+                          final container = state.devices!.containers[index];
                           final GlobalKey key = GlobalKey();
 
                           return ListTile(

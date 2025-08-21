@@ -59,10 +59,10 @@ final class AppointmentParentalLoaded extends ParentalState {
 }
 
 final class DeviceParentalLoaded extends ParentalState {
-  final Device devices;
+  final Device? devices;
 
   const DeviceParentalLoaded(this.devices);
 
   @override
-  List<Object> get props => [devices];
+  List<Object> get props => [devices ?? []];
 }

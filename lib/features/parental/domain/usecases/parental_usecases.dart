@@ -1,4 +1,5 @@
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
+import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 
 import '../entities/parental.dart';
@@ -51,5 +52,15 @@ class GetParentalAppointment {
 
   Future<List<Appointment>> call(int parentalId) async {
     return await repository.getParentalAppointments(parentalId);
+  }
+}
+
+class GetParentalDevice {
+  final ParentalRepository repository;
+
+  GetParentalDevice(this.repository);
+
+  Future<Device> call(int parentalId) async {
+    return await repository.getParentalDevice(parentalId);
   }
 }

@@ -10,10 +10,11 @@ class ParentalDetail extends StatefulWidget {
 
 class _ParentalDetailState extends State<ParentalDetail> {
   int _selectedSegment = 0;
+
   @override
   void initState() {
     super.initState();
-    Modular.to.navigate('/parental/detail/', arguments: {
+    Modular.to.pushNamed('/parental/detail/', arguments: {
       'parental': widget.parental,
     });
   }
@@ -26,9 +27,27 @@ class _ParentalDetailState extends State<ParentalDetail> {
         actions: [],
         leading: IconButton(
           onPressed: () {
-            Modular.to.navigate('/home/parental/list');
+            // Find the main page and trigger proper navigation
+            Navigator.of(context).popUntil((route) {
+              // Pop until we reach the main page route
+              UserHelper.executeWithUserId(context, (int userId) {
+                context.read<ParentalBloc>().add(LoadParentals(userId));
+              });
+              return route.settings.name == '/home' || route.isFirst;
+            });
+            // Navigator.of(context).popUntil((route) {
+            //   // Pop until we reach the main page route
+            //   return route.settings.name == '/home' || route.isFirst;
+            // });
+            // Navigator.of(context).pop();
+            // Navigator.of(context).pop();
+
+            // Then navigate to parental with proper state update
+            // Future.delayed(const Duration(milliseconds: 500), () {
+            //   Modular.to.navigate('/home/parental');
+            // });
           },
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios_new),
         ),
       ),
       backgroundColor: Colors.white,
@@ -47,27 +66,29 @@ class _ParentalDetailState extends State<ParentalDetail> {
                   2: Text('Device'),
                 },
                 onValueChanged: (int? value) {
-                  setState(() {
-                    _selectedSegment = value!;
-                  });
-                  switch (value) {
-                    case 0:
-                      Modular.to.navigate('/parental/detail/', arguments: {
-                        'parental': widget.parental,
-                      });
-                      break;
-                    case 1:
-                      Modular.to
-                          .navigate('/parental/detail/appointment', arguments: {
-                        'parental': widget.parental,
-                      });
-                      break;
-                    case 2:
-                      Modular.to
-                          .navigate('/parental/detail/device', arguments: {
-                        'parental': widget.parental,
-                      });
-                      break;
+                  if (value != null) {
+                    setState(() {
+                      _selectedSegment = value;
+                    });
+                    switch (value) {
+                      case 0:
+                        Modular.to.pushNamed('/parental/detail/', arguments: {
+                          'parental': widget.parental,
+                        });
+                        break;
+                      case 1:
+                        Modular.to.pushNamed('/parental/detail/appointment',
+                            arguments: {
+                              'parental': widget.parental,
+                            });
+                        break;
+                      case 2:
+                        Modular.to
+                            .pushNamed('/parental/detail/device', arguments: {
+                          'parental': widget.parental,
+                        });
+                        break;
+                    }
                   }
                 },
               ),
@@ -81,7 +102,7 @@ class _ParentalDetailState extends State<ParentalDetail> {
           ? FloatingActionButton(
               onPressed: () {},
               shape: const CircleBorder(),
-              backgroundColor: Colors.blue,
+              backgroundColor: kPrimaryColor,
               foregroundColor: Colors.white,
               child: const Icon(Icons.add),
             )

@@ -2,6 +2,8 @@ import 'package:medicine_reminder/core/constant/url.dart';
 import 'package:medicine_reminder/core/network/network_service.dart';
 import 'package:medicine_reminder/features/appointment/data/models/appointment_model.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
+import 'package:medicine_reminder/features/device/data/models/device_model.dart';
+import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/parental/data/models/parental_model.dart';
 import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
@@ -113,6 +115,42 @@ class ParentalRemoteDataSourceImpl implements ParentalRemoteDataSource {
     } catch (e) {
       print('Error in fetchParentalAppointments: $e');
       throw Exception('Failed to fetch parental appointments: $e');
+    }
+  }
+
+  @override
+  Future<Device> fetchParentalDevice(int parentalId) async {
+    try {
+      final response = await networkService.get<DeviceModel>(
+        '$parentalUrl/$parentalId/device',
+        fromData: (data) {
+          print('Parental device data received: $data');
+
+          // Handle the case where API returns an array of devices
+          if (data is List && data.isNotEmpty) {
+            // Take the first device from the array
+            return DeviceModel.fromJson(data.first as Map<String, dynamic>);
+          } else if (data is Map<String, dynamic>) {
+            // Handle single device response
+            return DeviceModel.fromJson(data);
+          } else {
+            throw Exception('Invalid device data format: $data');
+          }
+        },
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        print('Successfully fetched parental device');
+        return response.data!;
+      } else {
+        print(
+            'Failed to fetch parental device - Status: ${response.statusCode}, Message: ${response.message}');
+        throw Exception(
+            'Failed to fetch parental device: Status ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error in fetchParentalDevice: $e');
+      throw Exception('Failed to fetch parental device: $e');
     }
   }
 

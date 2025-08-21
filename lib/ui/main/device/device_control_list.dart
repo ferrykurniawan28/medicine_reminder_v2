@@ -46,7 +46,7 @@ class _DeviceControlListState extends State<DeviceControlList> {
       appBar: defaultAppBar(
         'Device Control List',
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () {
             final userState = context.read<UserBloc>().state;
             if (userState is CurrentUser) {
