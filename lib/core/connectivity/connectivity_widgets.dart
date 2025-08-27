@@ -80,7 +80,7 @@ class _ConnectivityBannerState extends State<ConnectivityBanner>
                             horizontal: 16,
                             vertical: 8,
                           ),
-                          color: isConnected ? Colors.green : Colors.red,
+                          color: isConnected ? Colors.white : Colors.red,
                           child: SafeArea(
                             bottom: false,
                             child: Row(

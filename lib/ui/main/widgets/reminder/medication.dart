@@ -2,11 +2,86 @@ part of '../widgets.dart';
 
 class AddReminderScreen extends StatelessWidget {
   final User assignedUser;
-  const AddReminderScreen({super.key, required this.assignedUser});
+  final bool isParental;
+  const AddReminderScreen(
+      {super.key, required this.assignedUser, this.isParental = false});
+
+  Future<Device> _fetchParentalDevice() async {
+    final networkService = NetworkService();
+    final response = await networkService.get<DeviceModel>(
+      '$deviceUserUrl/${assignedUser.userId!}',
+      fromData: (data) {
+        if (data is List && data.isNotEmpty) {
+          return DeviceModel.fromJson(data.first as Map<String, dynamic>);
+        } else if (data is Map<String, dynamic>) {
+          return DeviceModel.fromJson(data);
+        } else {
+          throw Exception('Invalid device data format');
+        }
+      },
+    );
+
+    if (response.statusCode == 200 && response.data != null) {
+      return response.data!;
+    } else {
+      throw Exception('Failed to fetch device: ${response.message}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final device = context.read<DeviceBloc>().device;
+    // If it's parental mode, use FutureBuilder to fetch device from server
+    if (isParental) {
+      return FutureBuilder<Device>(
+        future: _fetchParentalDevice(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Scaffold(
+              appBar: AppBar(title: const Text('Add Reminder')),
+              body: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Scaffold(
+              appBar: AppBar(title: const Text('Add Reminder')),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error, size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text('Error: ${snapshot.error}'),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Go Back'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            return _buildReminderScreen(context, snapshot.data!);
+          }
+
+          return Scaffold(
+            appBar: AppBar(title: const Text('Add Reminder')),
+            body: const Center(
+              child: Text('No device data available'),
+            ),
+          );
+        },
+      );
+    }
+
+    // For non-parental mode, use device from DeviceBloc
+    Device? device = context.read<DeviceBloc>().device;
+
     if (device == null) {
       return Scaffold(
         appBar: AppBar(),
@@ -16,6 +91,10 @@ class AddReminderScreen extends StatelessWidget {
       );
     }
 
+    return _buildReminderScreen(context, device);
+  }
+
+  Widget _buildReminderScreen(BuildContext context, Device device) {
     return CupertinoPageScaffold(
       backgroundColor: kPrimaryColor,
       navigationBar: defaultCupertinoAppBar('Add Reminder', context: context),
@@ -36,7 +115,9 @@ class AddReminderScreen extends StatelessWidget {
                   context,
                   CupertinoPageRoute(
                     builder: (context) => RoutineSelectionScreen(
-                        container: container, assignedUser: assignedUser),
+                        container: container,
+                        assignedUser: assignedUser,
+                        isParental: isParental),
                   ),
                 );
               },

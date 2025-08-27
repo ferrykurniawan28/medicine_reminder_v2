@@ -3,8 +3,12 @@ part of '../widgets.dart';
 class MoreOptionsPage extends StatefulWidget {
   final DeviceContainer container;
   final User assignedUser;
+  final bool isParental;
   const MoreOptionsPage(
-      {super.key, required this.container, required this.assignedUser});
+      {super.key,
+      required this.container,
+      required this.assignedUser,
+      required this.isParental});
 
   @override
   State<MoreOptionsPage> createState() => _MoreOptionsPageState();
@@ -588,6 +592,7 @@ class _MoreOptionsPageState extends State<MoreOptionsPage> {
                                     'container': widget.container,
                                     'howManyTimes': multipleTimesDaily,
                                     'assignedUser': widget.assignedUser,
+                                    'isParental': widget.isParental,
                                   });
                               break;
                             case 1:
@@ -603,6 +608,7 @@ class _MoreOptionsPageState extends State<MoreOptionsPage> {
                                     'container': widget.container,
                                     'days': selectedDays,
                                     'assignedUser': widget.assignedUser,
+                                    'isParental': widget.isParental,
                                   });
                             default:
                           }

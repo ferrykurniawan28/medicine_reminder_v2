@@ -74,3 +74,13 @@ class AddParentalAppointment {
     await repository.createParentalAppointment(appointment, parentalId);
   }
 }
+
+class AddParentalReminder {
+  final ParentalRepository repository;
+
+  AddParentalReminder(this.repository);
+
+  Future<void> call(Reminder reminder, int parentalId) async {
+    await repository.createParentalReminder(reminder, parentalId);
+  }
+}

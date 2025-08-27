@@ -4,12 +4,14 @@ class OnceTwiceDailyPage extends StatefulWidget {
   final DeviceContainer container;
   final bool isOnce;
   final User assignedUser;
+  final bool isParental;
 
   const OnceTwiceDailyPage({
     super.key,
     required this.container,
     required this.isOnce,
     required this.assignedUser,
+    required this.isParental,
   });
 
   @override
@@ -74,13 +76,7 @@ class _OnceTwiceDailyPageState extends State<OnceTwiceDailyPage> {
 
     final assignedUser = widget.assignedUser;
 
-    User? createdBy;
-    final userState = context.read<UserBloc>().state;
-    if (userState is CurrentUser) {
-      createdBy = userState.user;
-    } else if (userState is UserLoaded) {
-      createdBy = userState.user;
-    }
+    User? createdBy = UserHelper.getCurrentUser(context);
 
     final reminder = Reminder(
       containerId: widget.container.id,
@@ -98,12 +94,24 @@ class _OnceTwiceDailyPageState extends State<OnceTwiceDailyPage> {
       createdBy: createdBy,
     );
 
-    context.read<ReminderBloc>().add(
-          AddReminder(reminder),
-        );
-    Modular.to.popUntil(
-      (route) => route.settings.name == '/home',
-    );
+    if (widget.isParental) {
+      context.read<ParentalBloc>().add(
+            CreateParentalReminder(reminder, widget.assignedUser.userId!),
+          );
+      Navigator.of(context)
+        ..pop()
+        ..pop()
+        ..pop();
+      // Modular.to
+      //     .popUntil((route) => route.settings.name == '/parental/detail/');
+    } else {
+      context.read<ReminderBloc>().add(
+            AddReminder(reminder),
+          );
+      Modular.to.popUntil(
+        (route) => route.settings.name == '/home',
+      );
+    }
   }
 
   @override

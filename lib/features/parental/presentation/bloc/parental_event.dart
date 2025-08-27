@@ -80,3 +80,13 @@ final class CreateParentalAppointment extends ParentalEvent {
   @override
   List<Object> get props => [appointment, parentalId];
 }
+
+final class CreateParentalReminder extends ParentalEvent {
+  final Reminder reminder;
+  final int parentalId;
+
+  const CreateParentalReminder(this.reminder, this.parentalId);
+
+  @override
+  List<Object> get props => [reminder, parentalId];
+}

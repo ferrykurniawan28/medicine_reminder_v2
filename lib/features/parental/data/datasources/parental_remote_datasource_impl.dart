@@ -178,6 +178,30 @@ class ParentalRemoteDataSourceImpl implements ParentalRemoteDataSource {
   }
 
   @override
+  Future<void> createParentalReminder(
+      ReminderModel reminder, int parentalId) async {
+    try {
+      print('Creating parental reminder: ${reminder.toJson()}');
+      final response = await networkService.post(
+        '$parentalUrl/$parentalId/reminder',
+        body: reminder.toJson(),
+      );
+
+      if (response.statusCode == 201) {
+        print('Successfully created parental reminder');
+      } else {
+        print(
+            'Failed to create parental reminder - Status: ${response.statusCode}, Message: ${response.message}');
+        throw Exception(
+            'Failed to create parental reminder: Status ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error in createParentalReminder: $e');
+      throw Exception('Failed to create parental reminder: $e');
+    }
+  }
+
+  @override
   Future<void> addParental(Parental parental) async {
     //TODO: add parental
   }

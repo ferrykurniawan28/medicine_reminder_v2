@@ -68,6 +68,11 @@ class _ReminderListState extends State<ReminderList> {
               foregroundColor: Colors.white,
               onPressed: () {
                 // Handle add reminder action
+                // final user = UserHelper.getCurrentUser(context);
+                Modular.to.pushNamed('/reminder/', arguments: {
+                  'assignedUser': widget.parental.user,
+                  'isParental': true,
+                });
               },
               child: const Icon(Icons.add),
             ),

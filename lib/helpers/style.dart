@@ -56,8 +56,11 @@ CupertinoNavigationBar defaultCupertinoAppBar(String title,
           fontWeight: FontWeight.bold,
         )),
     backgroundColor: Colors.white,
-    leading: (context != null && Navigator.canPop(context))
-        ? const CupertinoNavigationBarBackButton(color: Colors.white)
+    leading: (context != null && Navigator.of(context).canPop())
+        ? CupertinoNavigationBarBackButton(
+            color: Colors.white,
+            onPressed: () => Navigator.of(context).pop(),
+          )
         : null,
   );
 }

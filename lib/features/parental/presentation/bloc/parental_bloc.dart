@@ -20,6 +20,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
   final GetParentalAppointment getParentalAppointment;
   final GetParentalDevice getParentalDevice;
   final AddParentalAppointment addParentalAppointment;
+  final AddParentalReminder createParentalReminder;
   final ParentalRepository repository;
 
   List<Parental> _parentals = [];
@@ -35,6 +36,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
         getParentalAppointment = GetParentalAppointment(repository),
         getParentalDevice = GetParentalDevice(repository),
         addParentalAppointment = AddParentalAppointment(repository),
+        createParentalReminder = AddParentalReminder(repository),
         super(ParentalInitial()) {
     on<LoadParentals>(_onFetchParentals);
     // on<LoadParental>(_onFetchParental);
@@ -45,6 +47,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
     on<LoadAppointmentParental>(_onFetchAppointmentParental);
     on<LoadDeviceParental>(_onFetchDeviceParental);
     on<CreateParentalAppointment>(_onCreateParentalAppointment);
+    on<CreateParentalReminder>(_onCreateParentalReminder);
   }
 
   Future<void> _onFetchParentals(
@@ -141,6 +144,21 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
 
       // Emit the updated appointments state
       emit(AppointmentParentalLoaded(_appointments));
+    } catch (e) {
+      emit(ParentalError(e.toString()));
+    }
+  }
+
+  Future<void> _onCreateParentalReminder(
+      CreateParentalReminder event, Emitter<ParentalState> emit) async {
+    emit(ParentalLoading());
+    try {
+      await createParentalReminder(event.reminder, event.parentalId);
+      _reminders = [..._reminders ?? [], event.reminder];
+      Future.delayed(const Duration(milliseconds: 500), () {
+        // print()
+        emit(ReminderParentalLoaded(_reminders));
+      });
     } catch (e) {
       emit(ParentalError(e.toString()));
     }

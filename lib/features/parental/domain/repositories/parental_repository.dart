@@ -22,6 +22,7 @@ abstract class ParentalRepository {
   Future<Device> getParentalDevice(int parentalId);
   Future<void> createParentalAppointment(
       Appointment appointment, int parentalId);
+  Future<void> createParentalReminder(Reminder reminder, int parentalId);
 
   Future<void> syncParentalToServer(Parental parental);
   // Future<void> updateParentalOnServer(Parental parental);

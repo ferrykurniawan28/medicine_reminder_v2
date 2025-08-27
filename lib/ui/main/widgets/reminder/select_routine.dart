@@ -3,9 +3,13 @@ part of '../widgets.dart';
 class RoutineSelectionScreen extends StatelessWidget {
   final User assignedUser;
   final DeviceContainer container;
+  final bool isParental;
 
   const RoutineSelectionScreen(
-      {super.key, required this.container, required this.assignedUser});
+      {super.key,
+      required this.container,
+      required this.assignedUser,
+      required this.isParental});
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +42,7 @@ class RoutineSelectionScreen extends StatelessWidget {
                   'container': container,
                   'isOnce': true,
                   'assignedUser': assignedUser,
+                  'isParental': isParental,
                 },
               ),
             ),
@@ -51,6 +56,7 @@ class RoutineSelectionScreen extends StatelessWidget {
                       container: container,
                       isOnce: false,
                       assignedUser: assignedUser,
+                      isParental: isParental,
                     ),
                   ),
                 );
@@ -64,6 +70,7 @@ class RoutineSelectionScreen extends StatelessWidget {
                   builder: (context) => MoreOptionsPage(
                     container: container,
                     assignedUser: assignedUser,
+                    isParental: isParental,
                   ),
                 ),
               ),

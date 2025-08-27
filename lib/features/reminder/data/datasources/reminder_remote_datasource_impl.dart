@@ -39,7 +39,8 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
       "note": reminder.note,
       "type": ReminderTypeHelper.getName(reminder.type),
       "times": reminder.times
-          .map((time) => '${time.toDateTime().toIso8601String()}Z')
+          .map((time) =>
+              '${time.toDateTime().toIso8601String()}Z') //TODO: change format
           .toList(),
       "daysofWeek": reminder.daysofWeek?.map((day) => day.index).toList(),
       "endDate": reminder.endDate?.toIso8601String(),

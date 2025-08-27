@@ -4,11 +4,13 @@ class SpecificDays extends StatefulWidget {
   final ContainerModel container;
   final List<Days> days;
   final User assignedUser;
+  final bool isParental;
   const SpecificDays({
     super.key,
     required this.container,
     required this.days,
     required this.assignedUser,
+    required this.isParental,
   });
 
   @override
@@ -27,29 +29,7 @@ class _SpecificDaysState extends State<SpecificDays> {
       return;
     }
 
-    // final userState = context.read<UserBloc>().state;
-    // if (userState is CurrentUser) {
-    //   if (userState.user.userId == null) {
-    //     _showErrorDialog('User ID is not available.');
-    //     return;
-    //   }
-    // } else if (userState is UserLoaded) {
-    //   if (userState.user.userId == null) {
-    //     _showErrorDialog('User ID is not available.');
-    //     return;
-    //   }
-    // } else {
-    //   _showErrorDialog('No user is currently logged in.');
-    //   return;
-    // }
-
-    User? createdBy;
-    final userState = context.read<UserBloc>().state;
-    if (userState is CurrentUser) {
-      createdBy = userState.user;
-    } else if (userState is UserLoaded) {
-      createdBy = userState.user;
-    }
+    User? createdBy = UserHelper.getCurrentUser(context);
 
     Reminder newReminder = Reminder(
       type: ReminderType.specificDays,
@@ -66,12 +46,18 @@ class _SpecificDaysState extends State<SpecificDays> {
       createdBy: createdBy,
     );
 
-    context.read<ReminderBloc>().add(
-          AddReminder(
-            newReminder,
-          ),
-        );
-    Modular.to.popUntil((route) => route.settings.name == '/home');
+    if (widget.isParental) {
+      context.read<ParentalBloc>().add(
+            CreateParentalReminder(newReminder, widget.assignedUser.userId!),
+          );
+      Modular.to
+          .popUntil((route) => route.settings.name == '/parental/detail/');
+    } else {
+      context.read<ReminderBloc>().add(
+            AddReminder(newReminder),
+          );
+      Modular.to.popUntil((route) => route.settings.name == '/home');
+    }
   }
 
   void _showErrorDialog(String message) {

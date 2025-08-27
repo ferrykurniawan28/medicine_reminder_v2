@@ -4,11 +4,13 @@ class MultipleTimesDaily extends StatefulWidget {
   final ContainerModel container;
   final int howManyTimes;
   final User assignedUser;
+  final bool isParental;
   const MultipleTimesDaily({
     super.key,
     required this.container,
     required this.howManyTimes,
     required this.assignedUser,
+    required this.isParental,
   });
 
   @override
@@ -32,8 +34,7 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
     dosage = List.generate(widget.howManyTimes, (index) => 1);
   }
 
-  // TODO: adjust for prod
-  void _save() {
+  Future<void> _save() async {
     if (dosage.isEmpty) {
       _showErrorDialog('Please enter a valid dose.');
       return;
@@ -50,15 +51,9 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
 
     final assignedUser = widget.assignedUser;
 
-    User? createdBy;
-    final userState = context.read<UserBloc>().state;
-    if (userState is CurrentUser) {
-      createdBy = userState.user;
-    } else if (userState is UserLoaded) {
-      createdBy = userState.user;
-    }
+    User? createdBy = UserHelper.getCurrentUser(context);
 
-    ReminderModel newReminder = ReminderModel(
+    final reminder = ReminderModel(
       type: ReminderType.multipleTimesDaily,
       times: times,
       medicineName: widget.container.medicineName!,
@@ -69,12 +64,19 @@ class _MultipleTimesDailyState extends State<MultipleTimesDaily> {
       createdBy: createdBy,
     );
 
-    context.read<ReminderBloc>().add(
-          AddReminder(
-            newReminder,
-          ),
-        );
-    Modular.to.popUntil((route) => route.settings.name == '/home');
+    if (widget.isParental) {
+      context.read<ParentalBloc>().add(
+            CreateParentalReminder(reminder, widget.assignedUser.userId!),
+          );
+      // Navigator.of(context)
+      //   ..pop()
+      //   ..pop()
+      // ..pop()
+      //   ..pop();
+    } else {
+      context.read<ReminderBloc>().add(AddReminder(reminder));
+      Modular.to.popUntil((route) => route.settings.name == '/home');
+    }
   }
 
   Future<TimeOfDay?> _showTimePicker(TimeOfDay initialTime) async {

@@ -99,7 +99,8 @@ class ReminderModel extends Reminder {
       'note': note,
       'type': ReminderTypeHelper.getName(type),
       'times': times
-          .map((t) => DateTime(0, 1, 1, t.hour, t.minute).toIso8601String())
+          .map((t) =>
+              DateTime(0, 1, 1, t.hour, t.minute).toUtc().toIso8601String())
           .toList(),
       'daysofWeek': daysofWeek?.map((e) => e.index).toList(),
       'endDate': endDate?.toIso8601String(),

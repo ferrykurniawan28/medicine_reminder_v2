@@ -1,6 +1,7 @@
 import 'package:medicine_reminder/features/appointment/data/models/appointment_model.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
+import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 
 import '../../domain/entities/parental.dart';
@@ -25,6 +26,7 @@ abstract class ParentalRemoteDataSource {
 
   Future<void> createParentalAppointment(
       AppointmentModel appointment, int parentalId);
+  Future<void> createParentalReminder(ReminderModel reminder, int parentalId);
 
   // /// Generate QR code for parental invitation
   // /// Returns QR code data for parent-child relationship setup

@@ -1,6 +1,7 @@
 import 'package:medicine_reminder/features/appointment/data/models/appointment_model.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
+import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
 
 import '../../domain/entities/parental.dart';
@@ -94,6 +95,17 @@ class ParentalRepositoryImpl implements ParentalRepository {
     } catch (e) {
       print('Error creating parental appointment: $e');
       throw Exception('Failed to create parental appointment: $e');
+    }
+  }
+
+  @override
+  Future<void> createParentalReminder(Reminder reminder, int parentalId) async {
+    try {
+      final reminderModel = ReminderModel.fromEntity(reminder);
+      await remoteDataSource.createParentalReminder(reminderModel, parentalId);
+    } catch (e) {
+      print('Error creating parental reminder: $e');
+      throw Exception('Failed to create parental reminder: $e');
     }
   }
 
