@@ -142,7 +142,7 @@ class ConnectivityIndicator extends StatelessWidget {
             Icon(
               isConnected ? Icons.wifi : Icons.wifi_off,
               size: size,
-              color: isConnected ? Colors.green : Colors.red,
+              color: isConnected ? Colors.white : Colors.red,
             ),
             if (showText) ...[
               const SizedBox(width: 4),

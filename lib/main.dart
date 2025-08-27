@@ -10,6 +10,7 @@ import 'package:medicine_reminder/features/auth/bloc/auth_bloc.dart';
 import 'package:medicine_reminder/features/device/data/repositories/device_repository_impl_new.dart'
     as device_repo_offline;
 import 'package:medicine_reminder/features/features.dart';
+import 'package:medicine_reminder/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:medicine_reminder/features/parental/data/datasources/parental_remote_datasource_impl.dart';
 import 'package:medicine_reminder/features/reminder/data/datasources/reminder_local_datasource_impl.dart';
 import 'package:medicine_reminder/features/reminder/data/datasources/reminder_remote_datasource_impl.dart';
@@ -24,7 +25,6 @@ import 'package:medicine_reminder/routes/routes.dart';
 import 'package:flutter/services.dart';
 import 'package:medicine_reminder/core/services/sync_manager.dart';
 import 'package:medicine_reminder/features/device/data/datasources/device_local_datasource_impl.dart';
-import 'package:medicine_reminder/features/parental/data/database/parental_database.dart';
 import 'package:medicine_reminder/features/parental/data/datasources/parental_local_datasource_impl.dart';
 import 'package:medicine_reminder/features/parental/data/repositories/parental_repository_impl.dart';
 import 'package:medicine_reminder/features/device/data/datasources/device_remote_datasource_impl.dart';
@@ -74,7 +74,7 @@ Future<void> _initializeCoreServices() async {
         .database; // This initializes the reminder database
 
     // Initialize parental database
-    final parentalDatabase = ParentalDatabase();
+    final parentalDatabase = ParentalLocalDataSourceImpl();
     await parentalDatabase.database; // This initializes the parental database
 
     // Initialize FCM service
@@ -198,6 +198,7 @@ class MainApp extends StatelessWidget {
             create: (context) => AuthBloc(
                 // userBloc: ReadContext(context).read<UserBloc>(),
                 )),
+        BlocProvider(create: (context) => NotificationBloc()),
       ],
       child: ConnectivityListener(
         onConnected: () {

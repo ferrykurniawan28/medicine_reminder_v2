@@ -114,6 +114,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
       LoadAppointmentParental event, Emitter<ParentalState> emit) async {
     emit(ParentalLoading());
     try {
+      print('Fetching appointments for parentalId: ${event.parentalId}');
       _appointments = await getParentalAppointment(event.parentalId);
       emit(AppointmentParentalLoaded(_appointments));
     } catch (e) {
@@ -125,6 +126,7 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
       LoadDeviceParental event, Emitter<ParentalState> emit) async {
     emit(ParentalLoading());
     try {
+      print('Fetching device for parentalId: ${event.parentalId}');
       _deviceModel = await getParentalDevice(event.parentalId);
       emit(DeviceParentalLoaded(_deviceModel));
     } catch (e) {

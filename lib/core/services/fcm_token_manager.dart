@@ -88,7 +88,7 @@ class FCMTokenManager {
     }
   }
 
-  /// Subscribe user to parental notifications
+  /// Subscribe user to parental notifications //TODO: adjust topic
   Future<bool> subscribeToParentalNotifications(int parentalId) async {
     try {
       await _fcmService.subscribeToTopic('parental_$parentalId');
@@ -125,7 +125,7 @@ class FCMTokenManager {
     }
   }
 
-  /// Subscribe to medication reminder notifications
+  /// Subscribe to medication reminder notifications TODO: adjust topic
   Future<bool> subscribeToMedicationReminders() async {
     try {
       await _fcmService.subscribeToTopic('medication_reminders');

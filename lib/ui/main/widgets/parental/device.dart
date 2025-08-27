@@ -16,7 +16,9 @@ class _DeviceParentalState extends State<DeviceParental> {
   }
 
   Future<void> _loadDevices() async {
-    context.read<ParentalBloc>().add(LoadDeviceParental(widget.parental.id!));
+    context
+        .read<ParentalBloc>()
+        .add(LoadDeviceParental(widget.parental.user.userId!));
   }
 
   @override

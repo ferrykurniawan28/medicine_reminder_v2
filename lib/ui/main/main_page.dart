@@ -63,7 +63,7 @@ class _MainPageState extends State<MainPage> {
         const ConnectivityIndicator(size: 20, showText: false),
         const SizedBox(width: 8),
         IconButton(
-          onPressed: () {},
+          onPressed: () => Modular.to.pushNamed('/notification'),
           icon: const Icon(Icons.notifications),
         ),
       ],
@@ -74,7 +74,7 @@ class _MainPageState extends State<MainPage> {
         const ConnectivityIndicator(size: 20, showText: false),
         const SizedBox(width: 8),
         IconButton(
-          onPressed: () {},
+          onPressed: () => Modular.to.pushNamed('/notification'),
           icon: const Icon(Icons.notifications),
         ),
       ],

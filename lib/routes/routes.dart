@@ -1,5 +1,6 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:medicine_reminder/features/analytics/presentation/pages/analytics_dashboard_page.dart';
+import 'package:medicine_reminder/features/notification/presentation/pages/notification.dart';
 // import 'package:medicine_reminder/features/analytics/presentation/pages/analytics_page.dart';
 import 'package:medicine_reminder/features/record/presentation/pages/medical_records_page.dart';
 import 'package:medicine_reminder/ui/main/widgets/widgets.dart';
@@ -93,7 +94,8 @@ class AppRoute extends Module {
         ]);
     r.child('/records', child: (_) => const MedicalRecordsPage());
     r.child('/analytics', child: (_) => const AnalyticsPage());
-    r.child('/fcm-test', child: (_) => const FCMTestScreen());
+    // r.child('/fcm-test', child: (_) => const FCMTestScreen());
+    r.child('/notification', child: (_) => const NotificationPage());
     r.module('/auth', module: AuthRoutes());
     r.module('/reminder', module: AddReminderModule());
   }
