@@ -1,0 +1,376 @@
+import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class FCMService {
+  static final FCMService _instance = FCMService._internal();
+  factory FCMService() => _instance;
+  FCMService._internal();
+
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
+
+  String? _fcmToken;
+  String? get fcmToken => _fcmToken;
+
+  /// Initialize FCM service
+  Future<void> initialize() async {
+    try {
+      // Initialize local notifications
+      await _initializeLocalNotifications();
+
+      // Request notification permissions
+      await _requestPermissions();
+
+      // Get FCM token
+      await _getFCMToken();
+
+      // Configure message handlers
+      _configureMessageHandlers();
+
+      // Listen for token refresh
+      _firebaseMessaging.onTokenRefresh.listen(_onTokenRefresh);
+
+      if (kDebugMode) {
+        print('FCM Service initialized successfully');
+        print('FCM Token: $_fcmToken');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error initializing FCM service: $e');
+      }
+    }
+  }
+
+  /// Initialize local notifications
+  Future<void> _initializeLocalNotifications() async {
+    const AndroidInitializationSettings androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const DarwinInitializationSettings iosSettings =
+        DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
+    );
+
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    await _localNotifications.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: _onNotificationTapped,
+    );
+
+    // Create notification channel for Android
+    await _createNotificationChannel();
+  }
+
+  /// Create notification channel for Android
+  Future<void> _createNotificationChannel() async {
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'medicine_reminder_channel',
+      'Medicine Reminders',
+      description: 'Notifications for medicine reminders',
+      importance: Importance.high,
+      playSound: true,
+    );
+
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+  }
+
+  /// Request notification permissions
+  Future<void> _requestPermissions() async {
+    final NotificationSettings settings =
+        await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+      provisional: false,
+      announcement: false,
+      carPlay: false,
+      criticalAlert: false,
+    );
+
+    if (kDebugMode) {
+      print('Notification permission status: ${settings.authorizationStatus}');
+    }
+  }
+
+  /// Get FCM token
+  Future<void> _getFCMToken() async {
+    try {
+      _fcmToken = await _firebaseMessaging.getToken();
+      if (_fcmToken != null) {
+        // Save token to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('fcm_token', _fcmToken!);
+
+        if (kDebugMode) {
+          print('FCM Token obtained: $_fcmToken');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting FCM token: $e');
+      }
+    }
+  }
+
+  /// Configure message handlers
+  void _configureMessageHandlers() {
+    // Handle messages when app is in foreground
+    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+
+    // Handle messages when app is opened from background
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
+
+    // Handle messages when app is opened from terminated state
+    _handleInitialMessage();
+  }
+
+  /// Handle foreground messages
+  Future<void> _handleForegroundMessage(RemoteMessage message) async {
+    if (kDebugMode) {
+      print('Received foreground message: ${message.messageId}');
+      print('Message data: ${message.data}');
+      print('Message notification: ${message.notification?.title}');
+    }
+
+    // Show local notification when app is in foreground
+    await _showLocalNotification(message);
+  }
+
+  /// Handle message when app is opened from background
+  Future<void> _handleMessageOpenedApp(RemoteMessage message) async {
+    if (kDebugMode) {
+      print('App opened from background message: ${message.messageId}');
+    }
+
+    // Handle navigation or other actions based on message data
+    await _handleNotificationAction(message);
+  }
+
+  /// Handle initial message when app is opened from terminated state
+  Future<void> _handleInitialMessage() async {
+    final RemoteMessage? initialMessage =
+        await _firebaseMessaging.getInitialMessage();
+
+    if (initialMessage != null) {
+      if (kDebugMode) {
+        print(
+            'App opened from terminated state message: ${initialMessage.messageId}');
+      }
+
+      // Handle navigation or other actions based on message data
+      await _handleNotificationAction(initialMessage);
+    }
+  }
+
+  /// Show local notification
+  Future<void> _showLocalNotification(RemoteMessage message) async {
+    final RemoteNotification? notification = message.notification;
+
+    if (notification != null) {
+      const AndroidNotificationDetails androidDetails =
+          AndroidNotificationDetails(
+        'medicine_reminder_channel',
+        'Medicine Reminders',
+        channelDescription: 'Notifications for medicine reminders',
+        importance: Importance.high,
+        priority: Priority.high,
+        icon: '@mipmap/ic_launcher',
+      );
+
+      const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
+
+      const NotificationDetails notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      await _localNotifications.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        notificationDetails,
+        payload: jsonEncode(message.data),
+      );
+    }
+  }
+
+  /// Handle notification action (navigation, etc.)
+  Future<void> _handleNotificationAction(RemoteMessage message) async {
+    final Map<String, dynamic> data = message.data;
+
+    // Handle different notification types based on data
+    final String? notificationType = data['type'];
+
+    switch (notificationType) {
+      case 'reminder':
+        // Navigate to reminder details
+        final String? reminderId = data['reminder_id'];
+        if (reminderId != null) {
+          // TODO: Navigate to reminder details page
+          if (kDebugMode) {
+            print('Navigate to reminder: $reminderId');
+          }
+        }
+        break;
+      case 'appointment':
+        // Navigate to appointment details
+        final String? appointmentId = data['appointment_id'];
+        if (appointmentId != null) {
+          // TODO: Navigate to appointment details page
+          if (kDebugMode) {
+            print('Navigate to appointment: $appointmentId');
+          }
+        }
+        break;
+      default:
+        // Default action
+        if (kDebugMode) {
+          print('Unknown notification type: $notificationType');
+        }
+    }
+  }
+
+  /// Handle notification tap
+  void _onNotificationTapped(NotificationResponse response) {
+    if (response.payload != null) {
+      try {
+        final Map<String, dynamic> data = jsonDecode(response.payload!);
+        final RemoteMessage message = RemoteMessage(
+          messageId: DateTime.now().millisecondsSinceEpoch.toString(),
+          data: data,
+        );
+        _handleNotificationAction(message);
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error handling notification tap: $e');
+        }
+      }
+    }
+  }
+
+  /// Handle token refresh
+  void _onTokenRefresh(String token) {
+    _fcmToken = token;
+    _saveFCMToken(token);
+
+    if (kDebugMode) {
+      print('FCM Token refreshed: $token');
+    }
+
+    // TODO: Send updated token to your server
+  }
+
+  /// Save FCM token to SharedPreferences
+  Future<void> _saveFCMToken(String token) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('fcm_token', token);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error saving FCM token: $e');
+      }
+    }
+  }
+
+  /// Get saved FCM token from SharedPreferences
+  Future<String?> getSavedFCMToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString('fcm_token');
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error getting saved FCM token: $e');
+      }
+      return null;
+    }
+  }
+
+  /// Send FCM token to server
+  Future<void> sendTokenToServer(String? userId) async {
+    if (_fcmToken == null || userId == null) return;
+
+    try {
+      // TODO: Implement API call to send token to your server
+      // Example:
+      // await ApiService.sendFCMToken(userId, _fcmToken!);
+
+      if (kDebugMode) {
+        print('Sending FCM token to server for user: $userId');
+        print('Token: $_fcmToken');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error sending FCM token to server: $e');
+      }
+    }
+  }
+
+  /// Subscribe to topic
+  Future<void> subscribeToTopic(String topic) async {
+    try {
+      await _firebaseMessaging.subscribeToTopic(topic);
+      if (kDebugMode) {
+        print('Subscribed to topic: $topic');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error subscribing to topic $topic: $e');
+      }
+    }
+  }
+
+  /// Unsubscribe from topic
+  Future<void> unsubscribeFromTopic(String topic) async {
+    try {
+      await _firebaseMessaging.unsubscribeFromTopic(topic);
+      if (kDebugMode) {
+        print('Unsubscribed from topic: $topic');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error unsubscribing from topic $topic: $e');
+      }
+    }
+  }
+
+  /// Clear all notifications
+  Future<void> clearAllNotifications() async {
+    await _localNotifications.cancelAll();
+  }
+
+  /// Clear specific notification
+  Future<void> clearNotification(int id) async {
+    await _localNotifications.cancel(id);
+  }
+}
+
+/// Background message handler (must be top-level function)
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Initialize Firebase if not already done
+  // await Firebase.initializeApp();
+
+  if (kDebugMode) {
+    print('Background message received: ${message.messageId}');
+    print('Message data: ${message.data}');
+  }
+
+  // Handle background message (e.g., update local database, etc.)
+}

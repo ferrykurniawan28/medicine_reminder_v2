@@ -21,12 +21,12 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
       version: 2, // Bump version for migration
       onCreate: (db, version) async {
         await db.execute('''
-          CREATE TABLE users(
+            CREATE TABLE IF NOT EXISTS users(
             id INTEGER PRIMARY KEY,
             username TEXT,
             email TEXT,
             is_synced INTEGER DEFAULT 0
-          )
+            )
         ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {

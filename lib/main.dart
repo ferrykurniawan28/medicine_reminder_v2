@@ -30,9 +30,21 @@ import 'package:medicine_reminder/features/parental/data/repositories/parental_r
 import 'package:medicine_reminder/features/device/data/datasources/device_remote_datasource_impl.dart';
 import 'package:medicine_reminder/core/connectivity/connectivity.dart';
 import 'package:medicine_reminder/core/services/services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:medicine_reminder/core/services/fcm_service.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Set background message handler for FCM
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   // Initialize critical services first
   await _initializeCoreServices();
@@ -64,6 +76,9 @@ Future<void> _initializeCoreServices() async {
     // Initialize parental database
     final parentalDatabase = ParentalDatabase();
     await parentalDatabase.database; // This initializes the parental database
+
+    // Initialize FCM service
+    await FCMService().initialize();
 
     debugPrint('✅ Core services initialized successfully');
   } catch (e) {

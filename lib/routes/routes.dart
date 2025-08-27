@@ -4,6 +4,7 @@ import 'package:medicine_reminder/features/analytics/presentation/pages/analytic
 import 'package:medicine_reminder/features/record/presentation/pages/medical_records_page.dart';
 import 'package:medicine_reminder/ui/main/widgets/widgets.dart';
 import 'package:medicine_reminder/ui/ui.dart';
+import 'package:medicine_reminder/ui/screens/fcm_test_screen.dart';
 
 import '../ui/auth/auth.dart';
 import '../ui/main/main.dart';
@@ -92,6 +93,7 @@ class AppRoute extends Module {
         ]);
     r.child('/records', child: (_) => const MedicalRecordsPage());
     r.child('/analytics', child: (_) => const AnalyticsPage());
+    r.child('/fcm-test', child: (_) => const FCMTestScreen());
     r.module('/auth', module: AuthRoutes());
     r.module('/reminder', module: AddReminderModule());
   }

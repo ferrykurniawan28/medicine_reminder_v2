@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:medicine_reminder/core/network/network_service.dart';
+import 'package:medicine_reminder/core/services/fcm_token_manager.dart';
 import 'package:medicine_reminder/core/services/services.dart';
 import 'package:medicine_reminder/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:medicine_reminder/features/user/domain/entities/user.dart';
@@ -35,6 +36,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // Add user to local user table via UserBloc
         // userBloc?.add(CreateUser(user));
         SharedPreference.setInt('userId', user.userId!);
+        FCMTokenManager().registerTokenForUser(user.userId!);
         emit(AuthAuthenticated(user: user));
       } else {
         emit(AuthError(response.message ?? response.error ?? 'Login failed'));
@@ -52,6 +54,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       SharedPreference.setInt('userId', 0);
       // Optionally notify UserBloc to remove user data
       // userBloc?.add(RemoveUser());
+      FCMTokenManager().unregisterTokenForUser(0);
       emit(AuthUnauthenticated());
     } catch (e) {
       emit(AuthError(e.toString()));
@@ -74,6 +77,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // Add user to local user table via UserBloc
         // userBloc?.add(CreateUser(user));
         SharedPreference.setInt('userId', user.userId!);
+        FCMTokenManager().registerTokenForUser(user.userId!);
         emit(AuthAuthenticated(user: user));
       } else {
         emit(AuthError(
