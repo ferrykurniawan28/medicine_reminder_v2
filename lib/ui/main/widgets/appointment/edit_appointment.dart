@@ -61,7 +61,9 @@ Future<void> editAppointment(BuildContext ctx, Appointment appointment) async {
                     child: CupertinoButton(
                       child: const Icon(Icons.more_horiz, size: 25),
                       onPressed: () {
-                        _showActionSheet(context, appointment, userId);
+                        _showActionSheet(context, appointment, userId, () {
+                          Navigator.of(context).pop(); // Close edit sheet
+                        });
                       },
                     ),
                   )
@@ -156,21 +158,25 @@ Future<void> editAppointment(BuildContext ctx, Appointment appointment) async {
   );
 }
 
-void _showActionSheet(
-    BuildContext context, Appointment appointment, int userId) {
+void _showActionSheet(BuildContext context, Appointment appointment, int userId,
+    VoidCallback onDelete) {
   showCupertinoModalPopup<void>(
     context: context,
     builder: (BuildContext context) => CupertinoActionSheet(
       actions: <CupertinoActionSheetAction>[
         CupertinoActionSheetAction(
           isDestructiveAction: true,
-          onPressed: () {
+          onPressed: () async {
+            // Add the delete event first
             context.read<AppointmentBloc>().add(
                   AppointmentDelete(appointment),
                 );
-            // context.read<AppointmentBloc>().add(AppointmentsFetch(userId));
+
+            // Close action sheet
             Navigator.pop(context);
-            Navigator.pop(context);
+
+            // Close edit sheet using callback
+            onDelete();
           },
           child: const Text('Delete Appointment'),
         ),
