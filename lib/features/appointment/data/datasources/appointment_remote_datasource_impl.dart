@@ -67,7 +67,7 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
     final body = {
       'doctor': appointment.doctor,
       'notes': appointment.note,
-      'dates': appointment.time.toUtc().toIso8601String(),
+      'dates': '${appointment.time.toIso8601String()}Z',
     };
     final response = await networkService.put<AppointmentModel>(
       '$appointmentUrl/${appointment.id}',
