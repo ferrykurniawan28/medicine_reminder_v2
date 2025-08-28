@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 class FCMService {
   static final FCMService _instance = FCMService._internal();
@@ -217,33 +218,80 @@ class FCMService {
 
     // Handle different notification types based on data
     final String? notificationType = data['type'];
+    final String? route = data['route']; // Custom route parameter
 
     switch (notificationType) {
       case 'reminder':
         // Navigate to reminder details
         final String? reminderId = data['reminder_id'];
         if (reminderId != null) {
-          // TODO: Navigate to reminder details page
-          if (kDebugMode) {
-            print('Navigate to reminder: $reminderId');
-          }
+          _navigateToPage('/reminder_detail', {'id': reminderId});
+        } else {
+          _navigateToPage('/reminders'); // Default to reminders list
         }
         break;
       case 'appointment':
         // Navigate to appointment details
         final String? appointmentId = data['appointment_id'];
         if (appointmentId != null) {
-          // TODO: Navigate to appointment details page
-          if (kDebugMode) {
-            print('Navigate to appointment: $appointmentId');
-          }
+          _navigateToPage('/appointment_detail', {'id': appointmentId});
+        } else {
+          _navigateToPage('/appointments'); // Default to appointments list
+        }
+        break;
+      case 'medicine':
+        // Navigate to medicine details
+        final String? medicineId = data['medicine_id'];
+        if (medicineId != null) {
+          _navigateToPage('/medicine_detail', {'id': medicineId});
+        } else {
+          _navigateToPage('/medicines'); // Default to medicines list
+        }
+        break;
+      case 'custom':
+        // Handle custom routes
+        if (route != null) {
+          final Map<String, String> params = {};
+          // Parse additional parameters if needed
+          data.forEach((key, value) {
+            if (key != 'type' && key != 'route') {
+              params[key] = value.toString();
+            }
+          });
+          _navigateToPage(route, params);
         }
         break;
       default:
-        // Default action
+        // Default action - navigate to home
+        _navigateToPage('/home');
         if (kDebugMode) {
           print('Unknown notification type: $notificationType');
         }
+    }
+  }
+
+  /// Navigate to a specific page
+  void _navigateToPage(String route, [Map<String, String>? params]) {
+    // Use a global navigator key or context
+    // You'll need to implement this based on your routing system
+
+    if (kDebugMode) {
+      print('Navigating to: $route with params: $params');
+    }
+
+    // Example implementation using Modular (since you're using it)
+    try {
+      if (params != null && params.isNotEmpty) {
+        Modular.to.pushNamed(route, arguments: params);
+      } else {
+        Modular.to.pushNamed(route);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Navigation error: $e');
+      }
+      // Fallback to home if navigation fails
+      Modular.to.pushNamed('/home');
     }
   }
 
