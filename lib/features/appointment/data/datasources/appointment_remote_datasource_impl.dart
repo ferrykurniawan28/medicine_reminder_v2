@@ -47,14 +47,6 @@ class AppointmentRemoteDataSourceImpl implements AppointmentRemoteDataSource {
 
   @override
   Future<AppointmentModel> addAppointment(AppointmentModel appointment) async {
-    final body = {
-      'created_by': appointment.userCreated.userId,
-      'assigned_to': appointment.userAssigned.userId,
-      'doctor': appointment.doctor,
-      'notes': appointment.note,
-      'dates': appointment.time.toUtc().toIso8601String(),
-    };
-
     late AppointmentModel addedAppointment;
     final response = await networkService.post<AppointmentModel>(
       appointmentUrl,

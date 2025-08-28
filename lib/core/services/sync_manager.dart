@@ -71,7 +71,10 @@ class SyncManager {
     try {
       final unsyncedAppointments =
           await appointmentLocalDataSource.getUnsyncedAppointments();
+      print('Found ${unsyncedAppointments.length} unsynced appointments');
       for (var appointment in unsyncedAppointments) {
+        print(
+            'Syncing appointment: id=${appointment.id}, isSynced=${appointment.isSynced}, isDeleted=${appointment.isDeleted}, isUpdated=${appointment.isUpdated}');
         if (appointment.isDeleted == 1) {
           await _syncDeletedAppointment(appointment);
         } else if (appointment.isUpdated == 1) {
@@ -113,9 +116,14 @@ class SyncManager {
   }
 
   Future<void> _syncNewAppointment(AppointmentModel appointment) async {
+    print('_syncNewAppointment called for appointment id: ${appointment.id}');
     if (appointment.id != null) {
+      print('Posting appointment to remote API...');
       await appointmentRemoteDataSource.addAppointment(appointment);
       await appointmentLocalDataSource.markAppointmentAsSynced(appointment.id!);
+      print('Appointment synced successfully');
+    } else {
+      print('Skipping sync - appointment has no ID');
     }
   }
 

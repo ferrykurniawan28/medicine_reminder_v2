@@ -68,47 +68,50 @@ class _ConnectivityBannerState extends State<ConnectivityBanner>
           alignment: Alignment.topCenter, // Use non-directional alignment
           children: [
             widget.child,
-            AnimatedBuilder(
-              animation: _slideAnimation,
-              builder: (context, child) {
-                return Transform.translate(
-                  offset: Offset(0, _slideAnimation.value * 50),
-                  child: shouldShow
-                      ? Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          color: isConnected ? Colors.white : Colors.red,
-                          child: SafeArea(
-                            bottom: false,
-                            child: Row(
-                              children: [
-                                Icon(
-                                  isConnected ? Icons.wifi : Icons.wifi_off,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    _connectivityService.statusMessage,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                );
-              },
-            ),
+            // if (shouldShow)
+            //   Positioned(
+            //     top: 0,
+            //     left: 0,
+            //     right: 0,
+            //     child: AnimatedContainer(
+            //       duration: widget.animationDuration,
+            //       curve: Curves.easeOut,
+            //       transform: Matrix4.translationValues(
+            //           0, _slideAnimation.value * 50, 0),
+            //       child: Container(
+            //         width: double.infinity,
+            //         height: 50,
+            //         padding: const EdgeInsets.symmetric(
+            //           horizontal: 16,
+            //           vertical: 8,
+            //         ),
+            //         color: isConnected ? Colors.green : Colors.red,
+            //         child: SafeArea(
+            //           bottom: false,
+            //           child: Row(
+            //             children: [
+            //               Icon(
+            //                 isConnected ? Icons.wifi : Icons.wifi_off,
+            //                 color: Colors.white,
+            //                 size: 16,
+            //               ),
+            //               const SizedBox(width: 8),
+            //               Expanded(
+            //                 child: Text(
+            //                   _connectivityService.statusMessage,
+            //                   style: const TextStyle(
+            //                     color: Colors.white,
+            //                     fontSize: 12,
+            //                     fontWeight: FontWeight.w500,
+            //                   ),
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
           ],
         );
       },

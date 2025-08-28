@@ -58,6 +58,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
       }
       emit(AppointmentsLoaded(_appointments));
     } catch (e) {
+      print(e);
       emit(AppointmentError(e.toString()));
     }
   }
@@ -82,6 +83,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
       AppointmentAdd event, Emitter<AppointmentState> emit) async {
     emit(AppointmentLoading());
     try {
+      print(event.appointment.toJson());
       await addAppointmentUseCase(event.appointment);
       add(AppointmentsFetch(event.appointment.userAssigned.userId!));
     } catch (e) {

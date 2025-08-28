@@ -66,7 +66,7 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
               'userAssigned': e['assigned_to'],
               'doctor': e['doctor'],
               'note': e['notes'],
-              'time': e['dates'],
+              'dates': e['dates'], // Use 'dates' not 'time'
             }))
         .toList();
   }
@@ -84,20 +84,30 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
       'userAssigned': e['assigned_to'],
       'doctor': e['doctor'],
       'note': e['notes'],
-      'time': e['dates'],
+      'dates': e['dates'], // Use 'dates' not 'time'
     });
   }
 
   @override
-  Future<void> addAppointment(AppointmentModel appointment) async {
+  Future<void> addAppointment(AppointmentModel appointment,
+      {bool sync = false}) async {
     try {
       final db = await database;
       final data = appointment.toJson();
+
+      // Filter out double Z from dates field
+      if (data['dates'] != null && data['dates'].toString().contains('ZZ')) {
+        print('Warning: Fixing double Z in date: ${data['dates']}');
+        data['dates'] = data['dates'].toString().replaceAll('ZZ', 'Z');
+        print('Fixed date: ${data['dates']}');
+      }
+
       // Remove id if null so SQLite auto-increments
       if (data['id'] == null) {
         data.remove('id');
       }
-      data['is_synced'] = 0; // Always mark as not synced on local add
+      data['is_synced'] =
+          sync ? 1 : 0; // Always mark as not synced on local add
       await db.insert('appointments', data,
           conflictAlgorithm: ConflictAlgorithm.replace);
     } catch (e) {
@@ -109,6 +119,14 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
   Future<void> updateAppointment(AppointmentModel appointment) async {
     final db = await database;
     final data = appointment.toJson();
+
+    // Filter out double Z from dates field
+    if (data['dates'] != null && data['dates'].toString().contains('ZZ')) {
+      print('Warning: Fixing double Z in update date: ${data['dates']}');
+      data['dates'] = data['dates'].toString().replaceAll('ZZ', 'Z');
+      print('Fixed update date: ${data['dates']}');
+    }
+
     data['is_synced'] = 0; // Always mark as not synced on local update
     data['is_updated'] = 1; // Mark as updated on local update
     await db.update('appointments', data,
@@ -161,7 +179,7 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
               'userAssigned': e['assigned_to'],
               'doctor': e['doctor'],
               'note': e['notes'],
-              'time': e['dates'],
+              'dates': e['dates'], // Use 'dates' not 'time'
             }))
         .toList();
   }
@@ -202,7 +220,7 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
               'userAssigned': e['assigned_to'],
               'doctor': e['doctor'],
               'note': e['notes'],
-              'time': e['dates'],
+              'dates': e['dates'], // Use 'dates' not 'time'
             }))
         .toList();
   }

@@ -74,7 +74,9 @@ class AppointmentModel extends Appointment {
         'assigned_to': userAssigned.userId,
         'doctor': doctor,
         'notes': note,
-        'dates': time.toUtc().toIso8601String(),
+        'dates': time.toIso8601String().endsWith('Z')
+            ? time.toIso8601String()
+            : '${time.toIso8601String()}Z',
         'is_synced': isSynced,
         'is_deleted': isDeleted,
         'is_updated': isUpdated,
