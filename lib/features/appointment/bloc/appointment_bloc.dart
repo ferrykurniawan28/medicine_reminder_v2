@@ -56,6 +56,7 @@ class AppointmentBloc extends Bloc<AppointmentEvent, AppointmentState> {
         emit(const AppointmentError('No appointments found'));
         return;
       }
+      _appointments.sort((a, b) => a.time.compareTo(b.time));
       emit(AppointmentsLoaded(_appointments));
     } catch (e) {
       print(e);
