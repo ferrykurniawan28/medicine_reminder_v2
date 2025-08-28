@@ -117,9 +117,13 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
       note: appointment.note,
       time: appointment.time,
     );
-    await localDataSource.updateAppointment(model);
     if (isOnline != null && isOnline!()) {
-      await syncManager.syncUnsyncedAppointments();
+      await remoteDataSource?.updateAppointment(model);
+      await localDataSource.updateAppointment(model, sync: true);
+      // await syncManager.syncUnsyncedAppointments();
+      return;
+    } else {
+      await localDataSource.updateAppointment(model);
     }
   }
 

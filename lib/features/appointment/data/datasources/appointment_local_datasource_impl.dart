@@ -116,7 +116,8 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
   }
 
   @override
-  Future<void> updateAppointment(AppointmentModel appointment) async {
+  Future<void> updateAppointment(AppointmentModel appointment,
+      {bool sync = false}) async {
     final db = await database;
     final data = appointment.toJson();
 
@@ -127,8 +128,8 @@ class AppointmentLocalDataSourceImpl implements AppointmentLocalDataSource {
       print('Fixed update date: ${data['dates']}');
     }
 
-    data['is_synced'] = 0; // Always mark as not synced on local update
-    data['is_updated'] = 1; // Mark as updated on local update
+    data['is_updated'] = sync ? 0 : 1;
+    data['is_synced'] = sync ? 1 : 0;
     await db.update('appointments', data,
         where: 'id = ?', whereArgs: [appointment.id]);
   }

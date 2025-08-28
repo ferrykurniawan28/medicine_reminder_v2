@@ -5,7 +5,8 @@ abstract class AppointmentLocalDataSource {
   Future<AppointmentModel?> getAppointment(int id);
   Future<void> addAppointment(AppointmentModel appointment,
       {bool sync = false});
-  Future<void> updateAppointment(AppointmentModel appointment);
+  Future<void> updateAppointment(AppointmentModel appointment,
+      {bool sync = false});
   Future<void> deleteAppointment(int id);
   Future<void> markAppointmentAsDeleted(int id);
   Future<List<AppointmentModel>> getDeletedAppointments();
