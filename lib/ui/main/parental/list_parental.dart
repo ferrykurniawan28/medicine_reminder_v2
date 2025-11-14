@@ -109,7 +109,35 @@ class _ListParentalState extends State<ListParental> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Modular.to.pushNamed('/home/parental/add');
+          Modular.to.pushNamed('/scan-barcode', arguments: {
+            'title': 'Scan Parental ID',
+            'onScanned': (String parentalId) {
+              String parentalUid = parentalId;
+              if (parentalUid.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Scanned code is empty. Please try again.'),
+                  ),
+                );
+                return;
+              }
+
+              print('Scanned parental ID: $parentalId');
+
+              final sucess = UserHelper.executeWithUserId(context, (int id) {
+                context.read<ParentalBloc>().add(ParentalAdd(id, parentalId));
+              }, errorMessage: 'Error adding parental relationship.');
+
+              if (sucess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Parental relationship added successfully.'),
+                  ),
+                );
+                Modular.to.pop();
+              }
+            },
+          });
         },
         backgroundColor: kPrimaryColor,
         shape: const CircleBorder(),

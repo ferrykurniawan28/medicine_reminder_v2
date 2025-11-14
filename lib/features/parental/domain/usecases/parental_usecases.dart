@@ -20,8 +20,8 @@ class AddParental {
 
   AddParental(this.repository);
 
-  Future<void> call(Parental parental, int userId) async {
-    await repository.addParental(parental, userId);
+  Future<void> call(int userId, String parentalId) async {
+    await repository.addParental(userId, parentalId);
   }
 }
 

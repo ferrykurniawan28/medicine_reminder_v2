@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+
 import '../../data/models/medical_analytics.dart';
 
 class ComplianceChart extends StatelessWidget {
@@ -121,10 +122,10 @@ class WeeklyTrendChart extends StatelessWidget {
           ),
           titlesData: FlTitlesData(
             show: true,
-            rightTitles: AxisTitles(
+            rightTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            topTitles: AxisTitles(
+            topTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
             bottomTitles: AxisTitles(
@@ -136,7 +137,7 @@ class WeeklyTrendChart extends StatelessWidget {
                   if (value.toInt() < weeklyTrends.length) {
                     final week = weeklyTrends[value.toInt()].week;
                     return SideTitleWidget(
-                      meta: meta,
+                      axisSide: meta.axisSide,
                       child: Text(
                         week.replaceAll('2025-W', 'W'),
                         style: const TextStyle(
@@ -263,10 +264,10 @@ class MedicineComplianceBarChart extends StatelessWidget {
           ),
           titlesData: FlTitlesData(
             show: true,
-            rightTitles: AxisTitles(
+            rightTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            topTitles: AxisTitles(
+            topTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
             bottomTitles: AxisTitles(
@@ -276,7 +277,7 @@ class MedicineComplianceBarChart extends StatelessWidget {
                   if (value.toInt() < medicineAnalysis.length) {
                     final medicine = medicineAnalysis[value.toInt()];
                     return SideTitleWidget(
-                      meta: meta,
+                      axisSide: meta.axisSide,
                       child: Text(
                         medicine.medicineName.length > 8
                             ? '${medicine.medicineName.substring(0, 8)}...'
@@ -389,10 +390,10 @@ class TimeSlotActivityChart extends StatelessWidget {
           ),
           titlesData: FlTitlesData(
             show: true,
-            rightTitles: AxisTitles(
+            rightTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            topTitles: AxisTitles(
+            topTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
             bottomTitles: AxisTitles(
@@ -404,7 +405,7 @@ class TimeSlotActivityChart extends StatelessWidget {
                     final timeParts =
                         slot.timeRange.split(' ')[0]; // Get just the time part
                     return SideTitleWidget(
-                      meta: meta,
+                      axisSide: meta.axisSide,
                       child: Text(
                         timeParts,
                         style: const TextStyle(

@@ -31,6 +31,10 @@ final class ParentalLoaded extends ParentalState {
   List<Object> get props => [parental];
 }
 
+final class ParentalAdded extends ParentalState {}
+
+final class ParentalDeleted extends ParentalState {}
+
 final class ParentalError extends ParentalState {
   final String message;
 

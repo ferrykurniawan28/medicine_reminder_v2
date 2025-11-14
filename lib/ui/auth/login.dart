@@ -50,6 +50,7 @@ class _LoginState extends State<Login> {
               } else if (state is AuthError) {
                 CustomOverlay.hide();
                 // Show error message
+                print('Auth Error: ${state.message}');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(state.message)),
                 );

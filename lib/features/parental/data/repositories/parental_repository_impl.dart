@@ -120,8 +120,36 @@ class ParentalRepositoryImpl implements ParentalRepository {
   }
 
   @override
-  Future<void> addParental(Parental parental, int userId) async {
-    await localDataSource.addParental(parental, userId);
+  Future<void> addParental(int userId, String parentalId) async {
+    // If online, create on server first then fetch and save to local
+    if (isOnline != null && isOnline!()) {
+      try {
+        // Create the relationship on server (only needs user IDs)
+        await remoteDataSource.createParentalRelationship(userId, parentalId);
+        print('Parental relationship created on server');
+
+        // Fetch all parentals from server to get the newly created one with full data
+        final parentals = await remoteDataSource.fetchParentals(userId);
+
+        // Save all fetched parentals to local (including the new one)
+        for (final fetchedParental in parentals) {
+          if (fetchedParental.id != null) {
+            final exists =
+                await localDataSource.parentalExistsById(fetchedParental.id!);
+            if (!exists) {
+              await localDataSource.addParental(fetchedParental, userId);
+            }
+          }
+        }
+        print('Parental relationship saved to local database');
+      } catch (e) {
+        print('Failed to create parental on server: $e');
+        throw Exception('Failed to create parental relationship: $e');
+      }
+    } else {
+      // If offline, save placeholder to local for later sync
+      throw Exception('Cannot add parental relationship while offline');
+    }
   }
 
   @override
@@ -145,7 +173,13 @@ class ParentalRepositoryImpl implements ParentalRepository {
   }
 
   @override
-  Future<void> syncParentalToServer(Parental parental) async {
-    await remoteDataSource.addParental(parental);
+  Future<void> syncParentalToServer(int userId, String parentalId) async {
+    try {
+      await remoteDataSource.createParentalRelationship(userId, parentalId);
+      print('Parental relationship synced to server');
+    } catch (e) {
+      print('Failed to sync parental to server: $e');
+      throw Exception('Failed to sync parental relationship: $e');
+    }
   }
 }

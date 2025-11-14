@@ -56,6 +56,7 @@ class _RegisterState extends State<Register> {
               } else if (state is AuthError) {
                 CustomOverlay.hide();
                 // Show error message
+                print('Auth Error: ${state.message}');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(state.message)),
                 );

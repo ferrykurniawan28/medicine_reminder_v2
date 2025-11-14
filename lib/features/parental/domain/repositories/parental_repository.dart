@@ -1,4 +1,3 @@
-import 'package:medicine_reminder/features/appointment/data/models/appointment_model.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/parental/domain/entities/parental.dart';
@@ -9,7 +8,8 @@ abstract class ParentalRepository {
   Future<List<Parental>> getParentals(int userId);
   Future<List<Parental>> getParentalsByParentalId(int parentalId);
   Future<Parental?> getParental(int id);
-  Future<void> addParental(Parental parental, int userId);
+
+  Future<void> addParental(int userId, String parentalId);
   Future<void> updateParental(Parental parental);
   Future<void> deleteParental(int id);
   Future<bool> parentalExists(int userId, int parentalId);
@@ -24,7 +24,7 @@ abstract class ParentalRepository {
       Appointment appointment, int parentalId);
   Future<void> createParentalReminder(Reminder reminder, int parentalId);
 
-  Future<void> syncParentalToServer(Parental parental);
+  Future<void> syncParentalToServer(int userId, String parentalId);
   // Future<void> updateParentalOnServer(Parental parental);
   // Future<void> deleteParentalOnServer(int parentalId);
 }

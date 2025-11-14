@@ -202,8 +202,28 @@ class ParentalRemoteDataSourceImpl implements ParentalRemoteDataSource {
   }
 
   @override
-  Future<void> addParental(Parental parental) async {
-    //TODO: add parental
+  @override
+  Future<void> createParentalRelationship(int userId, String parentalId) async {
+    final body = {
+      'user_id': userId,
+      'parental_uuid': parentalId,
+    };
+    try {
+      final response = await networkService.post(
+        '$parentalUrl/qr',
+        body: body,
+      );
+      if (response.statusCode != 201) {
+        throw Exception(
+            'Failed to create parental relationship: ${response.message}');
+      } else {
+        print(
+            'Parental relationship created successfully for userId: $userId, parentalId: $parentalId');
+      }
+    } catch (e) {
+      print('Error in addParental: $e');
+      throw Exception('Failed to add parental: $e');
+    }
   }
 
   @override

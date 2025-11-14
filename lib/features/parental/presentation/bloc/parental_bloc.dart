@@ -1,10 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:medicine_reminder/features/appointment/domain/entities/appointment.dart';
-import 'package:medicine_reminder/features/device/data/models/device_model.dart';
 import 'package:medicine_reminder/features/device/domain/entities/device.dart';
 import 'package:medicine_reminder/features/parental/domain/repositories/parental_repository.dart';
-import 'package:medicine_reminder/features/reminder/data/models/reminder_model.dart';
 import 'package:medicine_reminder/features/parental/domain/entities/parental.dart';
 import 'package:medicine_reminder/features/parental/domain/usecases/parental_usecases.dart';
 import 'package:medicine_reminder/features/reminder/domain/entities/reminder.dart';
@@ -63,12 +61,16 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
 
   Future<void> _onAddParental(
       ParentalAdd event, Emitter<ParentalState> emit) async {
+    emit(ParentalLoading());
     try {
-      await addParental(event.parental, event.userId);
-      // Reload the parentals list
-      if (state is ParentalsLoaded) {
-        add(LoadParentals(event.parental.id!));
-      }
+      // Create on server and save to local (repository handles the full flow)
+      await addParental(event.userId, event.parentalId);
+
+      // Emit success state
+      emit(ParentalAdded());
+
+      // Reload the parentals list to get updated data
+      add(LoadParentals(event.userId));
     } catch (e) {
       emit(ParentalError(e.toString()));
     }
@@ -89,10 +91,18 @@ class ParentalBloc extends Bloc<ParentalEvent, ParentalState> {
 
   Future<void> _onDeleteParental(
       ParentalDelete event, Emitter<ParentalState> emit) async {
+    emit(ParentalLoading());
     try {
+      // Delete parental
       await deleteParental(event.id);
+
       // Remove from local list
       _parentals.removeWhere((p) => p.id == event.id);
+
+      // Emit success state
+      emit(ParentalDeleted());
+
+      // Emit updated list
       emit(ParentalsLoaded(_parentals));
     } catch (e) {
       emit(ParentalError(e.toString()));

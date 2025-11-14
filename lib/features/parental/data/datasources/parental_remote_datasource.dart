@@ -14,7 +14,7 @@ abstract class ParentalRemoteDataSource {
 
   /// Add a new parental relationship to the server
   /// Creates a new relationship between parent and child
-  Future<void> addParental(Parental parental);
+  Future<void> createParentalRelationship(int userId, String parentalId);
 
   /// Delete a parental relationship on the server
   /// Removes the relationship from remote storage

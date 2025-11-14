@@ -137,10 +137,34 @@ class ReminderDetail extends StatelessWidget {
                   if (reminder.assignedTo != null)
                     _buildDetailItem(
                         'Assigned To', reminder.assignedTo!.userName ?? 'N/A'),
+                  if (reminder.createdBy != null)
+                    _buildDetailItem(
+                        'Created By', reminder.createdBy!.userName ?? 'N/A'),
                   if (reminder.note != null && reminder.note!.isNotEmpty)
                     _buildDetailItem('Notes', reminder.note!),
                 ],
               ),
+              spacerHeight(20),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {},
+                      label: const Text('Skip'),
+                      icon: const Icon(
+                        Icons.close,
+                      ),
+                    ),
+                  ),
+                  spacerWidth(20),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                        onPressed: () {},
+                        label: const Text('Confirm'),
+                        icon: const Icon(Icons.check)),
+                  ),
+                ],
+              )
             ],
           ),
         ),

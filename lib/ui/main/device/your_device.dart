@@ -14,91 +14,91 @@ class YourDevice extends StatelessWidget {
       shrinkWrap: true,
       // crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FlutterCarousel.builder(
-          itemCount: 5,
-          options: FlutterCarouselOptions(
-            height: 150,
-            viewportFraction: 1,
-            initialPage: 0,
-            // reverse: false,
-            // autoPlay: true,
-            // autoPlayInterval: const Duration(seconds: 3),
-            // autoPlayAnimationDuration:
-            //     const Duration(milliseconds: 800),
-            // autoPlayCurve: Curves.fastOutSlowIn,
-            enlargeCenterPage: true,
-            showIndicator: true,
-            // floatingIndicator: true,
-            slideIndicator: CircularSlideIndicator(
-                slideIndicatorOptions: const SlideIndicatorOptions(
-              currentIndicatorColor: kPrimaryColor,
-              indicatorBackgroundColor: Colors.grey,
-              indicatorRadius: 4,
-              haloPadding: EdgeInsets.symmetric(horizontal: 5),
-            )),
-            indicatorMargin: 1,
-            scrollDirection: Axis.horizontal,
-          ),
-          itemBuilder: (BuildContext context, int index, int realIndex) {
-            // List<ContainerModel> containers = device.containers;
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                // gradient: LinearGradient(
-                //   colors: [
-                //     softBlueColor,
-                //     softBlueColor.lighten(0.1),
-                //   ],
-                // ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  defaultShadow,
-                ],
-              ),
-              child: Row(
-                children: [
-                  OptimizedIcon(
-                    assetPath: 'assets/icons/pils.png',
-                    size: 60,
-                  ),
-                  spacerWidth(10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Container ${device.containers[index].containerId + 1}',
-                        style: subtitleTextStyle,
-                      ),
-                      Text(
-                        (device.containers[index].medicineName == null ||
-                                device.containers[index].medicineName == "")
-                            ? 'Add Medicine'
-                            : device.containers[index].medicineName ?? '',
-                        style: captionTextStyle,
-                      )
-                    ],
-                  ),
-                  const Spacer(),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Stock', style: subtitleTextStyle),
-                      Text(
-                        device.containers[index].quantity.toString(),
-                        style: captionTextStyle,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+        // FlutterCarousel.builder(
+        //   itemCount: 5,
+        //   options: FlutterCarouselOptions(
+        //     height: 150,
+        //     viewportFraction: 1,
+        //     initialPage: 0,
+        //     // reverse: false,
+        //     // autoPlay: true,
+        //     // autoPlayInterval: const Duration(seconds: 3),
+        //     // autoPlayAnimationDuration:
+        //     //     const Duration(milliseconds: 800),
+        //     // autoPlayCurve: Curves.fastOutSlowIn,
+        //     enlargeCenterPage: true,
+        //     showIndicator: true,
+        //     // floatingIndicator: true,
+        //     slideIndicator: CircularSlideIndicator(
+        //         slideIndicatorOptions: const SlideIndicatorOptions(
+        //       currentIndicatorColor: kPrimaryColor,
+        //       indicatorBackgroundColor: Colors.grey,
+        //       indicatorRadius: 4,
+        //       haloPadding: EdgeInsets.symmetric(horizontal: 5),
+        //     )),
+        //     indicatorMargin: 1,
+        //     scrollDirection: Axis.horizontal,
+        //   ),
+        //   itemBuilder: (BuildContext context, int index, int realIndex) {
+        //     // List<ContainerModel> containers = device.containers;
+        //     return Container(
+        //       width: double.infinity,
+        //       padding: const EdgeInsets.all(16),
+        //       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        //       decoration: BoxDecoration(
+        //         color: Colors.white,
+        //         // gradient: LinearGradient(
+        //         //   colors: [
+        //         //     softBlueColor,
+        //         //     softBlueColor.lighten(0.1),
+        //         //   ],
+        //         // ),
+        //         borderRadius: BorderRadius.circular(16),
+        //         boxShadow: [
+        //           defaultShadow,
+        //         ],
+        //       ),
+        //       child: Row(
+        //         children: [
+        //           OptimizedIcon(
+        //             assetPath: 'assets/icons/pils.png',
+        //             size: 60,
+        //           ),
+        //           spacerWidth(10),
+        //           Column(
+        //             crossAxisAlignment: CrossAxisAlignment.start,
+        //             mainAxisAlignment: MainAxisAlignment.center,
+        //             children: [
+        //               Text(
+        //                 'Container ${device.containers[index].containerId + 1}',
+        //                 style: subtitleTextStyle,
+        //               ),
+        //               Text(
+        //                 (device.containers[index].medicineName == null ||
+        //                         device.containers[index].medicineName == "")
+        //                     ? 'Add Medicine'
+        //                     : device.containers[index].medicineName ?? '',
+        //                 style: captionTextStyle,
+        //               )
+        //             ],
+        //           ),
+        //           const Spacer(),
+        //           Column(
+        //             crossAxisAlignment: CrossAxisAlignment.center,
+        //             mainAxisAlignment: MainAxisAlignment.center,
+        //             children: [
+        //               Text('Stock', style: subtitleTextStyle),
+        //               Text(
+        //                 device.containers[index].quantity.toString(),
+        //                 style: captionTextStyle,
+        //               ),
+        //             ],
+        //           ),
+        //         ],
+        //       ),
+        //     );
+        //   },
+        // ),
         spacerHeight(8),
         Row(
           children: [

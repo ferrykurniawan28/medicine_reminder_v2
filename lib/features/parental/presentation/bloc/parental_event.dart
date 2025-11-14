@@ -17,13 +17,13 @@ final class LoadParentals extends ParentalEvent {
 }
 
 final class ParentalAdd extends ParentalEvent {
-  final Parental parental;
   final int userId;
+  final String parentalId;
 
-  const ParentalAdd(this.parental, this.userId);
+  const ParentalAdd(this.userId, this.parentalId);
 
   @override
-  List<Object> get props => [parental, userId];
+  List<Object> get props => [userId, parentalId];
 }
 
 final class ParentalUpdate extends ParentalEvent {
