@@ -98,10 +98,18 @@ class DeviceRemoteDataSourceImpl implements DeviceRemoteDataSource {
       'medicine_name': container.medicineName,
       'quantity': container.quantity,
     };
-    final response =
-        await networkService.put('$containerUrl/${container.id}', body: body);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update container: ${response.statusCode}');
+    try {
+      final url = '$containerUrl/${container.containerId}';
+      print('Updating container at URL: $url with body: $body');
+      final response = await networkService.put(url, body: body);
+      print('Update container response status: ${response.statusCode}');
+      print('Update container response data: ${response.data}');
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update container: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error updating container: $e');
+      rethrow;
     }
   }
 

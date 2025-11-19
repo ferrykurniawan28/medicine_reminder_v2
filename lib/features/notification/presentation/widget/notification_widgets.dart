@@ -76,6 +76,12 @@ class NotificationIcon extends StatelessWidget {
         return CupertinoIcons.lab_flask;
       case NotificationType.general:
         return CupertinoIcons.bell;
+      case NotificationType.medicineReminderDue:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case NotificationType.unknown:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 
@@ -93,6 +99,12 @@ class NotificationIcon extends StatelessWidget {
         return CupertinoColors.systemIndigo;
       case NotificationType.general:
         return CupertinoColors.systemGrey;
+      case NotificationType.medicineReminderDue:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case NotificationType.unknown:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 }

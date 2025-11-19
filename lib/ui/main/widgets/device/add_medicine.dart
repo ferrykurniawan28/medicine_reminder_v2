@@ -113,11 +113,11 @@ class _MedicineFormState extends State<_MedicineForm> {
                               ),
                             );
                         Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Medicine added successfully'),
-                          ),
-                        );
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   const SnackBar(
+                        //     content: Text('Medicine added successfully'),
+                        //   ),
+                        // );
                       }
                     },
                     child: const Text('Add Medicine'),

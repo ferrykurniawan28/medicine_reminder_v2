@@ -16,6 +16,7 @@ import 'package:medicine_reminder/features/user/bloc/user_bloc.dart';
 import 'package:medicine_reminder/features/user/domain/entities/user.dart';
 import 'package:medicine_reminder/ui/common/optimized_image.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
+import 'package:medicine_reminder/helpers/notification_helper.dart';
 import 'package:medicine_reminder/core/connectivity/connectivity.dart';
 import 'package:shimmer/shimmer.dart';
 

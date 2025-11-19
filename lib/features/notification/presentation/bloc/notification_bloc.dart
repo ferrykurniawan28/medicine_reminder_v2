@@ -1,15 +1,38 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:medicine_reminder/features/notification/data/models/notification_model.dart';
+import 'package:medicine_reminder/features/notification/domain/usecases/notification_usecases.dart'
+    as usecases;
+import 'package:medicine_reminder/features/notification/domain/entities/notification.dart'
+    as entity;
 
 part 'notification_event.dart';
 part 'notification_state.dart';
 
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
-  // TODO: Add repository dependency injection
-  // final NotificationRepository _repository;
+  final usecases.GetNotifications getNotificationsUseCase;
+  final usecases.GetUnreadNotifications getUnreadNotificationsUseCase;
+  final usecases.MarkNotificationAsRead markNotificationAsReadUseCase;
+  final usecases.MarkAllNotificationsAsRead markAllNotificationsAsReadUseCase;
+  final usecases.DeleteNotification deleteNotificationUseCase;
+  final usecases.ClearAllNotifications clearAllNotificationsUseCase;
+  final usecases.CreateNotification createNotificationUseCase;
+  final usecases.SyncNotifications syncNotificationsUseCase;
 
-  NotificationBloc() : super(NotificationInitial()) {
+  int userId; // Current user ID (can be updated)
+
+  NotificationBloc({
+    required this.getNotificationsUseCase,
+    required this.getUnreadNotificationsUseCase,
+    required this.markNotificationAsReadUseCase,
+    required this.markAllNotificationsAsReadUseCase,
+    required this.deleteNotificationUseCase,
+    required this.clearAllNotificationsUseCase,
+    required this.createNotificationUseCase,
+    required this.syncNotificationsUseCase,
+    this.userId = 0,
+  }) : super(NotificationInitial()) {
+    on<InitializeNotifications>(_onInitializeNotifications);
     on<LoadNotifications>(_onLoadNotifications);
     on<MarkAsRead>(_onMarkAsRead);
     on<MarkAllAsRead>(_onMarkAllAsRead);
@@ -19,6 +42,15 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<CreateNotification>(_onCreateNotification);
   }
 
+  Future<void> _onInitializeNotifications(
+    InitializeNotifications event,
+    Emitter<NotificationState> emit,
+  ) async {
+    userId = event.userId;
+    // Automatically load notifications after initialization
+    add(LoadNotifications());
+  }
+
   Future<void> _onLoadNotifications(
     LoadNotifications event,
     Emitter<NotificationState> emit,
@@ -26,17 +58,17 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     try {
       emit(NotificationLoading());
 
-      // TODO: Replace with actual repository call
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      // Fetch notifications from repository
+      final notifications = await getNotificationsUseCase(userId);
+      final unreadNotifications = await getUnreadNotificationsUseCase(userId);
 
-      // Mock data - replace with actual data from repository
-      final notifications = _getMockNotifications();
-      final unreadNotifications =
-          notifications.where((n) => !n.isRead).toList();
+      // Convert domain entities to models for UI
+      final notificationModels = notifications.map((n) => _toModel(n)).toList();
+      final unreadModels = unreadNotifications.map((n) => _toModel(n)).toList();
 
       emit(NotificationLoaded(
-        notifications: notifications,
-        unreadNotifications: unreadNotifications,
+        notifications: notificationModels,
+        unreadNotifications: unreadModels,
       ));
     } catch (e) {
       emit(NotificationError('Failed to load notifications: $e'));
@@ -48,8 +80,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     try {
-      // TODO: Call repository to mark as read
-      await Future.delayed(const Duration(milliseconds: 300));
+      await markNotificationAsReadUseCase(event.notificationId);
 
       // Reload notifications
       add(LoadNotifications());
@@ -63,8 +94,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     try {
-      // TODO: Call repository to mark all as read
-      await Future.delayed(const Duration(milliseconds: 500));
+      await markAllNotificationsAsReadUseCase(userId);
 
       // Reload notifications
       add(LoadNotifications());
@@ -79,8 +109,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     try {
-      // TODO: Call repository to delete notification
-      await Future.delayed(const Duration(milliseconds: 300));
+      await deleteNotificationUseCase(event.notificationId);
 
       // Reload notifications
       add(LoadNotifications());
@@ -94,8 +123,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     try {
-      // TODO: Call repository to clear all notifications
-      await Future.delayed(const Duration(milliseconds: 500));
+      await clearAllNotificationsUseCase(userId);
 
       emit(NotificationLoaded(
         notifications: [],
@@ -111,8 +139,16 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     RefreshNotifications event,
     Emitter<NotificationState> emit,
   ) async {
-    // Same as load but without loading state
-    add(LoadNotifications());
+    try {
+      // Sync with server first
+      await syncNotificationsUseCase(userId);
+
+      // Then reload notifications
+      add(LoadNotifications());
+    } catch (e) {
+      // If sync fails, still try to load from local
+      add(LoadNotifications());
+    }
   }
 
   Future<void> _onCreateNotification(
@@ -120,8 +156,18 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     try {
-      // TODO: Call repository to create notification
-      await Future.delayed(const Duration(milliseconds: 300));
+      final notification = entity.Notification(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: event.title,
+        message: event.body,
+        type: event.type,
+        createdAt: DateTime.now(),
+        isRead: false,
+        userId: userId,
+        data: event.data,
+      );
+
+      await createNotificationUseCase(notification);
 
       // Reload notifications to show the new one
       add(LoadNotifications());
@@ -131,54 +177,18 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     }
   }
 
-  // Mock data - replace with actual data source
-  List<NotificationModel> _getMockNotifications() {
-    return [
-      NotificationModel(
-        id: '1',
-        title: 'Medicine Reminder',
-        body: 'Time to take your Aspirin',
-        type: NotificationType.medicineReminder,
-        createdAt: DateTime.now().subtract(const Duration(minutes: 5)),
-        isRead: false,
-        data: {'medication_id': '123'},
-      ),
-      NotificationModel(
-        id: '2',
-        title: 'Appointment Tomorrow',
-        body: 'Don\'t forget your doctor appointment at 2:00 PM',
-        type: NotificationType.appointmentReminder,
-        createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-        isRead: false,
-        data: {'appointment_id': '456'},
-      ),
-      NotificationModel(
-        id: '3',
-        title: 'Device Alert',
-        body: 'Medicine container is running low',
-        type: NotificationType.deviceAlert,
-        createdAt: DateTime.now().subtract(const Duration(hours: 4)),
-        isRead: true,
-        data: {'device_id': '789'},
-      ),
-      NotificationModel(
-        id: '4',
-        title: 'Parental Alert',
-        body: 'Child missed medication dose',
-        type: NotificationType.parentalAlert,
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        isRead: true,
-        data: {'child_id': '321'},
-      ),
-      NotificationModel(
-        id: '5',
-        title: 'FCM Test',
-        body: 'This is a test notification from Firebase',
-        type: NotificationType.fcmTest,
-        createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
-        isRead: false,
-        data: {'test_data': 'firebase_test'},
-      ),
-    ];
+  // Helper method to convert domain entity to model
+  NotificationModel _toModel(entity.Notification notification) {
+    return NotificationModel(
+      id: notification.id,
+      title: notification.title,
+      message: notification.message,
+      type: notification.type,
+      createdAt: notification.createdAt,
+      isRead: notification.isRead,
+      readAt: notification.readAt,
+      userId: notification.userId,
+      data: notification.data,
+    );
   }
 }

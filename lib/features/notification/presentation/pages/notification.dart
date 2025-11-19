@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medicine_reminder/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:medicine_reminder/features/notification/data/models/notification_model.dart';
 import 'package:medicine_reminder/helpers/helpers.dart';
+import 'package:medicine_reminder/helpers/notification_helper.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -16,8 +17,8 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   void initState() {
     super.initState();
-    // Load notifications when page opens
-    context.read<NotificationBloc>().add(LoadNotifications());
+    // Initialize and load notifications when page opens
+    NotificationHelper.loadNotifications(context);
   }
 
   @override
@@ -351,7 +352,7 @@ class _NotificationCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      notification.body,
+                      notification.message,
                       style: TextStyle(
                         fontSize: 14,
                         color: CupertinoColors.systemGrey.withOpacity(0.8),

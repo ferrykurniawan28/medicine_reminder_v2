@@ -26,3 +26,5 @@ const parentalUserUrl = '$parentalUrl/user';
 
 const medicalRecordURL = '$baseUrl/medical-record';
 const medicalAnalyticsUrl = '$medicalRecordURL/summary';
+
+const notificationUrl = '$baseUrl/notifications';

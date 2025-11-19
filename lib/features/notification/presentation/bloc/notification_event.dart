@@ -7,6 +7,15 @@ sealed class NotificationEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class InitializeNotifications extends NotificationEvent {
+  final int userId;
+
+  const InitializeNotifications(this.userId);
+
+  @override
+  List<Object> get props => [userId];
+}
+
 class LoadNotifications extends NotificationEvent {}
 
 class MarkAsRead extends NotificationEvent {

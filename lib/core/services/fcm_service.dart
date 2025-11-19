@@ -4,6 +4,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:medicine_reminder/features/notification/domain/repositories/notification_repository.dart';
+import 'package:medicine_reminder/features/notification/domain/entities/notification.dart'
+    as entity;
+import 'package:medicine_reminder/features/notification/data/models/notification_model.dart';
+import 'package:medicine_reminder/features/notification/data/datasources/notification_local_datasource_impl.dart';
 
 class FCMService {
   static final FCMService _instance = FCMService._internal();
@@ -14,8 +19,18 @@ class FCMService {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
+  NotificationRepository? _notificationRepository;
+  int? _currentUserId;
+
   String? _fcmToken;
   String? get fcmToken => _fcmToken;
+
+  /// Set the notification repository for saving notifications
+  void setNotificationRepository(
+      NotificationRepository repository, int userId) {
+    _notificationRepository = repository;
+    _currentUserId = userId;
+  }
 
   /// Initialize FCM service
   Future<void> initialize() async {
@@ -146,6 +161,9 @@ class FCMService {
       print('Message notification: ${message.notification?.title}');
     }
 
+    // Save notification to database
+    await _saveNotificationToDatabase(message);
+
     // Show local notification when app is in foreground
     await _showLocalNotification(message);
   }
@@ -155,6 +173,9 @@ class FCMService {
     if (kDebugMode) {
       print('App opened from background message: ${message.messageId}');
     }
+
+    // Save notification to database
+    await _saveNotificationToDatabase(message);
 
     // Handle navigation or other actions based on message data
     await _handleNotificationAction(message);
@@ -170,6 +191,9 @@ class FCMService {
         print(
             'App opened from terminated state message: ${initialMessage.messageId}');
       }
+
+      // Save notification to database
+      await _saveNotificationToDatabase(initialMessage);
 
       // Handle navigation or other actions based on message data
       await _handleNotificationAction(initialMessage);
@@ -403,6 +427,83 @@ class FCMService {
     await _localNotifications.cancelAll();
   }
 
+  /// Save notification to database
+  Future<void> _saveNotificationToDatabase(RemoteMessage message) async {
+    if (_notificationRepository == null || _currentUserId == null) {
+      if (kDebugMode) {
+        print('Notification repository not set, skipping database save');
+      }
+      return;
+    }
+
+    try {
+      final notification = message.notification;
+      if (notification == null) {
+        if (kDebugMode) {
+          print('No notification data in message, skipping database save');
+        }
+        return;
+      }
+
+      // Determine notification type from data
+      final notificationType = _parseNotificationType(message.data['type']);
+
+      // Create notification entity
+      final notificationEntity = entity.Notification(
+        id: message.messageId ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
+        title: notification.title ?? 'Notification',
+        message: notification.body ?? '',
+        type: notificationType,
+        createdAt: DateTime.now(),
+        isRead: false,
+        userId: _currentUserId,
+        data: message.data,
+      );
+
+      // Save to database via repository
+      await _notificationRepository!.createNotification(notificationEntity);
+
+      if (kDebugMode) {
+        print('Notification saved to database: ${notificationEntity.id}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error saving notification to database: $e');
+      }
+    }
+  }
+
+  /// Parse notification type from string
+  NotificationType _parseNotificationType(dynamic type) {
+    if (type == null) return NotificationType.general;
+
+    final typeStr = type.toString().toLowerCase();
+
+    switch (typeStr) {
+      case 'medicine_reminder_due':
+      case 'medicine_due':
+        return NotificationType.medicineReminderDue;
+      case 'medicine_reminder':
+      case 'reminder':
+        return NotificationType.medicineReminder;
+      case 'appointment_reminder':
+      case 'appointment':
+        return NotificationType.appointmentReminder;
+      case 'device_alert':
+      case 'device':
+        return NotificationType.deviceAlert;
+      case 'parental_alert':
+      case 'parental':
+        return NotificationType.parentalAlert;
+      case 'fcm_test':
+      case 'test':
+        return NotificationType.fcmTest;
+      default:
+        return NotificationType.general;
+    }
+  }
+
   /// Clear specific notification
   Future<void> clearNotification(int id) async {
     await _localNotifications.cancel(id);
@@ -420,5 +521,46 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     print('Message data: ${message.data}');
   }
 
-  // Handle background message (e.g., update local database, etc.)
+  // Save notification to database
+  try {
+    // Import datasources directly since we can't inject dependencies in top-level function
+    final localDataSource = NotificationLocalDataSourceImpl();
+    final notification = message.notification;
+
+    if (notification != null) {
+      // Get user ID from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt('userId');
+
+      if (userId != null) {
+        // Parse notification type
+        final typeStr = message.data['type']?.toString() ?? 'general';
+        final notificationType = NotificationTypeExtension.fromString(typeStr);
+
+        // Create and save notification
+        final notificationModel = NotificationModel(
+          id: message.messageId ??
+              DateTime.now().millisecondsSinceEpoch.toString(),
+          title: notification.title ?? 'Notification',
+          message: notification.body ?? '',
+          type: notificationType,
+          createdAt: DateTime.now(),
+          isRead: false,
+          userId: userId,
+          data: message.data,
+        );
+
+        await localDataSource.saveNotification(notificationModel);
+
+        if (kDebugMode) {
+          print(
+              'Background notification saved to database: ${notificationModel.id}');
+        }
+      }
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error saving background notification to database: $e');
+    }
+  }
 }

@@ -16,6 +16,11 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _navItems = _initializeNavItems();
     Modular.to.navigate('/home/reminder');
+
+    // Initialize NotificationBloc with userId after frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationHelper.initializeWithUserId(context);
+    });
   }
 
   List<BottomNavItem> _initializeNavItems() => [

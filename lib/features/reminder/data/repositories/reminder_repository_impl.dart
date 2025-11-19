@@ -1,4 +1,5 @@
 import 'package:medicine_reminder/core/services/sync_manager.dart';
+import 'package:medicine_reminder/core/services/notification_controller.dart';
 
 import '../../domain/entities/reminder.dart';
 import '../../domain/repositories/reminder_repository.dart';
@@ -10,6 +11,8 @@ class ReminderRepositoryImpl implements ReminderRepository {
   final ReminderRemoteDataSource? remoteDataSource;
   final bool Function()? isOnline;
   final SyncManager syncManager; // Updated to use centralized SyncManager
+  final NotificationController _notificationController =
+      NotificationController();
 
   ReminderRepositoryImpl(
     this.localDataSource, {
@@ -44,7 +47,22 @@ class ReminderRepositoryImpl implements ReminderRepository {
         return local;
       }
     }
+
+    // If offline, schedule local notifications for active reminders
+    if (isOnline == null || !isOnline!()) {
+      await _scheduleLocalNotifications(local);
+    }
+
     return local;
+  }
+
+  /// Schedule local notifications for reminders when offline
+  Future<void> _scheduleLocalNotifications(List<Reminder> reminders) async {
+    for (final reminder in reminders) {
+      if (reminder.isActive) {
+        await _notificationController.scheduleReminderNotifications(reminder);
+      }
+    }
   }
 
   @override
@@ -65,11 +83,21 @@ class ReminderRepositoryImpl implements ReminderRepository {
         // Return local version (will be synced later)
       }
     }
+
+    // Schedule notification for the new reminder
+    if (localReminder.isActive) {
+      await _notificationController
+          .scheduleReminderNotifications(localReminder);
+    }
+
     return localReminder;
   }
 
   @override
   Future<void> deleteReminder(int id) async {
+    // Cancel all notifications for this reminder
+    await _notificationController.cancelReminderNotifications(id);
+
     // Mark as deleted locally first (offline-first)
     await localDataSource.markReminderAsDeleted(id);
 
@@ -90,6 +118,11 @@ class ReminderRepositoryImpl implements ReminderRepository {
   Future<void> updateReminder(Reminder reminder) async {
     print('Updating reminder: ${reminder.toJson()}');
 
+    // Cancel existing notifications first
+    if (reminder.id != null) {
+      await _notificationController.cancelReminderNotifications(reminder.id!);
+    }
+
     // Always update local first (offline-first)
     // await localDataSource.updateReminder(reminder, isSynced: false);
 //
@@ -108,6 +141,11 @@ class ReminderRepositoryImpl implements ReminderRepository {
     } else {
       // If offline, just update locally
       await localDataSource.updateReminder(reminder, isSynced: false);
+    }
+
+    // Reschedule notifications if reminder is active
+    if (reminder.isActive) {
+      await _notificationController.scheduleReminderNotifications(reminder);
     }
   }
 
@@ -129,6 +167,17 @@ class ReminderRepositoryImpl implements ReminderRepository {
     } else {
       // If offline, just update locally
       await localDataSource.updateReminderStatus(reminder, isSynced: false);
+    }
+
+    // Handle notifications based on status
+    if (reminder.id != null) {
+      if (reminder.isActive) {
+        // Reschedule notifications if activated
+        await _notificationController.scheduleReminderNotifications(reminder);
+      } else {
+        // Cancel notifications if deactivated
+        await _notificationController.cancelReminderNotifications(reminder.id!);
+      }
     }
   }
 

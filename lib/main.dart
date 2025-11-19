@@ -33,10 +33,20 @@ import 'package:medicine_reminder/core/services/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:medicine_reminder/core/services/fcm_service.dart';
+import 'package:medicine_reminder/core/services/notification_controller.dart';
+import 'package:medicine_reminder/features/notification/data/datasources/notification_local_datasource_impl.dart';
+import 'package:medicine_reminder/features/notification/data/datasources/notification_remote_datasource_impl.dart';
+import 'package:medicine_reminder/features/notification/data/repositories/notification_repository_impl.dart';
+import 'package:medicine_reminder/features/notification/domain/usecases/notification_usecases.dart'
+    as usecases;
+import 'package:timezone/data/latest.dart' as tz;
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize timezone database for local notifications
+  tz.initializeTimeZones();
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -77,13 +87,79 @@ Future<void> _initializeCoreServices() async {
     final parentalDatabase = ParentalLocalDataSourceImpl();
     await parentalDatabase.database; // This initializes the parental database
 
+    // Initialize notification database
+    final notificationLocalDataSource = NotificationLocalDataSourceImpl();
+    await notificationLocalDataSource
+        .database; // This initializes the notification database
+
     // Initialize FCM service
     await FCMService().initialize();
+
+    // Initialize NotificationController
+    await NotificationController().initialize();
 
     debugPrint('✅ Core services initialized successfully');
   } catch (e) {
     debugPrint('❌ Failed to initialize core services: $e');
   }
+}
+
+// Helper function to create NotificationBloc with dependencies
+NotificationBloc createNotificationBloc() {
+  try {
+    // Create datasources
+    final localDataSource = NotificationLocalDataSourceImpl();
+    final remoteDataSource = NotificationRemoteDataSourceImpl(
+      networkService: NetworkService(),
+    );
+
+    // Create repository
+    final repository = NotificationRepositoryImpl(
+      localDataSource: localDataSource,
+      remoteDataSource: remoteDataSource,
+      isOnline: _isOnline,
+    );
+
+    // Create usecases
+    final getNotifications = usecases.GetNotifications(repository);
+    final getUnreadNotifications = usecases.GetUnreadNotifications(repository);
+    final markNotificationAsRead = usecases.MarkNotificationAsRead(repository);
+    final markAllNotificationsAsRead =
+        usecases.MarkAllNotificationsAsRead(repository);
+    final deleteNotification = usecases.DeleteNotification(repository);
+    final clearAllNotifications = usecases.ClearAllNotifications(repository);
+    final createNotification = usecases.CreateNotification(repository);
+    final syncNotifications = usecases.SyncNotifications(repository);
+
+    // Note: FCM connection will be established when user loads
+    // via NotificationHelper.initializeFCMForUser()
+
+    // Create and return BLoC (userId will be set via InitializeNotifications event)
+    return NotificationBloc(
+      getNotificationsUseCase: getNotifications,
+      getUnreadNotificationsUseCase: getUnreadNotifications,
+      markNotificationAsReadUseCase: markNotificationAsRead,
+      markAllNotificationsAsReadUseCase: markAllNotificationsAsRead,
+      deleteNotificationUseCase: deleteNotification,
+      clearAllNotificationsUseCase: clearAllNotifications,
+      createNotificationUseCase: createNotification,
+      syncNotificationsUseCase: syncNotifications,
+    );
+  } catch (e) {
+    debugPrint('❌ Failed to create NotificationBloc: $e');
+    rethrow;
+  }
+}
+
+// Helper function to get the NotificationRepository instance
+NotificationRepositoryImpl _getNotificationRepository() {
+  return NotificationRepositoryImpl(
+    localDataSource: NotificationLocalDataSourceImpl(),
+    remoteDataSource: NotificationRemoteDataSourceImpl(
+      networkService: NetworkService(),
+    ),
+    isOnline: _isOnline,
+  );
 }
 
 Future<UserBloc> _initializeUserBloc() async {
@@ -198,7 +274,7 @@ class MainApp extends StatelessWidget {
             create: (context) => AuthBloc(
                 // userBloc: ReadContext(context).read<UserBloc>(),
                 )),
-        BlocProvider(create: (context) => NotificationBloc()),
+        BlocProvider(create: (context) => createNotificationBloc()),
       ],
       child: ConnectivityListener(
         onConnected: () {

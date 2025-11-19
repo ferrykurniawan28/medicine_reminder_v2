@@ -113,20 +113,16 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
         emit(const DeviceError('Device not loaded'));
         return;
       }
-      final containerIndex = device!.containers
-          .indexWhere((c) => c.containerId == event.containerId);
-      if (containerIndex == -1) {
-        emit(const DeviceError('Container not found'));
-        return;
-      }
-      final updatedContainers = List<DeviceContainer>.from(device!.containers);
-      updatedContainers[containerIndex] =
-          updatedContainers[containerIndex].copyWith(
+      DeviceContainer container = DeviceContainer(
+        deviceId: device!.id!,
+        containerId: event.containerId,
         medicineName: event.medicineName,
         quantity: event.quantity,
       );
-      device = device!.copyWith(containers: updatedContainers);
-      // print('Updated device: ${device!.toJson()}');
+      await updateContainer(
+        device!.id!,
+        container,
+      );
       emit(DeviceLoaded(device!));
     } catch (e) {
       emit(DeviceError(e.toString()));
