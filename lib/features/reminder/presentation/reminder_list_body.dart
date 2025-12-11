@@ -260,14 +260,23 @@ class _RemindersList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Sort reminders by time (earliest first)
+    final sortedReminders = List<Reminder>.from(reminders)
+      ..sort((a, b) {
+        if (a.times.isEmpty && b.times.isEmpty) return 0;
+        if (a.times.isEmpty) return 1;
+        if (b.times.isEmpty) return -1;
+        return a.times.first.toString().compareTo(b.times.first.toString());
+      });
+
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: reminders.length,
+      itemCount: sortedReminders.length,
       // Add caching and performance optimizations
       cacheExtent: 250.0, // Cache items outside viewport
       physics: const BouncingScrollPhysics(), // Smoother scrolling
       itemBuilder: (context, index) {
-        final reminder = reminders[index];
+        final reminder = sortedReminders[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
           child: RepaintBoundary(
