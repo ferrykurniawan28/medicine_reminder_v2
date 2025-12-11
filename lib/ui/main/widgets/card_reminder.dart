@@ -70,112 +70,236 @@ class _CardReminderState extends State<CardReminder> {
     }
   }
 
+  bool get _isPastReminder {
+    if (widget.reminder.times.isEmpty) return false;
+
+    final now = DateTime.now();
+    final todayDate = DateTime(now.year, now.month, now.day);
+
+    // Get the first reminder time for today
+    final reminderTime = widget.reminder.times.first;
+    final reminderDateTime = DateTime(
+      todayDate.year,
+      todayDate.month,
+      todayDate.day,
+      reminderTime.hour,
+      reminderTime.minute,
+    );
+
+    return now.isAfter(reminderDateTime);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isPast = _isPastReminder;
+
     return GestureDetector(
       onTap: () => showReminderDetail(context, widget.reminder),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [defaultShadow],
-          border: Border.all(color: kPrimaryColor, width: 1),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.reminder.medicineName,
-                    style: subtitleTextStyle,
-                  ),
-                  Text(
-                    'Dosage: ${widget.reminder.dosage.join(', ')}',
-                    style: captionTextStyle.copyWith(
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    maxLines: 1,
-                  ),
-                  Text(
-                    'Left: ${widget.reminder.medicineLeft ?? 'Empty'}',
-                    style: bodyTextStyle,
-                  )
-                ],
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: isPast ? Colors.grey.shade100 : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [defaultShadow],
+              border: Border.all(
+                color: isPast ? Colors.grey.shade400 : kPrimaryColor,
+                width: isPast ? 1 : 1,
               ),
             ),
-            Expanded(
-              flex: 4,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 60,
-                    child: VerticalDivider(
-                      width: 20,
-                      thickness: 1,
-                      indent: 0,
-                      endIndent: 0,
-                      color: darkGrayColor,
-                    ),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.reminder.medicineName,
+                              style: subtitleTextStyle.copyWith(
+                                color: isPast ? Colors.grey.shade600 : null,
+                              ),
+                            ),
+                          ),
+                          // if (isPast)
+                          //   Container(
+                          //     padding: const EdgeInsets.symmetric(
+                          //       horizontal: 8,
+                          //       vertical: 2,
+                          //     ),
+                          //     decoration: BoxDecoration(
+                          //       color: Colors.orange.shade100,
+                          //       borderRadius: BorderRadius.circular(8),
+                          //     ),
+                          //     child: Text(
+                          //       'PAST',
+                          //       style: TextStyle(
+                          //         fontSize: 10,
+                          //         fontWeight: FontWeight.bold,
+                          //         color: Colors.orange.shade800,
+                          //       ),
+                          //     ),
+                          //   ),
+                        ],
+                      ),
+                      Text(
+                        'Dosage: ${widget.reminder.dosage.join(', ')}',
+                        style: captionTextStyle.copyWith(
+                          overflow: TextOverflow.ellipsis,
+                          color: isPast ? Colors.grey.shade500 : null,
+                        ),
+                        maxLines: 1,
+                      ),
+                      Text(
+                        'Left: ${widget.reminder.medicineLeft ?? 'Empty'}',
+                        style: bodyTextStyle.copyWith(
+                          color: isPast ? Colors.grey.shade500 : null,
+                        ),
+                      )
+                    ],
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.reminder.times
-                              .map((time) => DateFormat.jm().format(
-                                    DateTime(
-                                      0,
-                                      0,
-                                      0,
-                                      time.hour,
-                                      time.minute,
+                ),
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 60,
+                        child: VerticalDivider(
+                          width: 20,
+                          thickness: 1,
+                          indent: 0,
+                          endIndent: 0,
+                          color: darkGrayColor,
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  isPast ? Icons.access_time : Icons.alarm,
+                                  size: 16,
+                                  color: isPast
+                                      ? Colors.grey.shade500
+                                      : kPrimaryColor,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    widget.reminder.times
+                                        .map((time) => DateFormat.jm().format(
+                                              DateTime(
+                                                0,
+                                                0,
+                                                0,
+                                                time.hour,
+                                                time.minute,
+                                              ),
+                                            ))
+                                        .join(', '),
+                                    style: subtitleTextStyle.copyWith(
+                                      color: isPast
+                                          ? Colors.grey.shade600
+                                          : Colors.black,
+                                      overflow: TextOverflow.ellipsis,
+                                      decoration: isPast
+                                          ? TextDecoration.lineThrough
+                                          : null,
                                     ),
-                                  ))
-                              .join(', '),
-                          style: subtitleTextStyle.copyWith(
-                            color: Colors.black,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          maxLines: 1,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              reminderType,
+                              style: captionTextStyle.copyWith(
+                                overflow: TextOverflow.ellipsis,
+                                color: isPast ? Colors.grey.shade500 : null,
+                              ),
+                              maxLines: 1,
+                            ),
+                          ],
                         ),
-                        Text(
-                          reminderType,
-                          style: captionTextStyle.copyWith(
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          maxLines: 1,
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: _isActiveNotifier,
+                    builder: (context, isActive, child) {
+                      return Switch(
+                        value: isActive,
+                        activeTrackColor: kPrimaryColor,
+                        onChanged: _onSwitchChanged,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // if (isPast)
+          //               Container(
+          //                 padding: const EdgeInsets.symmetric(
+          //                   horizontal: 8,
+          //                   vertical: 2,
+          //                 ),
+          //                 decoration: BoxDecoration(
+          //                   color: Colors.orange.shade100,
+          //                   borderRadius: BorderRadius.circular(8),
+          //                 ),
+          //                 child: Text(
+          //                   'PAST',
+          //                   style: TextStyle(
+          //                     fontSize: 10,
+          //                     fontWeight: FontWeight.bold,
+          //                     color: Colors.orange.shade800,
+          //                   ),
+          //                 ),
+          //               ),
+          if (isPast)
+            Positioned(
+              top: 5,
+              left: -5,
+              child: Transform.rotate(
+                angle: pi / -4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'PAST',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade800,
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-            Expanded(
-              flex: 2,
-              child: ValueListenableBuilder<bool>(
-                valueListenable: _isActiveNotifier,
-                builder: (context, isActive, child) {
-                  return Switch(
-                    value: isActive,
-                    activeTrackColor: kPrimaryColor,
-                    onChanged: _onSwitchChanged,
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
