@@ -11,12 +11,12 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
 
   @override
   Future<List<Reminder>> fetchReminders(int userId) async {
-    final response = await networkService.get<List<ReminderModel>>(
+    final response = await networkService.get<List<Reminder>>(
       '$reminderUserUrl/$userId',
       fromData: (data) {
         print('Data received: $data');
         return (data as List)
-            .map((item) => ReminderModel.fromJson(item))
+            .map((item) => ReminderModel.fromJson(item) as Reminder)
             .toList();
       },
     );

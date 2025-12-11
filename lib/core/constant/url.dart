@@ -28,3 +28,5 @@ const medicalRecordURL = '$baseUrl/medical-record';
 const medicalAnalyticsUrl = '$medicalRecordURL/summary';
 
 const notificationUrl = '$baseUrl/notifications';
+
+const confirmMedicineUrl = '$baseUrl/medications/confirm';

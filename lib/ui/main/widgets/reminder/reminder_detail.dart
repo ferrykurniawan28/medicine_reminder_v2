@@ -19,13 +19,54 @@ void showReminderDetail(BuildContext context, Reminder reminder) {
   );
 }
 
-class ReminderDetail extends StatelessWidget {
+class ReminderDetail extends StatefulWidget {
   const ReminderDetail({
     super.key,
     required this.reminder,
   });
 
   final Reminder reminder;
+
+  @override
+  State<ReminderDetail> createState() => _ReminderDetailState();
+}
+
+class _ReminderDetailState extends State<ReminderDetail> {
+  final NetworkService _networkService = NetworkService();
+  String _hasTaken = '';
+  String _time = '';
+  int _logId = 0;
+  int _dosage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMedicineLog();
+  }
+
+  void _fetchMedicineLog() async {
+    try {
+      final response = await _networkService.get(
+        '$baseUrl/users/${widget.reminder.assignedTo?.userId}/medications/reminder/${widget.reminder.id}',
+      );
+
+      // print('Medicine log response: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        setState(() {
+          _hasTaken = data['status'] ?? '';
+          _logId = data['log_id'] ?? 0;
+          _time = data['scheduled_time'] ?? '';
+          _dosage = data['dosage'] ?? 0;
+        });
+      } else {
+        // Handle non-200 responses
+      }
+    } catch (e) {
+      print('Error fetching medicine log: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +102,7 @@ class ReminderDetail extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 child:
                     const Icon(Icons.more_horiz, size: 25, color: Colors.blue),
-                onPressed: () => _showActionSheet(context, reminder),
+                onPressed: () => _showActionSheet(context, widget.reminder),
               ),
             ],
           ),
@@ -80,13 +121,14 @@ class ReminderDetail extends StatelessWidget {
                 ),
                 title: 'Medicine',
                 items: [
-                  if (reminder.medicineName.isNotEmpty)
-                    _buildDetailItem('Name', reminder.medicineName),
-                  if (reminder.dosage.isNotEmpty)
-                    _buildDetailItem('Dosage', reminder.dosage.join(', ')),
-                  if (reminder.medicineLeft != null)
+                  if (widget.reminder.medicineName.isNotEmpty)
+                    _buildDetailItem('Name', widget.reminder.medicineName),
+                  if (widget.reminder.dosage.isNotEmpty)
                     _buildDetailItem(
-                        'Quantity Left', reminder.medicineLeft!.toString()),
+                        'Dosage', widget.reminder.dosage.join(', ')),
+                  if (widget.reminder.medicineLeft != null)
+                    _buildDetailItem('Quantity Left',
+                        widget.reminder.medicineLeft!.toString()),
                 ],
               ),
               const SizedBox(height: 20),
@@ -99,26 +141,27 @@ class ReminderDetail extends StatelessWidget {
                 ),
                 title: 'Schedule',
                 items: [
-                  _buildDetailItem('Type', _getReminderTypeName(reminder.type)),
+                  _buildDetailItem(
+                      'Type', _getReminderTypeName(widget.reminder.type)),
                   _buildDetailItem(
                     'Times',
-                    reminder.times
+                    widget.reminder.times
                         .map((t) => DateFormat.Hm()
                             .format(DateTime(2023, 1, 1, t.hour, t.minute)))
                         .join(', '),
                   ),
-                  if (reminder.daysofWeek != null &&
-                      reminder.daysofWeek!.isNotEmpty)
+                  if (widget.reminder.daysofWeek != null &&
+                      widget.reminder.daysofWeek!.isNotEmpty)
                     _buildDetailItem(
                       'Days',
-                      reminder.daysofWeek!
+                      widget.reminder.daysofWeek!
                           .map((d) => _getDayName(d))
                           .join(', '),
                     ),
-                  if (reminder.endDate != null)
+                  if (widget.reminder.endDate != null)
                     _buildDetailItem(
                       'End Date',
-                      DateFormat.yMMMd().format(reminder.endDate!),
+                      DateFormat.yMMMd().format(widget.reminder.endDate!),
                     ),
                 ],
               ),
@@ -129,42 +172,55 @@ class ReminderDetail extends StatelessWidget {
                     size: 24, color: kPrimaryColor),
                 title: 'Status',
                 items: [
-                  _buildDetailItem(
-                    'Status',
-                    reminder.isActive ? 'Active' : 'Inactive',
-                    valueColor: reminder.isActive ? Colors.green : Colors.grey,
-                  ),
-                  if (reminder.assignedTo != null)
-                    _buildDetailItem(
-                        'Assigned To', reminder.assignedTo!.userName ?? 'N/A'),
-                  if (reminder.createdBy != null)
-                    _buildDetailItem(
-                        'Created By', reminder.createdBy!.userName ?? 'N/A'),
-                  if (reminder.note != null && reminder.note!.isNotEmpty)
-                    _buildDetailItem('Notes', reminder.note!),
+                  // _buildDetailItem(
+                  //   'Status',
+                  //   widget.reminder.isActive ? 'Active' : 'Inactive',
+                  //   valueColor:
+                  //       widget.reminder.isActive ? Colors.green : Colors.grey,
+                  // ),
+                  _buildDetailItem('Status', _hasTaken),
+                  if (widget.reminder.assignedTo != null)
+                    _buildDetailItem('Assigned To',
+                        widget.reminder.assignedTo!.userName ?? 'N/A'),
+                  if (widget.reminder.createdBy != null)
+                    _buildDetailItem('Created By',
+                        widget.reminder.createdBy!.userName ?? 'N/A'),
+                  if (widget.reminder.note != null &&
+                      widget.reminder.note!.isNotEmpty)
+                    _buildDetailItem('Notes', widget.reminder.note!),
                 ],
               ),
               spacerHeight(20),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {},
-                      label: const Text('Skip'),
-                      icon: const Icon(
-                        Icons.close,
-                      ),
+              if (_hasTaken != 'taken')
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    // final NetworkService _networkService = NetworkService();
+
+                    // final response = await _networkService.get(
+                    //   '$baseUrl/users/${reminder.assignedTo?.userId}/medications/reminders/${reminder.id}',
+                    // );
+                    Navigator.pop(context);
+                    Modular.to.pushNamed('/take-medicine', arguments: {
+                      'medicine_name': widget.reminder.medicineName,
+                      'dosage': _dosage,
+                      'reminder_time': _time,
+                      'reminder_id': widget.reminder.id!,
+                      'log_id': _logId,
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  spacerWidth(20),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                        onPressed: () {},
-                        label: const Text('Confirm'),
-                        icon: const Icon(Icons.check)),
+                  icon: const Icon(Icons.check, size: 20),
+                  label: const Text(
+                    'Take Medicine',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
-                ],
-              )
+                ),
             ],
           ),
         ),
@@ -277,9 +333,9 @@ class ReminderDetail extends StatelessWidget {
       case ReminderType.multipleTimesDaily:
         return 'Multiple Times Daily';
       case ReminderType.intervalhours:
-        return 'Every ${reminder.times.first.hour} Hours';
+        return 'Every ${widget.reminder.times.first.hour} Hours';
       case ReminderType.intervaldays:
-        return 'Every ${reminder.daysofWeek} Days';
+        return 'Every ${widget.reminder.daysofWeek} Days';
       case ReminderType.specificDays:
         return 'Specific Days';
       case ReminderType.cyclic:

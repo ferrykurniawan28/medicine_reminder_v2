@@ -245,13 +245,21 @@ class FCMService {
     final String? route = data['route']; // Custom route parameter
 
     switch (notificationType) {
-      case 'reminder':
-        // Navigate to reminder details
+      case 'medicine_reminder_due':
+        // // Navigate to reminder details
+        // final String? reminderId = data['reminder_id'];
+        // if (reminderId != null) {
+        //   _navigateToPage('/reminder_detail', {'id': reminderId});
+        // } else {
+        //   _navigateToPage('/reminders'); // Default to reminders list
+        // }
+
+        // navigate to take medicine page
         final String? reminderId = data['reminder_id'];
         if (reminderId != null) {
-          _navigateToPage('/reminder_detail', {'id': reminderId});
+          _navigateToPage('/take_medicine', {'id': reminderId});
         } else {
-          _navigateToPage('/reminders'); // Default to reminders list
+          _navigateToPage('/home'); // Default to reminders list
         }
         break;
       case 'appointment':

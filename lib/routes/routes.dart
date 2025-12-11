@@ -2,6 +2,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:medicine_reminder/core/services/scan_barcode.dart';
 import 'package:medicine_reminder/features/analytics/presentation/pages/analytics_dashboard_page.dart';
 import 'package:medicine_reminder/features/notification/presentation/pages/notification.dart';
+import 'package:medicine_reminder/features/reminder/presentation/take_medicine.dart';
 // import 'package:medicine_reminder/features/analytics/presentation/pages/analytics_page.dart';
 import 'package:medicine_reminder/features/record/presentation/pages/medical_records_page.dart';
 import 'package:medicine_reminder/ui/main/widgets/widgets.dart';
@@ -102,6 +103,14 @@ class AppRoute extends Module {
         child: (_) => ScanBarcodePage(
               title: r.args.data['title'],
               onScanned: r.args.data['onScanned'],
+            ));
+    r.child('/take-medicine',
+        child: (_) => TakeMedicine(
+              medicineName: r.args.data['medicine_name'],
+              dosage: r.args.data['dosage'],
+              scheduledTime: r.args.data['reminder_time'],
+              reminderId: r.args.data['reminder_id'],
+              logId: r.args.data['log_id'],
             ));
   }
 }
