@@ -145,51 +145,51 @@ class YourDevice extends StatelessWidget {
                 ],
               ),
             ),
-            // Expanded(
-            //   child: Container(
-            //     width: double.infinity,
-            //     padding: const EdgeInsets.all(16),
-            //     margin: const EdgeInsets.all(8),
-            //     decoration: BoxDecoration(
-            //       color: Colors.white,
-            //       // gradient: LinearGradient(
-            //       //   colors: [
-            //       //     softBlueColor,
-            //       //     softBlueColor.lighten(0.1),
-            //       //   ],
-            //       // ),
-            //       borderRadius: BorderRadius.circular(16),
-            //       boxShadow: [
-            //         defaultShadow,
-            //       ],
-            //     ),
-            //     child: Row(
-            //       children: [
-            //         Image.asset(
-            //           'assets/icons/humidity.png',
-            //           width: 60,
-            //           height: 60,
-            //         ),
-            //         spacerWidth(10),
-            //         Expanded(
-            //           child: Column(
-            //             crossAxisAlignment: CrossAxisAlignment.start,
-            //             children: [
-            //               Text(
-            //                 'Humidity',
-            //                 style: subtitleTextStyle,
-            //               ),
-            //               Text(
-            //                 '${device.humidity}%',
-            //                 style: captionTextStyle,
-            //               )
-            //             ],
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  // gradient: LinearGradient(
+                  //   colors: [
+                  //     softBlueColor,
+                  //     softBlueColor.lighten(0.1),
+                  //   ],
+                  // ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    defaultShadow,
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/icons/humidity.png',
+                      width: 60,
+                      height: 60,
+                    ),
+                    spacerWidth(10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Humidity',
+                            style: subtitleTextStyle,
+                          ),
+                          Text(
+                            '${device.humidity}%',
+                            style: captionTextStyle,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ],

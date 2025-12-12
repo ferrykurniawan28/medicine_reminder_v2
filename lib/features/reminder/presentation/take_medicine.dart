@@ -46,7 +46,7 @@ class _TakeMedicineState extends State<TakeMedicine> {
     try {
       final body = {
         "log_id": widget.logId,
-        "confirmation": taken,
+        "confirmation": taken ? "yes" : "no",
         "trigger_dispense": _triggerDispense,
       };
 
@@ -54,6 +54,8 @@ class _TakeMedicineState extends State<TakeMedicine> {
         confirmMedicineUrl, // Update with your actual endpoint
         body: body,
       );
+
+      print('Confirm Medicine Response: $response');
 
       if (response.isSuccess) {
         if (!mounted) return;
