@@ -24,9 +24,9 @@ class _MedicineFormState extends State<_MedicineForm> {
   @override
   void initState() {
     medicineNameController.text = widget.container.medicineName ?? '';
-    dosageController.text = (widget.container.quantity != null)
-        ? widget.container.quantity.toString()
-        : '';
+    // dosageController.text = (widget.container.quantity != null)
+    //     ? widget.container.quantity.toString()
+    //     : '';
     super.initState();
   }
 
